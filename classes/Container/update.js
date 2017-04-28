@@ -1,6 +1,6 @@
 'use strict';
 
-const log = require('modules/log')('container update');
+const log = require('../../modules/log')('container update');
 
 function containerUpdate(callback) {
   log.info('starting update');

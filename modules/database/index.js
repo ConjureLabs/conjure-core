@@ -1,8 +1,8 @@
 'use strict';
 
 const pgPool = require('pg').Pool;
-const config = require('modules/config');
-const log = require('modules/log')('database');
+const config = require('../config');
+const log = require('../log')('database');
 
 const pool = new pgPool(config.database.pg);
 

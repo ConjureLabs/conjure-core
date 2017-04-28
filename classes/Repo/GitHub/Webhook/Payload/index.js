@@ -140,7 +140,7 @@ class WebhookPayload {
   getGitHubAccount(callback) {
     const gitHubId = this.payload.sender.id;
 
-    const DatabaseTable = require('classes/DatabaseTable');
+    const DatabaseTable = require('../../../../DatabaseTable');
     DatabaseTable.select('account_github', {
       github_id: gitHubId
     }, (err, rows) => {
@@ -179,7 +179,7 @@ class WebhookPayload {
 
   // finds the watched repo record
   watchedRepoRecord(callback) {
-    const DatabaseTable = require('classes/DatabaseTable');
+    const DatabaseTable = require('../../../../DatabaseTable');
     DatabaseTable.select('watched_repos', {
       service_repo_id: this.repoId
     }, (err, rows) => {

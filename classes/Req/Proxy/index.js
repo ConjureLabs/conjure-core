@@ -4,7 +4,7 @@ class ReqProxy {
   constructor(options) {
     options = options || {};
 
-    const config = require('modules/config');
+    const config = require('../../../modules/config');
 
     this.host = options.host || config.app.publicHost;
     this.protocol = options.protocol || 'http';

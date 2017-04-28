@@ -29,7 +29,7 @@ module.exports = class DatabaseTable {
   }
 
   select(/* [constraints, ...,] callback */) {
-    const database = require('modules/database');
+    const database = require('../../modules/database');
 
     const args = slice.call(arguments);
     const callback = args.pop(); // callback is assumed to always be last arg
@@ -46,7 +46,7 @@ module.exports = class DatabaseTable {
   }
 
   update(/* updates, [constraints, ...,] callback */) {
-    const database = require('modules/database');
+    const database = require('../../modules/database');
 
     const args = slice.call(arguments);
     const updates = args.shift(); // updates is assumed to always be the first arg
@@ -65,7 +65,7 @@ module.exports = class DatabaseTable {
   }
 
   delete(/* [constraints, ...,] callback */) {
-    const database = require('modules/database');
+    const database = require('../../modules/database');
 
     const args = slice.call(arguments);
     const callback = args.pop(); // callback is assumed to always be last arg
@@ -82,7 +82,7 @@ module.exports = class DatabaseTable {
   }
 
   insert(/* newRowContent[, newRowContent, ...,], callback */) {
-    const database = require('modules/database');
+    const database = require('../../modules/database');
 
     const args = slice.call(arguments);
     const callback = args.pop(); // callback is assumed to always be last arg
@@ -143,7 +143,7 @@ module.exports = class DatabaseTable {
         return callback(err)
       }
 
-      const DatabaseRow = require('classes/DatabaseRow');
+      const DatabaseRow = require('../DatabaseRow');
       return callback(null, (result.rows || []).map(row => {
         return new DatabaseRow(this.tableName, row);
       }));
