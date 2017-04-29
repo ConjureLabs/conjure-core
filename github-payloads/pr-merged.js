@@ -95,7 +95,7 @@
         site_admin: false },
      private: true,
      html_url: 'https://github.com/WiskeyTango/mock-web-repo',
-     description: 'for testing voyant',
+     description: 'for testing conjure',
      fork: false,
      url: 'https://github.com/WiskeyTango/mock-web-repo',
      forks_url: 'https://api.github.com/repos/WiskeyTango/mock-web-repo/forks',

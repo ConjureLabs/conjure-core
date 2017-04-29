@@ -70,7 +70,7 @@ function containerCreate(callback) {
   waterfall.push((watchedRepo, gitHubClient, gitHubToken, cb) => {
     gitHubClient
       .repo(`${orgName}/${repoName}`)
-      .contents('voyant.yml', branch, (err, file) => {
+      .contents('conjure.yml', branch, (err, file) => {
         // todo: handle errors, send a message to client/github
         if (
           (err && err.message === 'Not Found') ||

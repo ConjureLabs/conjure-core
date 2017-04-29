@@ -1,5 +1,5 @@
 {
-  "name": "voyant-core",
+  "name": "conjure-core",
   "version": "0.0.0",
   "description": "The heart of the beast",
   "private": true,
@@ -8,11 +8,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WiskeyTango/voyant-core.git"
+    "url": "git+https://github.com/WiskeyTango/conjure-core.git"
   },
   "author": "",
   "bugs": {
-    "url": "https://github.com/WiskeyTango/voyant-core/issues"
+    "url": "https://github.com/WiskeyTango/conjure-core/issues"
   },
-  "homepage": "https://github.com/WiskeyTango/voyant-core#readme"
+  "homepage": "https://github.com/WiskeyTango/conjure-core#readme"
 }

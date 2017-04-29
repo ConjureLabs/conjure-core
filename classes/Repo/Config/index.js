@@ -1,6 +1,6 @@
 'use strict';
 
-const log = require('../../modules/log')('repo voyant config');
+const log = require('../../modules/log')('repo conjure config');
 
 const internalDefinition = Symbol('parsed input object definition');
 const singleLanguageKey = Symbol('get single language being used');

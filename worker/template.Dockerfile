@@ -10,7 +10,7 @@ RUN wget -O ~/node-v6.9.0-linux-x64.tar.xz https://nodejs.org/dist/v6.9.0/node-v
 # user & env setup
 USER root
 ENV HOME /root
-WORKDIR /var/voyant/code
+WORKDIR /var/conjure/code
 
 # basics
 RUN yum install -y git

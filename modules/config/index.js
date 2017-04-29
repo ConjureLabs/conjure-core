@@ -13,8 +13,8 @@ const config = {
 
   database: {
     pg: {
-      user: 'voyant_admin',
-      database: 'voyant',
+      user: 'conjure_admin',
+      database: 'conjure',
       password: null,
       host: 'localhost',
       port: 5432,
