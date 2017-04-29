@@ -48,7 +48,7 @@ function containerDestroy(callback) {
 
       // todo: handle non-github repos
       exec(`bash ./destroy.sh "${containerRecord.url_uid}" "${containerRecord.container_id}"`, {
-        cwd: process.env.VOYANT_WORKER_DIR
+        cwd: process.env.CONJURE_WORKER_DIR
       }, err => {
         if (err) {
           // can't kick to callback

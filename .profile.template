@@ -1,2 +1,2 @@
 export GITHUB_CLIENT_SECRET='...';
-# export VOYANT_APP_PUBLIC_HOST='asdf.ngrok.io';
+# export CONJURE_APP_PUBLIC_HOST='asdf.ngrok.io';

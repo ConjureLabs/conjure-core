@@ -115,7 +115,7 @@ function containerCreate(callback) {
 
     const command = `bash ./build.sh "https://${gitHubToken}:x-oauth-basic@github.com/${orgName}/${repoName}.git" "${branch}" "${containerUid}" "${preSetupSteps}" "${repoConfig.machine.setup || bashNoOp}"`;
     exec(command, {
-      cwd: process.env.VOYANT_WORKER_DIR
+      cwd: process.env.CONJURE_WORKER_DIR
     }, err => {
       cb(err, watchedRepo, repoConfig, gitHubClient);
     });
@@ -142,7 +142,7 @@ function containerCreate(callback) {
 
       const command = `docker run --cidfile /tmp/${containerUid}.cid -i -t -d -p ${hostPort}:${repoConfig.machine.port}${extraEnvVars} "${containerUid}" ${repoConfig.machine.start}`;
       exec(command, {
-        cwd: process.env.VOYANT_WORKER_DIR
+        cwd: process.env.CONJURE_WORKER_DIR
       }, (runErr, stdout) => {
         if (runErr) {
           exec(`rm /tmp/${containerUid}.cid`, {}, rmCidErr => {
