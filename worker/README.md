@@ -1,4 +1,4 @@
-### Voyant Dockerfile Setup
+### Conjure Dockerfile Setup
 
 Build the pr branch
 

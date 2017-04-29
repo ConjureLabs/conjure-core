@@ -3,7 +3,7 @@
 const labelSeparator = ' --> ';
 
 module.exports = label => {
-  const labelUsing = `${label || 'Voyant'}${labelSeparator}`;
+  const labelUsing = `${label || 'Conjure'}${labelSeparator}`;
 
   return {
     log: console.log.bind(console.log, labelUsing),

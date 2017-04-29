@@ -76,7 +76,7 @@ function containerCreate(callback) {
           (err && err.message === 'Not Found') ||
           (!file || file.type !== 'file' || typeof file.content !== 'string')
         ) {
-          return cb(new Error('No Voyant YML config present in repo'));
+          return cb(new Error('No Conjure YML config present in repo'));
         }
 
         if (err) {
@@ -89,7 +89,7 @@ function containerCreate(callback) {
 
         // todo: handle invalid yml errors better, send message to client/github
         if (repoConfig.valid === false) {
-          return cb(new Error('Invalid Voyant YML config'));
+          return cb(new Error('Invalid Conjure YML config'));
         }
 
         cb(null, watchedRepo, repoConfig, gitHubClient, gitHubToken);

@@ -188,7 +188,7 @@ class WebhookPayload {
       }
 
       if (!rows.length) {
-        return callback(new Error('this repo is not being watched by Voyant'));
+        return callback(new Error('this repo is not being watched by Conjure'));
       }
 
       callback(null, rows[0]);
