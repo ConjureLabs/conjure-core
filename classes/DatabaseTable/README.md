@@ -212,6 +212,36 @@ DatabaseTable.delete('account', {
 ```
 </details>
 
+#### Upsert
+
+<details>
+##### Using Constructor
+
+```js
+const account = new DatabaseTable('Account');
+
+// INSERT INTO account (name, email) VALUES ('Tim Marshall', 'tim@marshall.io') ON CONFLICT DO UPDATE SET name = EXCLUDED.name;
+account.upsert({
+  name: 'Tim Marshall',
+  email: 'tim@marshall.io'
+}, [ 'name' ], (err, rows) => {
+  // ...
+});
+```
+
+##### Direct (static) call
+
+```js
+// INSERT INTO account (name, email) VALUES ('Tim Marshall', 'tim@marshall.io') ON CONFLICT DO UPDATE SET name = EXCLUDED.name;
+DatabaseTable.upsert('account', {
+  name: 'Tim Marshall',
+  email: 'tim@marshall.io'
+}, ['name'], (err, rows) => {
+  // ...
+});
+```
+</details>
+
 #### Literal strings
 
 These are **not** escaped by the postgres module.
