@@ -98,43 +98,40 @@ module.exports = class DatabaseTable {
       return callback(new Error('Cannot insert a row that has .id'));
     }
 
-    const insertAssignments = [];
     const queryValues = [];
-
-    for (let i = 0; i < newRows.length; i++) {
-      const newRowAssignment = [];
-
-      for (let j = 0; j < columnNames.length; j++) {
-        const val = newRows[i][ columnNames[j] ];
-
-        if (val === undefined) {
-          newRowAssignment.push('NULL');
-          continue;
-        }
-
-        if (val instanceof DatabaseQueryLiteral) {
-          newRowAssignment.push(val);
-          continue;
-        }
-
-        queryValues.push(val);
-        newRowAssignment.push(`$${queryValues.length}`);
-      }
-
-      insertAssignments.push(newRowAssignment);
-    }
-
-    const insertAssignmentsFormatted = insertAssignments
-      .map(assignmentArr => {
-        return `(${assignmentArr.join(', ')})`;
-      })
-      .join(', ');
+    const insertAssignmentsFormatted = generateInsertValues(newRows, columnNames, queryValues);
 
     database.query(`INSERT INTO ${this.tableName}(${columnNames.join(', ')}) VALUES ${insertAssignmentsFormatted} RETURNING *`, queryValues, this[queryCallback](callback));
   }
 
   static insert() {
     return this[staticProxy]('insert', arguments);
+  }
+
+  upsert(rowContent, columnsToUpdate, callback) {
+    const database = require('../../modules/database');
+
+    const columnNames = Object.keys(rowContent);
+
+    if (columnNames.includes('id')) {
+      return callback(new Error('Cannot upsert a row that has .id'));
+    }
+
+    const queryValues = [];
+    const insertAssignmentsFormatted = generateInsertValues([rowContent], columnNames, queryValues);
+
+    const upsertSet = 'SET ' + columnsToUpdate
+      .map(columnName => `${columnName} = EXCLUDED.${columnName}`)
+      .join(', ');
+
+    const updatesSql = generateSqlKeyVals(', ', updates, []); // [] passed as fake queryValues arr, so that local queryArgs is not polluted
+    const whereClause = generateWhereClause(constraints, queryValues);
+
+    database.query(`INSERT INTO ${this.tableName}(${columnNames.join(', ')}) VALUES ${insertAssignmentsFormatted} ON CONFLICT DO UPDATE ${upsertSet} RETURNING *`, queryValues, this[queryCallback](callback));
+  }
+
+  static upsert() {
+    return this[staticProxy]('upsert', arguments);
   }
 
   [queryCallback](callback) {
@@ -164,6 +161,41 @@ module.exports = class DatabaseTable {
   static cast(str, castTo) {
     return new DatabaseQueryCast(str, castTo);
   }
+}
+
+function generateInsertValues(rows, columnNames, valuesArray) {
+  const insertAssignments = [];
+
+  for (let i = 0; i < rows.length; i++) {
+    const newRowAssignment = [];
+
+    for (let j = 0; j < columnNames.length; j++) {
+      const val = rows[i][ columnNames[j] ];
+
+      if (val === undefined) {
+        newRowAssignment.push('NULL');
+        continue;
+      }
+
+      if (val instanceof DatabaseQueryLiteral) {
+        newRowAssignment.push(val);
+        continue;
+      }
+
+      valuesArray.push(val);
+      newRowAssignment.push(`$${valuesArray.length}`);
+    }
+
+    insertAssignments.push(newRowAssignment);
+  }
+
+  const valuesFormatted = insertAssignments
+    .map(assignmentArr => {
+      return `(${assignmentArr.join(', ')})`;
+    })
+    .join(', ');
+
+  return valuesFormatted;
 }
 
 function generateSqlKeyVals(separator, dict, valuesArray) {
