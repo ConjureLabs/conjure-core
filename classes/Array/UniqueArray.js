@@ -139,6 +139,10 @@ class UniqueArray extends Array {
     super.reverse();
   }
 
+  sort() {
+    throw new Error('You can not .sort() a UniqueArray - Use .native to get a native array');
+  }
+
   shift() {
     const shifted = super.shift();
     const keyRemoved = shifted[ this.uniqueKey ];
