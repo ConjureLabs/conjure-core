@@ -94,20 +94,35 @@ class GitHubIssueComment {
   }
 
   [updateComment](gitHubClient, body, callback) => {
-    const {
-      orgName,
-      repoName,
-      number
-    } = this.issue.payload;
+    const waterfall = [];
 
-    // todo: not use user's account to post comment (may not be possible, unless can get integration access from github)
-    gitHubClient
-      .issue(`${orgName}/${repoName}`, number)
-      .updateComment(this.commentId, {
-        body: body
-      }, err => {
-        callback(err);
+    waterfall.push(cb => {
+      const {
+        orgName,
+        repoName,
+        number
+      } = this.issue.payload;
+
+      // todo: not use user's account to post comment (may not be possible, unless can get integration access from github)
+      gitHubClient
+        .issue(`${orgName}/${repoName}`, number)
+        .updateComment(this.commentId, {
+          body: body
+        }, err => {
+          cb(err);
+        });
+    });
+
+    waterfall.push(cb => {
+      this.commentRow.updated = new Date();
+      this.commentRow.save(err => {
+        cb(err);
       });
+    });
+
+    async.waterfall(waterfall, err => {
+      cb(err, this.commentRow); // returns updated comment row
+    });
   }
 
   delete(callback) {
