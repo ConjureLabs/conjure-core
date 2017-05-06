@@ -15,14 +15,10 @@ class GitHubIssue {
         return callback(err);
       }
 
-      if (comment) {
-        return comment.update(body, callback);
-      }
-
       const GitHubIssueComment = require('./Comment');
+      comment = comment || new GitHubIssueComment(this);
 
-      const newComment = new GitHubIssueComment(this);
-      newComment.create(body, callback);
+      comment.save(body, callback);
     });
   }
 
