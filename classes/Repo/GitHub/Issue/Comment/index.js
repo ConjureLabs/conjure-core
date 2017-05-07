@@ -14,7 +14,7 @@ class GitHubIssueComment {
   }
 
   [getGitHubClient](callback) {
-    this.payload.getGitHubAccount((err, gitHubAccount) => {
+    this.issue.payload.getGitHubAccount((err, gitHubAccount) => {
       if (err) {
         return callback(err);
       }
