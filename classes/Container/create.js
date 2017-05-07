@@ -31,7 +31,7 @@ function containerCreate(callback) {
   waterfall.push((watchedRepo, cb) => {
     const DatabaseTable = require('../DatabaseTable');
     // todo: detect correct server host, but on develop / test keep localhost
-    DatabaseTable.select('container_proxies', {
+    DatabaseTable.select('containers', {
       repo: watchedRepo.id,
       branch: branch
     }, (err, records) => {
@@ -170,7 +170,7 @@ function containerCreate(callback) {
   waterfall.push((watchedRepo, hostPort, containerId, cb) => {
     const DatabaseTable = require('../DatabaseTable');
     // todo: detect correct server host, but on develop / test keep localhost
-    DatabaseTable.insert('container_proxies', {
+    DatabaseTable.insert('containers', {
       repo: watchedRepo.id,
       branch: branch,
       host: 'localhost',
