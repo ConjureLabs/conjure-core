@@ -202,6 +202,7 @@ class WebhookPayload {
       }
 
       if (!rows.length) {
+        // todo: this may be legit if a PR is changed post-enabling conjure - maybe just log a warning?
         return callback(new Error('this repo is not being watched by Conjure'));
       }
 
