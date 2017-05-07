@@ -128,7 +128,7 @@ class GitHubIssueComment {
       // todo: not use user's account to post comment (may not be possible, unless can get integration access from github)
       gitHubClient
         .issue(`${orgName}/${repoName}`, number)
-        .updateComment(this.commentRow.id, {
+        .updateComment(this.commentRow.comment_id, {
           body: body
         }, err => {
           cb(err);
