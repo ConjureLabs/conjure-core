@@ -21,14 +21,15 @@ module.exports = class DatabaseRow {
    */
   save(callback) {
     if (this[rowDeleted] === true) {
-      return callback(new Error('This row was previously deleted'));
+      callback(new Error('This row was previously deleted'));
+      return this;
     }
 
     const DatabaseTable = require('../DatabaseTable');
 
     // no .id, assuming it's a new row to insert
     if (this.id === undefined) {
-      return DatabaseTable.insert(this[rowTableName], this, (err, rows) => {
+      DatabaseTable.insert(this[rowTableName], this, (err, rows) => {
         if (err) {
           return callback(err);
         }
@@ -47,6 +48,7 @@ module.exports = class DatabaseRow {
 
         callback(null, this);
       });
+      return this;
     }
 
     // have a .id, must do an update
@@ -57,15 +59,19 @@ module.exports = class DatabaseRow {
     }, err => {
       callback(err, this);
     });
+
+    return this;
   }
 
   delete(callback) {
     if (this[rowDeleted] === true) {
-      return callback(new Error('This row was previously deleted'));
+      callback(new Error('This row was previously deleted'));
+      return this;
     }
 
     if (this.id === undefined) {
-      return callback(new Error('Exepected row .id to exist, for deletion'));
+      callback(new Error('Exepected row .id to exist, for deletion'));
+      return this;
     }
 
     const DatabaseTable = require('../DatabaseTable');
@@ -78,6 +84,8 @@ module.exports = class DatabaseRow {
 
       callback(err);
     });
+
+    return this;
   }
 
   // new row object, copies values, but without id
@@ -85,5 +93,14 @@ module.exports = class DatabaseRow {
     return new DatabaseRow(this[rowTableName], Object.assign({}, this, {
       id: null
     }));
+  }
+
+  // useful for chaining
+  set(data) {
+    for (let key in data) {
+      this[key] = data[key];
+    }
+
+    return this;
   }
 };
