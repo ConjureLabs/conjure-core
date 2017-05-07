@@ -14,7 +14,7 @@ class GitHubContainer extends Container {
       const Issue = require('../../Repo/GitHub/Issue');
       const issue = new Issue(this.payload);
 
-      const config = require('../../modules/config');
+      const config = require('../../../modules/config');
       const {
         protocol,
         domain
