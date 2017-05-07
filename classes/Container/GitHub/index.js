@@ -28,7 +28,7 @@ class GitHubContainer extends Container {
         '',
         '---',
         '',
-        `- This message was create via [Conjure.sh](${protocol}://${domain})`
+        `- This message was create via [⎔ Conjure.sh](${protocol}://${domain})`
       ].join('\n'), err => {
         callback(err);
       });
