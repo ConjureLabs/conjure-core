@@ -8,8 +8,8 @@ function containerUpdate(callback) {
   // there is a better way to do this - for now, keeping it rather simple
   const async = require('async');
   async.series([
-    this.destroy,
-    this.create
+    this.destroy.bind(this),
+    this.create.bind(this)
   ], err => {
     callback(err);
   });
