@@ -194,7 +194,7 @@ class WebhookPayload {
     }
 
     const DatabaseTable = require('../../../../DatabaseTable');
-    DatabaseTable.select('watched_repos', {
+    DatabaseTable.select('watched_repo', {
       service_repo_id: this.repoId
     }, (err, rows) => {
       if (err) {
