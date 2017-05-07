@@ -65,7 +65,7 @@ class GitHubIssueComment {
 
     // need to get watched repo record, so we can know its id (for next step)
     waterfall.push((commentCreationBody, cb) => {
-      this.issue.payload.watchedRepoRecord((err, watchedRepo) => {
+      this.issue.payload.getWatchedRepoRecord((err, watchedRepo) => {
         cb(err, commentCreationBody, watchedRepo);
       });
     });

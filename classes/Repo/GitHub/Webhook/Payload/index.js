@@ -188,7 +188,7 @@ class WebhookPayload {
   }
 
   // finds the watched repo record
-  watchedRepoRecord(callback) {
+  getWatchedRepoRecord(callback) {
     if (this[cached].watchedRepo) {
       return callback(null, this[cached].watchedRepo);
     }

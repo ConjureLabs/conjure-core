@@ -24,7 +24,7 @@ function containerCreate(callback) {
 
   // get watched repo record
   waterfall.push(cb => {
-    this.payload.watchedRepoRecord(cb);
+    this.payload.getWatchedRepoRecord(cb);
   });
 
   // make sure the repo/branch is not already spun up

@@ -40,7 +40,7 @@ class GitHubIssue {
     const waterfall = [];
 
     waterfall.push(cb => {
-      this.payload.watchedRepoRecord(cb);
+      this.payload.getWatchedRepoRecord(cb);
     });
 
     waterfall.push((watchedRepo, cb) => {
