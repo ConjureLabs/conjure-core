@@ -6,7 +6,7 @@ const log = require('../../../modules/log')('github container');
 class GitHubContainer extends Container {
   // saving github comment, when creating a new container
   create(callback) {
-    super.create(err => {
+    super.create((err, hostPort) => {
       if (err) {
         return callback(err);
       }

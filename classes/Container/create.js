@@ -179,17 +179,17 @@ function containerCreate(callback) {
       url_uid: containerUid,
       added: new Date()
     }, err => {
-      cb(err);
+      cb(err, hostPort);
     });
   });
 
   const async = require('async');
-  async.waterfall(waterfall, err => {
+  async.waterfall(waterfall, (err, hostPort) => {
     if (err === asyncBreak) {
       return callback();
     }
 
-    callback(err);
+    callback(err, hostPort);
   });
 }
 
