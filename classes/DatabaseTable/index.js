@@ -114,10 +114,11 @@ module.exports = class DatabaseTable {
         return callback.apply(callback, slice.call(arguments));
       }
 
-      // todo: return err if it's not from a duplicate row
-      console.error(err);
+      if (err && typeof err.message === 'string' && err.message.substr(0, 13) === 'duplicate key') {
+        return this.update(updateContent, updateConstraints, callback);
+      }
 
-      this.update(updateContent, updateConstraints, callback);
+      return callback(err);
     }.bind(this));
   }
 
