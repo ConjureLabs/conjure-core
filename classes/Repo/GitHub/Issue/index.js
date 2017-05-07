@@ -21,10 +21,11 @@ class GitHubIssue {
 
       comment.save(body, err => {
         if (err) {
-          if (existingComment && err && err.statusCode !== 404) {
-            log.info('github comment save returned 404');
+          if (!(existingComment && err && err.statusCode === 404)) {
             return callback(err);
           }
+
+          log.info('github comment save returned 404');
 
           // comment was deleted, likely by user (but possibly a system hiccup?)
           // so, will just add a new one, so that the flow does not break down
