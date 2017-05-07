@@ -1,6 +1,7 @@
 'use strict';
 
 const async = require('async');
+const log = require('../../../../modules/log')('github issue');
 
 const getExistingComment = Symbol('get existing GitHub issue comment');
 
@@ -21,6 +22,7 @@ class GitHubIssue {
       comment.save(body, err => {
         if (err) {
           if (existingComment && err && err.statusCode !== 404) {
+            log.info('github comment save returned 404');
             return callback(err);
           }
 
