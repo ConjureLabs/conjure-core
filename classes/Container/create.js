@@ -92,12 +92,12 @@ function containerCreate(callback) {
           return cb(new Error('Invalid Conjure YML config'));
         }
 
-        cb(null, watchedRepo, repoConfig, gitHubClient, gitHubToken);
+        cb(null, watchedRepo, repoConfig, gitHubToken);
       });
   });
 
   // create container
-  waterfall.push((watchedRepo, repoConfig, gitHubClient, gitHubToken, cb) => {
+  waterfall.push((watchedRepo, repoConfig, gitHubToken, cb) => {
     const exec = require('../../modules/childProcess/exec');
 
     // todo: handle non-github repos
@@ -117,12 +117,12 @@ function containerCreate(callback) {
     exec(command, {
       cwd: process.env.CONJURE_WORKER_DIR
     }, err => {
-      cb(err, watchedRepo, repoConfig, gitHubClient);
+      cb(err, watchedRepo, repoConfig);
     });
   });
 
   // run container
-  waterfall.push((watchedRepo, repoConfig, gitHubClient, cb) => {
+  waterfall.push((watchedRepo, repoConfig, cb) => {
     if (repoConfig.machine.start === null) {
       return cb(new Error('No container start command defined or known'));
     }
@@ -160,14 +160,14 @@ function containerCreate(callback) {
           return;
         }
 
-        cb(null, watchedRepo, gitHubClient, hostPort, stdout);
+        cb(null, watchedRepo, hostPort, stdout);
       });
     }
     attemptDockerRun();
   });
 
   // save reference for container
-  waterfall.push((watchedRepo, gitHubClient, hostPort, containerId, cb) => {
+  waterfall.push((watchedRepo, hostPort, containerId, cb) => {
     const DatabaseTable = require('../DatabaseTable');
     // todo: detect correct server host, but on develop / test keep localhost
     DatabaseTable.insert('container_proxies', {
@@ -179,25 +179,8 @@ function containerCreate(callback) {
       url_uid: containerUid,
       added: new Date()
     }, err => {
-      cb(err, hostPort, gitHubClient);
+      cb(err);
     });
-  });
-
-  waterfall.push((hostPort, gitHubClient, cb) => {
-    const config = require('../../modules/config');
-    const {
-      protocol,
-      domain
-    } = config.app;
-
-    // todo: not use user's account to post comment (may not be possible, unless can get integration access from github)
-    gitHubClient
-      .issue(`${orgName}/${repoName}`, this.payload.number)
-      .createComment({
-        body: `${protocol}://${domain}:${hostPort}`
-      }, err => {
-        cb(err);
-      });
   });
 
   const async = require('async');
