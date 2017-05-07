@@ -108,23 +108,17 @@ module.exports = class DatabaseTable {
     return this[staticProxy]('insert', arguments);
   }
 
-  upsert(rowContent, columnsToUpdate, callback) {
-    const database = require('../../modules/database');
+  upsert(insertContent, updateContent, updateConstraints, callback) {
+    this.insert(insertContent, function(err) {
+      if (!err) {
+        return callback.apply(callback, slice.call(arguments));
+      }
 
-    const columnNames = Object.keys(rowContent);
+      // todo: return err if it's not from a duplicate row
+      console.error(err);
 
-    if (columnNames.includes('id')) {
-      return callback(new Error('Cannot upsert a row that has .id'));
-    }
-
-    const queryValues = [];
-    const insertAssignmentsFormatted = generateInsertValues([rowContent], columnNames, queryValues);
-
-    const upsertSet = 'SET ' + columnsToUpdate
-      .map(columnName => `${columnName} = EXCLUDED.${columnName}`)
-      .join(', ');
-
-    database.query(`INSERT INTO ${this.tableName}(${columnNames.join(', ')}) VALUES ${insertAssignmentsFormatted} ON CONFLICT DO UPDATE ${upsertSet} RETURNING *`, queryValues, this[queryCallback](callback));
+      this.update(updateContent, updateConstraints, callback);
+    }.bind(this));
   }
 
   static upsert() {
