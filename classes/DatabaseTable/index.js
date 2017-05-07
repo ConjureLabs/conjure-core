@@ -39,6 +39,7 @@ module.exports = class DatabaseTable {
     const whereClause = generateWhereClause(constraints, queryValues);
 
     database.query(`SELECT * FROM ${this.tableName}${whereClause}`, queryValues, this[queryCallback](callback));
+    return this;
   }
 
   static select() {
@@ -58,6 +59,7 @@ module.exports = class DatabaseTable {
     const whereClause = generateWhereClause(constraints, queryValues);
 
     database.query(`UPDATE ${this.tableName} SET ${updatesSql}${whereClause}`, queryValues, this[queryCallback](callback));
+    return this;
   }
 
   static update() {
@@ -75,6 +77,7 @@ module.exports = class DatabaseTable {
     const whereClause = generateWhereClause(constraints, queryValues);
 
     database.query(`DELETE FROM ${this.tableName}${whereClause}`, queryValues, this[queryCallback](callback));
+    return this;
   }
 
   static delete() {
@@ -89,19 +92,22 @@ module.exports = class DatabaseTable {
     const newRows = args; // anything left in arguments will be considered new row objects
 
     if (!newRows.length) {
-      return callback(new Error('There were no rows to insert'));
+      callback(new Error('There were no rows to insert'));
+      return this;
     }
 
     const columnNames = findAllColumnNames(newRows);
 
     if (columnNames.includes('id')) {
-      return callback(new Error('Cannot insert a row that has .id'));
+      callback(new Error('Cannot insert a row that has .id'));
+      return this;
     }
 
     const queryValues = [];
     const insertAssignmentsFormatted = generateInsertValues(newRows, columnNames, queryValues);
 
     database.query(`INSERT INTO ${this.tableName}(${columnNames.join(', ')}) VALUES ${insertAssignmentsFormatted} RETURNING *`, queryValues, this[queryCallback](callback));
+    return this;
   }
 
   static insert() {
@@ -120,6 +126,8 @@ module.exports = class DatabaseTable {
 
       return callback(err);
     }.bind(this));
+
+    return this;
   }
 
   static upsert() {
@@ -144,6 +152,7 @@ module.exports = class DatabaseTable {
     const tableName = args.shift();
     const instance = new DatabaseTable(tableName);
     instance[methodName].apply(instance, args);
+    return this;
   }
 
   static literal(str) {
