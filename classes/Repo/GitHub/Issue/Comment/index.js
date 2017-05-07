@@ -132,9 +132,50 @@ class GitHubIssueComment {
   }
 
   delete(callback) {
-    if (!this.commentId) {
+    if (!this.commentRow) {
       return callback(new Error('Can not delete a comment without referencing existing row'));
     }
+
+    const waterfall = [];
+
+    // first deleting our own record of the comment
+    waterfall.push(cb => {
+      this.commentRow.delete(err => {
+        cb(err);
+      });
+    });
+
+    // getting github client
+    waterfall.push(cb => {
+      this[getGitHubClient](cb);
+    });
+
+    // now deleting the actual comment on github
+    waterfall.push((gitHubClient, cb) => {
+      const {
+        orgName,
+        repoName,
+        number
+      } = this.issue.payload;
+
+      // todo: not use user's account to post comment (may not be possible, unless can get integration access from github)
+      gitHubClient
+        .issue(`${orgName}/${repoName}`, number)
+        .deleteComment(this.commentId, err => {
+          cb(err);
+        });
+    });
+
+    // removing local attributes, since comment is gone
+    waterfall.push(cb => {
+      this.commentRow = null;
+      this.commentId = null;
+      return cb();
+    });
+
+    async.waterfall(waterfall, err => {
+      callback(err); // returning nothing
+    });
   }
 }
 
