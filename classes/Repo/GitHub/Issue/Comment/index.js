@@ -1,5 +1,7 @@
 'use strict';
 
+const log = require('../../../../../modules/log')('github issue comment');
+
 const getGitHubClient = Symbol('get GitHub api client instance');
 const createComment = Symbol('create new comment');
 const updateComment = Symbol('update existing comment');
@@ -43,6 +45,8 @@ class GitHubIssueComment {
   }
 
   [createComment](gitHubClient, body, callback) => {
+    log.info('creating new issue comment, on github');
+
     const waterfall = [];
 
     // actual comment creation
@@ -98,6 +102,8 @@ class GitHubIssueComment {
   }
 
   [updateComment](gitHubClient, body, callback) => {
+    log.info('updating existing issue comment, on github');
+
     const waterfall = [];
 
     // updating github comment
@@ -127,7 +133,7 @@ class GitHubIssueComment {
     });
 
     async.waterfall(waterfall, err => {
-      cb(err, this.commentRow); // returns updated comment row
+      callback(err, this.commentRow); // returns updated comment row
     });
   }
 
@@ -135,6 +141,8 @@ class GitHubIssueComment {
     if (!this.commentRow) {
       return callback(new Error('Can not delete a comment without referencing existing row'));
     }
+
+    log.info('deleting existing issue comment, on github');
 
     const waterfall = [];
 
