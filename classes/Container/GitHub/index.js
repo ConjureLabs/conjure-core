@@ -56,4 +56,4 @@ class GitHubContainer extends Container {
   }
 }
 
-module.exports = Container;
+module.exports = GitHubContainer;
