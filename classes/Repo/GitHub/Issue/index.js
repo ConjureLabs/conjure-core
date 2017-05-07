@@ -26,8 +26,32 @@ class GitHubIssue {
 
           // comment was deleted, likely by user (but possibly a system hiccup?)
           // so, will just add a new one, so that the flow does not break down
-          const forcedNewComment = new GitHubIssueComment(this);
-          forcedNewComment.save(body, err => {
+  
+          const series = [];
+
+          // will also wipe record of old (broken) comment
+          series.push(cb => {
+            const DatabaseTable = require('../../../DatabaseTable');
+            DatabaseTable.update('github_issue_comment', {
+              is_active: false,
+              updated: new Date()
+            }, {
+              watched_repo: watchedRepo.id,
+              issue_id: this.payload.number,
+              is_active: true
+            }, err => {
+              cb(err);
+            });
+          });
+
+          series.push(cb => {
+            const forcedNewComment = new GitHubIssueComment(this);
+            forcedNewComment.save(body, err => {
+              cb(err);
+            });
+          });
+
+          async.series(series, err => {
             callback(err);
           });
           return;
