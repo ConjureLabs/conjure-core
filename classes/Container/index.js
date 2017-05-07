@@ -4,10 +4,18 @@ class Container {
   constructor(payloadInstance) {
     this.payload = payloadInstance;
   }
-}
 
-Container.prototype.create = require('./create');
-Container.prototype.destroy = require('./destroy');
-Container.prototype.update = require('./update');
+  create(callback) {
+    require('./create')(callback);
+  }
+
+  destroy(callback) {
+    require('./destroy')(callback);
+  }
+
+  update(callback) {
+    require('./update')(callback);
+  }
+}
 
 module.exports = Container;
