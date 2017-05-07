@@ -32,7 +32,14 @@ class GitHubIssue {
         return callback();
       }
 
-      comment.delete(callback);
+      comment
+        .set({
+          is_active: false,
+          updated: new Date()
+        })
+        .save(err => {
+          callback(err);
+        });
     });
   }
 
@@ -47,7 +54,8 @@ class GitHubIssue {
       const DatabaseTable = require('../../../DatabaseTable');
       DatabaseTable.select('github_issue_comment', {
         watched_repo: watchedRepo.id,
-        issue_id: this.payload.number
+        issue_id: this.payload.number,
+        is_active: true
       }, (err, rows) => {
         if (err) {
           return cb(err);

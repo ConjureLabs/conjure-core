@@ -82,6 +82,7 @@ class GitHubIssueComment {
         issue_id: this.issue.payload.number,
         comment_id: commentCreationBody.id,
         url: commentCreationBody.html_url,
+        is_active: true,
         added: new Date()
       }, (err, rows) => {
         if (err) {
@@ -149,9 +150,14 @@ class GitHubIssueComment {
 
     // first deleting our own record of the comment
     waterfall.push(cb => {
-      this.commentRow.delete(err => {
-        cb(err);
-      });
+      this.commentRow
+        .update({
+          is_active: false,
+          updated: new Date()
+        })
+        .save(err => {
+          cb(err);
+        });
     });
 
     // getting github client
