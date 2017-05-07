@@ -75,3 +75,26 @@ const row2 = accountRow.copy();
   row2 !== accountRow
  */
 ```
+
+#### Chain an update to a row instance
+
+Nearly all the methods return the instance, making chaining easy.
+
+There is a method `.set(data)` which allows you to easily modify attributes and then chain off a `.save()`.
+
+```js
+const accountRow = new DatabaseRow('account', {
+  id: 1,
+  name: 'Tim Marshall',
+  email: 'tim@marshall.io'
+});
+
+// want to modify email and save
+accountRow
+  .set({
+    email: 'tim@conjure.sh'
+  })
+  .save(err => {
+    // ...
+  });
+```
