@@ -14,7 +14,7 @@ const gitHubCommentSignature = [
   '',
   '---',
   '',
-  `<kbd>⎔</kbd> __This message was create via [Conjure.sh](${protocol}://${domain})__`
+  `__This message was create via [<kbd>⎔ Conjure.sh</kbd>](${protocol}://${domain})__`
 ];
 
 class GitHubContainer extends Container {
