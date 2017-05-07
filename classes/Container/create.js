@@ -33,7 +33,8 @@ function containerCreate(callback) {
     // todo: detect correct server host, but on develop / test keep localhost
     DatabaseTable.select('container', {
       repo: watchedRepo.id,
-      branch: branch
+      branch: branch,
+      is_active: true
     }, (err, records) => {
       if (err) {
         return cb(err);
@@ -177,6 +178,8 @@ function containerCreate(callback) {
       port: hostPort,
       container_id: containerId,
       url_uid: containerUid,
+      is_active: true,
+      active_start: new Date(),
       added: new Date()
     }, err => {
       cb(err, hostPort);
