@@ -5,6 +5,7 @@ This classes serves as a proxy to database tables, making it easier to select, i
 #### Select
 
 <details>
+
 ##### Using Constructor
 
 ```js
@@ -55,6 +56,7 @@ DatabaseTable.select('account', {
 #### Update
 
 <details>
+
 ##### Using Constructor
 
 ```js
@@ -115,6 +117,7 @@ DatabaseTable.update('account', {
 #### Insert
 
 <details>
+
 ##### Using Constructor
 
 ```js
@@ -165,6 +168,7 @@ DatabaseTable.insert('account', {
 #### Delete
 
 <details>
+
 ##### Using Constructor
 
 ```js
@@ -215,6 +219,7 @@ DatabaseTable.delete('account', {
 #### Upsert
 
 <details>
+
 ##### Using Constructor
 
 ```js
