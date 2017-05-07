@@ -27,7 +27,7 @@ class GitHubIssueComment {
       const github = require('octonode');
       const gitHubClient = github.client(gitHubAccount.access_token);
 
-      callback(null, getGitHubClient);
+      callback(null, gitHubClient);
     });
   }
 
