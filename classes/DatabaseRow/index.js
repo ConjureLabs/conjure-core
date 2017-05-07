@@ -79,4 +79,11 @@ module.exports = class DatabaseRow {
       callback(err);
     });
   }
+
+  // new row object, copies values, but without id
+  copy() {
+    return new DatabaseRow(this[rowTableName], Object.assign({}, this, {
+      id: null
+    }));
+  }
 };
