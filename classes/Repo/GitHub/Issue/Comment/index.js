@@ -1,5 +1,6 @@
 'use strict';
 
+const async = require('async');
 const log = require('../../../../../modules/log')('github issue comment');
 
 const getGitHubClient = Symbol('get GitHub api client instance');
