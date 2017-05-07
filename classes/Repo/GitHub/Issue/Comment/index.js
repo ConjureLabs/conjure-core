@@ -164,7 +164,7 @@ class GitHubIssueComment {
     // first deleting our own record of the comment
     waterfall.push(cb => {
       this.commentRow
-        .update({
+        .set({
           is_active: false,
           updated: new Date()
         })
