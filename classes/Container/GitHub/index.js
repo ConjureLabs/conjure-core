@@ -22,13 +22,11 @@ class GitHubContainer extends Container {
       const { branch } = this.payload;
 
       issue.upsertComment([
-        '<kbd>⎔</kbd>',
-        '',
         `:octocat: [You can view this branch at ${protocol}://${domain}:${hostPort}](${protocol}://${domain}:${hostPort})`,
         '',
         '---',
         '',
-        `__This message was create via [⎔ Conjure.sh](${protocol}://${domain})__`
+        `<kbd>⎔</kbd> __This message was create via [Conjure.sh](${protocol}://${domain})__`
       ].join('\n'), err => {
         callback(err);
       });
