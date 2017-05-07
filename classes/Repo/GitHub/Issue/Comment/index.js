@@ -63,7 +63,7 @@ class GitHubIssueComment {
         .issue(`${orgName}/${repoName}`, number)
         .createComment({
           body: body
-        }, (err, _, body) => {
+        }, (err, body) => {
           cb(err, body);
         });
     });
