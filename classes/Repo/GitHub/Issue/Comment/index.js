@@ -44,7 +44,7 @@ class GitHubIssueComment {
     });
   }
 
-  [createComment](gitHubClient, body, callback) => {
+  [createComment](gitHubClient, body, callback) {
     log.info('creating new issue comment, on github');
 
     const waterfall = [];
@@ -101,7 +101,7 @@ class GitHubIssueComment {
     async.series(series, callback); // returns issue comment row
   }
 
-  [updateComment](gitHubClient, body, callback) => {
+  [updateComment](gitHubClient, body, callback) {
     log.info('updating existing issue comment, on github');
 
     const waterfall = [];
