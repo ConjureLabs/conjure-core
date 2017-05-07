@@ -24,7 +24,7 @@ class GitHubContainer extends Container {
       issue.upsertComment([
         '<kbd>⎔</kbd>',
         '',
-        `:octocat: [You can view this branch at ${protocol}://${domain}:${hostPort}](${protocol}://${domain}:${hostPort})`
+        `:octocat: [You can view this branch at ${protocol}://${domain}:${hostPort}](${protocol}://${domain}:${hostPort})`,
         '',
         '---',
         '',
