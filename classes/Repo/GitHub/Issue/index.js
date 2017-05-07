@@ -32,14 +32,7 @@ class GitHubIssue {
         return callback();
       }
 
-      comment
-        .set({
-          is_active: false,
-          updated: new Date()
-        })
-        .save(err => {
-          callback(err);
-        });
+      comment.delete(callback);
     });
   }
 
