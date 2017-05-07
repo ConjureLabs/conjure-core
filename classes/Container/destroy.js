@@ -23,7 +23,7 @@ function containerDestroy(callback) {
   waterfall.push((watchedRepo, cb) => {
     const DatabaseTable = require('../DatabaseTable');
     // todo: detect correct server host, but on develop / test keep localhost
-    DatabaseTable.select('containers', {
+    DatabaseTable.select('container', {
       repo: watchedRepo.id,
       branch: branch
     }, (err, records) => {
@@ -63,7 +63,7 @@ function containerDestroy(callback) {
   // remove db reference to proxy
   waterfall.push((watchedRepo, cb) => {
     const DatabaseTable = require('../DatabaseTable');
-    DatabaseTable.delete('containers', {
+    DatabaseTable.delete('container', {
       repo: watchedRepo.id,
       branch: branch
     }, err => {
