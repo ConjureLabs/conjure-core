@@ -11,7 +11,6 @@ class GitHubIssueComment {
   constructor(issueInstance, commentRow) {
     this.issue = issueInstance;
     this.commentRow = commentRow;
-    this.commentId = commentRow !== undefined ? commentRow.issue_id : null;
   }
 
   [getGitHubClient](callback) {
@@ -37,7 +36,7 @@ class GitHubIssueComment {
         return callback(err);
       }
 
-      if (this.commentId) {
+      if (this.commentRow) {
         return this[updateComment](gitHubClient, body, callback);
       }
 
@@ -63,8 +62,8 @@ class GitHubIssueComment {
         .issue(`${orgName}/${repoName}`, number)
         .createComment({
           body: body
-        }, (err, body) => {
-          cb(err, body);
+        }, (err, response) => {
+          cb(err, response);
         });
     });
 
@@ -81,6 +80,7 @@ class GitHubIssueComment {
       DatabaseTable.insert('github_issue_comment', {
         watched_repo: watchedRepo.id,
         issue_id: this.issue.payload.number,
+        comment_id: commentCreationBody.id,
         url: commentCreationBody.html_url,
         added: new Date()
       }, (err, rows) => {
@@ -95,7 +95,6 @@ class GitHubIssueComment {
     // updating self with new comment record details
     waterfall.push((issueCommentRow, cb) => {
       this.commentRow = issueCommentRow;
-      this.commentId = issueCommentRow.id;
       cb(null, issueCommentRow);
     });
 
@@ -118,7 +117,7 @@ class GitHubIssueComment {
       // todo: not use user's account to post comment (may not be possible, unless can get integration access from github)
       gitHubClient
         .issue(`${orgName}/${repoName}`, number)
-        .updateComment(this.commentId, {
+        .updateComment(this.commentRow.id, {
           body: body
         }, err => {
           cb(err);
@@ -146,6 +145,7 @@ class GitHubIssueComment {
     log.info('deleting existing issue comment, on github');
 
     const waterfall = [];
+    const commentId = this.commentRow.comment_id;
 
     // first deleting our own record of the comment
     waterfall.push(cb => {
@@ -170,7 +170,7 @@ class GitHubIssueComment {
       // todo: not use user's account to post comment (may not be possible, unless can get integration access from github)
       gitHubClient
         .issue(`${orgName}/${repoName}`, number)
-        .deleteComment(this.commentId, err => {
+        .deleteComment(commentId, err => {
           cb(err);
         });
     });
@@ -178,7 +178,6 @@ class GitHubIssueComment {
     // removing local attributes, since comment is gone
     waterfall.push(cb => {
       this.commentRow = null;
-      this.commentId = null;
       return cb();
     });
 
