@@ -10,15 +10,31 @@ class GitHubIssue {
   }
 
   upsertComment(body, callback) {
-    this[getExistingComment]((err, comment) => {
+    this[getExistingComment]((err, existingComment) => {
       if (err) {
         return callback(err);
       }
 
       const GitHubIssueComment = require('./Comment');
-      comment = comment || new GitHubIssueComment(this);
+      const comment = existingComment || new GitHubIssueComment(this);
 
-      comment.save(body, callback);
+      comment.save(body, err => {
+        if (err) {
+          if (existingComment && err && err.statusCode !== 404) {
+            return callback(err);
+          }
+
+          // comment was deleted, likely by user (but possibly a system hiccup?)
+          // so, will just add a new one, so that the flow does not break down
+          const forcedNewComment = new GitHubIssueComment(this);
+          forcedNewComment.save(body, err => {
+            callback(err);
+          });
+          return;
+        }
+
+        callback();
+      });
     });
   }
 
