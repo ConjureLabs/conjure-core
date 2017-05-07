@@ -10,7 +10,7 @@ class GitHubIssue {
   }
 
   upsertComment(body, callback) {
-    this[getExistingComment]((err, existingComment) => {
+    this[getExistingComment]((err, watchedRepo, existingComment) => {
       if (err) {
         return callback(err);
       }
@@ -63,7 +63,7 @@ class GitHubIssue {
   }
 
   deleteComment(callback) {
-    this[getExistingComment]((err, comment) => {
+    this[getExistingComment]((err, watchedRepo, comment) => {
       if (err) {
         return callback(err);
       }
@@ -94,14 +94,14 @@ class GitHubIssue {
           return cb(err);
         }
 
-        return cb(null, rows[0]);
+        return cb(null, watchedRepo, rows[0]);
       });
     });
 
-    async.waterfall(waterfall, (err, commentRecord) => {
+    async.waterfall(waterfall, (err, watchedRepo, commentRecord) => {
       const DatabaseRow = require('../../../DatabaseRow');
       const GitHubIssueComment = require('./Comment');
-      return callback(err, commentRecord instanceof DatabaseRow ? new GitHubIssueComment(this, commentRecord) : null);
+      return callback(err, watchedRepo, commentRecord instanceof DatabaseRow ? new GitHubIssueComment(this, commentRecord) : null);
     });
   }
 }
