@@ -20,7 +20,7 @@ const cached = Symbol('cached data');
 class WebhookPayload {
   constructor(payload) {
     this.payload = payload;
-    this[cached] = {}:
+    this[cached] = {};
 
     // keep this, for now, for debug
     console.log(this.payload);
