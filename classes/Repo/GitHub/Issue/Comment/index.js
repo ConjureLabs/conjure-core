@@ -36,7 +36,7 @@ class GitHubIssueComment {
         return callback(err);
       }
 
-      if (this.commentRow) {
+      if (this.commentRow && this.commentRow.is_active === true) {
         return this[updateComment](gitHubClient, body, callback);
       }
 
@@ -107,6 +107,16 @@ class GitHubIssueComment {
 
     const waterfall = [];
 
+    // making sure it's still active
+    waterfall.push(cb => {
+      // this should not happen
+      if (this.commentRow.is_active !== true) {
+        return cb(new Error('Can not update comment that is not longer active'));
+      }
+
+      cb();
+    });
+
     // updating github comment
     waterfall.push(cb => {
       const {
@@ -127,10 +137,13 @@ class GitHubIssueComment {
 
     // tracking updated time on our record
     waterfall.push(cb => {
-      this.commentRow.updated = new Date();
-      this.commentRow.save(err => {
-        cb(err);
-      });
+      this.commentRow
+        .set({
+          updated: new Date()
+        })
+        .save(err => {
+          cb(err);
+        });
     });
 
     async.waterfall(waterfall, err => {
