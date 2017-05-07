@@ -9,7 +9,7 @@ This classes serves as a proxy to database tables, making it easier to select, i
 ##### Using Constructor
 
 ```js
-const account = new DatabaseTable('Account');
+const account = new DatabaseTable('account');
 
 // SELECT * FROM account;
 account.select((err, rows) => {
@@ -60,7 +60,7 @@ DatabaseTable.select('account', {
 ##### Using Constructor
 
 ```js
-const account = new DatabaseTable('Account');
+const account = new DatabaseTable('account');
 
 // UPDATE account SET activated = false;
 account.update({
@@ -121,7 +121,7 @@ DatabaseTable.update('account', {
 ##### Using Constructor
 
 ```js
-const account = new DatabaseTable('Account');
+const account = new DatabaseTable('account');
 
 // INSERT INTO account (name, email) VALUES ('Tim Marshall', 'tim@marshall.io');
 account.insert({
@@ -172,7 +172,7 @@ DatabaseTable.insert('account', {
 ##### Using Constructor
 
 ```js
-const account = new DatabaseTable('Account');
+const account = new DatabaseTable('account');
 
 // DELETE FROM account;
 account.delete((err, rows) => {
@@ -223,25 +223,50 @@ DatabaseTable.delete('account', {
 ##### Using Constructor
 
 ```js
-const account = new DatabaseTable('Account');
+const account = new DatabaseTable('account');
 
-// INSERT INTO account (name, email) VALUES ('Tim Marshall', 'tim@marshall.io') ON CONFLICT DO UPDATE SET name = EXCLUDED.name;
+// attempts:
+// INSERT INTO account (name, email, added) VALUES ('Tim Marshall', 'tim@marshall.io', NOW());
+//
+// falls back to:
+// UPDATE account SET name = 'Tim Marshall', updated = NOW() WHERE email = 'tim@marshall.io';
 account.upsert({
+  // insert
   name: 'Tim Marshall',
+  email: 'tim@marshall.io',
+  added: new Date()
+}, {
+  // update
+  name: 'Tim Marshall',
+  updated: new Date()
+}, {
+  // update conditions
   email: 'tim@marshall.io'
-}, [ 'name' ], (err, rows) => {
+}, (err, rows) => {
   // ...
 });
-```
 
 ##### Direct (static) call
 
 ```js
-// INSERT INTO account (name, email) VALUES ('Tim Marshall', 'tim@marshall.io') ON CONFLICT DO UPDATE SET name = EXCLUDED.name;
+// attempts:
+// INSERT INTO account (name, email, added) VALUES ('Tim Marshall', 'tim@marshall.io', NOW());
+//
+// falls back to:
+// UPDATE account SET name = 'Tim Marshall', updated = NOW() WHERE email = 'tim@marshall.io';
 DatabaseTable.upsert('account', {
+  // insert
   name: 'Tim Marshall',
+  email: 'tim@marshall.io',
+  added: new Date()
+}, {
+  // update
+  name: 'Tim Marshall',
+  updated: new Date()
+}, {
+  // update conditions
   email: 'tim@marshall.io'
-}, ['name'], (err, rows) => {
+}, (err, rows) => {
   // ...
 });
 ```
