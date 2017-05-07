@@ -45,6 +45,7 @@ class GitHubIssueComment {
   [createComment](gitHubClient, body, callback) => {
     const waterfall = [];
 
+    // actual comment creation
     waterfall.push(cb => {
       const {
         orgName,
@@ -62,12 +63,14 @@ class GitHubIssueComment {
         });
     });
 
+    // need to get watched repo record, so we can know its id (for next step)
     waterfall.push((commentCreationBody, cb) => {
       this.issue.payload.watchedRepoRecord((err, watchedRepo) => {
         cb(err, commentCreationBody, watchedRepo);
       });
     });
 
+    // creating new comment record on our end
     waterfall.push((commentCreationBody, watchedRepo, cb) => {
       const DatabaseTable = require('../../../../DatabaseTable');
       DatabaseTable.insert('github_issue_comment', {
@@ -84,6 +87,7 @@ class GitHubIssueComment {
       });
     });
 
+    // updating self with new comment record details
     waterfall.push((issueCommentRow, cb) => {
       this.commentRow = issueCommentRow;
       this.commentId = issueCommentRow.id;
@@ -96,6 +100,7 @@ class GitHubIssueComment {
   [updateComment](gitHubClient, body, callback) => {
     const waterfall = [];
 
+    // updating github comment
     waterfall.push(cb => {
       const {
         orgName,
@@ -113,6 +118,7 @@ class GitHubIssueComment {
         });
     });
 
+    // tracking updated time on our record
     waterfall.push(cb => {
       this.commentRow.updated = new Date();
       this.commentRow.save(err => {
