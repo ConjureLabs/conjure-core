@@ -15,9 +15,13 @@ const ACTION_RESTORED = Symbol('resotration');
 const ACTION_UNKOWN = Symbol('uknown action');
 const ACTION_UPDATED = Symbol('update');
 
+const cached = Symbol('cached data');
+
 class WebhookPayload {
   constructor(payload) {
     this.payload = payload;
+    this[cached] = {}:
+
     // keep this, for now, for debug
     console.log(this.payload);
   }
@@ -138,6 +142,10 @@ class WebhookPayload {
   }
 
   getGitHubAccount(callback) {
+    if (this[cached].gitHubAccount) {
+      return callback(null, this[cached].gitHubAccount);
+    }
+
     const gitHubId = this.payload.sender.id;
 
     const DatabaseTable = require('../../../../DatabaseTable');
@@ -147,6 +155,8 @@ class WebhookPayload {
       if (err) {
         return callback(err);
       }
+
+      this[cached].gitHubAccount = rows[0];
 
       // callback handler should deal with undefined row
       callback(null, rows[0]);
@@ -179,6 +189,10 @@ class WebhookPayload {
 
   // finds the watched repo record
   watchedRepoRecord(callback) {
+    if (this[cached].watchedRepo) {
+      return callback(null, this[cached].watchedRepo);
+    }
+
     const DatabaseTable = require('../../../../DatabaseTable');
     DatabaseTable.select('watched_repos', {
       service_repo_id: this.repoId
@@ -190,6 +204,8 @@ class WebhookPayload {
       if (!rows.length) {
         return callback(new Error('this repo is not being watched by Conjure'));
       }
+
+      this[cached].watchedRepo = rows[0];
 
       callback(null, rows[0]);
     });
