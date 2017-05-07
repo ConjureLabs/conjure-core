@@ -7,14 +7,15 @@ const config = require('../../../modules/config');
 
 const {
   protocol,
-  domain
+  domain,
+  host
 } = config.app;
 
 const gitHubCommentSignature = [
   '',
   '---',
   '',
-  `__This message was generated via [<kbd>⎔ Conjure.sh</kbd>](${protocol}://${domain})__`
+  `__This message was generated via [<kbd>⎔ Conjure.sh</kbd>](${protocol}://${host})__`
 ];
 
 class GitHubContainer extends Container {
@@ -28,7 +29,7 @@ class GitHubContainer extends Container {
     // commenting on issue thread to notify that an instance is spinning up
     waterfall.push(cb => {
       issue.upsertComment([
-        `:hourglass_flowing_sand: [Conjure.sh](${protocol}://${domain}) is spinning up this branch`,
+        `:hourglass_flowing_sand: [Conjure.sh](${protocol}://${host}) is spinning up this branch`,
       ].concat(gitHubCommentSignature).join('\n'), err => {
         cb(err);
       });
