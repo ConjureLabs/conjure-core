@@ -22,8 +22,8 @@ class WebhookPayload {
     this.payload = payload;
     this[cached] = {};
 
-    // keep this, for now, for debug
-    console.log(this.payload);
+    // uncomment for debug
+    // console.log(this.payload);
   }
 
   static get types() {
