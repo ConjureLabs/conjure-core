@@ -22,6 +22,9 @@ class GitHubContainer extends Container {
   create(callback) {
     const waterfall = [];
 
+    const Issue = require('../../Repo/GitHub/Issue');
+    const issue = new Issue(this.payload);
+
     // commenting on issue thread to notify that an instance is spinning up
     waterfall.push(cb => {
       issue.upsertComment([
@@ -39,11 +42,6 @@ class GitHubContainer extends Container {
     });
 
     waterfall.push((hostPort, cb) => {
-      const Issue = require('../../Repo/GitHub/Issue');
-      const issue = new Issue(this.payload);
-
-      const config = require('../../../modules/config');
-
       issue.upsertComment([
         `:octocat: [You can view this branch at ${protocol}://${domain}:${hostPort}](${protocol}://${domain}:${hostPort})`,
       ].concat(gitHubCommentSignature).join('\n'), err => {
