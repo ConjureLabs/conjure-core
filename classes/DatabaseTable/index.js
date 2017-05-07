@@ -124,8 +124,6 @@ module.exports = class DatabaseTable {
       .map(columnName => `${columnName} = EXCLUDED.${columnName}`)
       .join(', ');
 
-    const whereClause = generateWhereClause(constraints, queryValues);
-
     database.query(`INSERT INTO ${this.tableName}(${columnNames.join(', ')}) VALUES ${insertAssignmentsFormatted} ON CONFLICT DO UPDATE ${upsertSet} RETURNING *`, queryValues, this[queryCallback](callback));
   }
 
