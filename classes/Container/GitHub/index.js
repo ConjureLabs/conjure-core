@@ -3,13 +3,10 @@
 const Container = require('../');
 const log = require('../../../modules/log')('github container');
 
-const parentCreate = require('../create');
-const parentDestroy = require('../destroy');
-
 class GitHubContainer extends Container {
   // saving github comment, when creating a new container
   create(callback) {
-    parentCreate(err => {
+    super.create(err => {
       if (err) {
         return callback(err);
       }
@@ -39,7 +36,7 @@ class GitHubContainer extends Container {
   }
 
   destroy(callback) {
-    parentDestroy(err => {
+    super.destroy(err => {
       if (err) {
         return callback(err);
       }
