@@ -99,7 +99,7 @@ class GitHubIssueComment {
       cb(null, issueCommentRow);
     });
 
-    async.series(series, callback); // returns issue comment row
+    async.waterfall(waterfall, callback); // returns issue comment row
   }
 
   [updateComment](gitHubClient, body, callback) {
