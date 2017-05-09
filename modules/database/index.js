@@ -11,7 +11,7 @@ pool.on('error', err => {
   log.error(err);
 });
 
-function query() {
+function query(/* query, [queryArgs], callback */) {
   const args = Array.prototype.slice.call(arguments);
   let callback = args.pop();
 
