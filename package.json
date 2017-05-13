@@ -14,5 +14,8 @@
   "bugs": {
     "url": "https://github.com/WiskeyTango/conjure-core/issues"
   },
-  "homepage": "https://github.com/WiskeyTango/conjure-core#readme"
+  "homepage": "https://github.com/WiskeyTango/conjure-core#readme",
+  "dependencies": {
+    "stripe": "^4.19.0"
+  }
 }
