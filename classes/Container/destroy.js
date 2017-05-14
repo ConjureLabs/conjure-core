@@ -1,6 +1,7 @@
 'use strict';
 
-const log = require('../../modules/log')('container destroy');
+const appRoot = require('app-root-path');
+const log = require(`${appRoot}/modules/log`)('container destroy');
 
 // todo: set up a module that handles cases like this
 const asyncBreak = {};
@@ -21,7 +22,7 @@ function containerDestroy(callback) {
 
   // make sure the repo/branch is spun up
   waterfall.push((watchedRepo, cb) => {
-    const DatabaseTable = require('../DatabaseTable');
+    const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
     // todo: detect correct server host, but on develop / test keep localhost
     DatabaseTable.select('container', {
       repo: watchedRepo.id,
@@ -42,7 +43,7 @@ function containerDestroy(callback) {
 
   // spin down vms
   waterfall.push((watchedRepo, runningContainerRecords, cb) => {
-    const exec = require('../../modules/childProcess/exec');
+    const exec = require(`${appRoot}/modules/childProcess/exec`);
 
     for (let i = 0; i < runningContainerRecords.length; i++) {
       const containerRecord = runningContainerRecords[i];
@@ -63,7 +64,7 @@ function containerDestroy(callback) {
 
   // remove db reference to proxy
   waterfall.push((watchedRepo, cb) => {
-    const DatabaseTable = require('../DatabaseTable');
+    const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
     DatabaseTable.update('container', {
       is_active: false,
       active_stop: new Date()

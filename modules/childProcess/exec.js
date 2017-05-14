@@ -1,6 +1,7 @@
 'use strict';
 
-const log = require('../log')('child process execution');
+const appRoot = require('app-root-path');
+const log = require(`${appRoot}/modules/log`)('child process execution');
 
 module.exports = (command, options, callback) => {
   const exec = require('child_process').exec;

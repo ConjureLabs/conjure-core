@@ -1,6 +1,7 @@
 'use strict';
 
-const log = require('../../modules/log')('container update');
+const appRoot = require('app-root-path');
+const log = require(`${appRoot}/modules/log`)('container update');
 
 function containerUpdate(callback) {
   log.info('starting update');
