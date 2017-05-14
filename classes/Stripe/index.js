@@ -1,10 +1,11 @@
-const stripe = Symbol('internal Stripe alias');
+const stripe = Symbol('private stripe key');
 
 class Stripe {
-  constructor() {
+  static get api() {
     const appRoot = require('app-root-path');
     const config = require(`${appRoot}/modules/config`);
-    this[stripe] = require('stripe')(config.stripe.secret);
+    const stripe = require('stripe');
+    return stripe(config.stripe.secret);
   }
 }
 
