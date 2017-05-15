@@ -4,10 +4,11 @@ const createCustomer = Symbol('create customer');
 const updateCustomer = Symbol('update existing customer');
 
 class Customer extends Stripe {
-  constructor(data, rawData) {
+  constructor(conjureId, data, rawData) {
     if (data.id) {
       this.id = data.id;
     }
+    this.conjureId = conjureId;
     this.email = data.email;
     this.name = data.name;
 
@@ -27,6 +28,7 @@ class Customer extends Stripe {
     Customer.api.customers.create({
       email: this.email,
       metadata: {
+        conureId: this.conjureId,
         name: this.name
       }
     }, (err, customerData) => {
@@ -46,28 +48,13 @@ class Customer extends Stripe {
     Customer.api.customers.update(this.id, {
       email: this.email,
       metadata: {
+        conjureId: this.conjureId,
         name: this.name
       }
-    }, (err, customer) => {
-      this.rawData = customer;
+    }, (err, customerData) => {
+      this.rawData = customerData;
       return callback(err, this);
     });
-  }
-
-  static fetch(id, callback) {
-    Customer.api.customers.retrieve(id, (err, customerData) => {
-      if (err) {
-        return callback(err);
-      }
-
-      callback(null, new Customer({
-        id: customerData.id,
-        email: customerData.email,
-        name: (customerData.metadata || {}).name
-      }, customerData));
-    });
-
-    return this;
   }
 }
 
