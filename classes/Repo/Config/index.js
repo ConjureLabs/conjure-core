@@ -1,6 +1,5 @@
-'use strict';
-
-const log = require('../../../modules/log')('repo conjure config');
+const appRoot = require('app-root-path');
+const log = require(`${appRoot}/modules/log`)('repo conjure config');
 
 const internalDefinition = Symbol('parsed input object definition');
 const singleLanguageKey = Symbol('get single language being used');

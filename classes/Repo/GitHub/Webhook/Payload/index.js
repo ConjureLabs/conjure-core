@@ -1,4 +1,4 @@
-'use strict';
+const appRoot = require('app-root-path');
 
 const TYPE_BRANCH = Symbol('is related to a branch');
 const TYPE_COMMIT = Symbol('is related to a commit');
@@ -148,7 +148,7 @@ class WebhookPayload {
 
     const gitHubId = this.payload.sender.id;
 
-    const DatabaseTable = require('../../../../DatabaseTable');
+    const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
     DatabaseTable.select('account_github', {
       github_id: gitHubId
     }, (err, rows) => {
@@ -193,7 +193,7 @@ class WebhookPayload {
       return callback(null, this[cached].watchedRepo);
     }
 
-    const DatabaseTable = require('../../../../DatabaseTable');
+    const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
     DatabaseTable.select('watched_repo', {
       service_repo_id: this.repoId
     }, (err, rows) => {

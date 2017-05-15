@@ -1,5 +1,3 @@
-'use strict';
-
 const config = {
   app: {
     domain: 'localhost',
@@ -29,6 +27,10 @@ const config = {
       secret: process.env.GITHUB_CLIENT_SECRET,
       inboundWebhookScret: 'super secret secret'
     }
+  },
+
+  stripe: {
+    secret: process.env.STRIPE_API_SECRET
   }
 };
 

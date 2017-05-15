@@ -1,5 +1,3 @@
-'use strict';
-
 const slice = Array.prototype.slice;
 
 /*

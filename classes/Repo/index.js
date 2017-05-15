@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = class Repo {
   constructor(data = {}) {
     for (let key in data) {

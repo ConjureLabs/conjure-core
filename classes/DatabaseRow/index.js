@@ -1,5 +1,3 @@
-'use strict';
-
 const rowTableName = Symbol('instance row\'s table name');
 const rowDeleted = Symbol('indicator that row was deleted');
 
@@ -25,7 +23,8 @@ module.exports = class DatabaseRow {
       return this;
     }
 
-    const DatabaseTable = require('../DatabaseTable');
+    const appRoot = require('app-root-path');
+    const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
 
     // no .id, assuming it's a new row to insert
     if (this.id === undefined) {
@@ -74,7 +73,7 @@ module.exports = class DatabaseRow {
       return this;
     }
 
-    const DatabaseTable = require('../DatabaseTable');
+    const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
     DatabaseTable.delete(this[rowTableName], {
       id: this.id
     }, err => {

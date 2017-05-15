@@ -1,7 +1,6 @@
-'use strict';
-
 const async = require('async');
-const log = require('../../../../modules/log')('github issue');
+const appRoot = require('app-root-path');
+const log = require(`${appRoot}/modules/log`)('github issue');
 
 const getExistingComment = Symbol('get existing GitHub issue comment');
 
@@ -34,7 +33,7 @@ class GitHubIssue {
 
           // will also wipe record of old (broken) comment
           series.push(cb => {
-            const DatabaseTable = require('../../../DatabaseTable');
+            const DatabaseTable = require(`${appRot}/classes/DatabaseTable`);
             DatabaseTable.update('github_issue_comment', {
               is_active: false,
               updated: new Date()
@@ -87,7 +86,7 @@ class GitHubIssue {
     });
 
     waterfall.push((watchedRepo, cb) => {
-      const DatabaseTable = require('../../../DatabaseTable');
+      const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
       DatabaseTable.select('github_issue_comment', {
         watched_repo: watchedRepo.id,
         issue_id: this.payload.number,
@@ -102,7 +101,7 @@ class GitHubIssue {
     });
 
     async.waterfall(waterfall, (err, watchedRepo, commentRecord) => {
-      const DatabaseRow = require('../../../DatabaseRow');
+      const DatabaseRow = require(`${appRoot}/classes/DatabaseRow`);
       const GitHubIssueComment = require('./Comment');
       return callback(err, watchedRepo, commentRecord instanceof DatabaseRow ? new GitHubIssueComment(this, commentRecord) : null);
     });

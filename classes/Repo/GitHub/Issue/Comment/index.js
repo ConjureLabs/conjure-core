@@ -1,7 +1,6 @@
-'use strict';
-
 const async = require('async');
-const log = require('../../../../../modules/log')('github issue comment');
+const appRoot = require('app-root-path');
+const log = require(`${appRoot}/modules/log`)('github issue comment');
 
 const getGitHubClient = Symbol('get GitHub api client instance');
 const createComment = Symbol('create new comment');
@@ -76,7 +75,7 @@ class GitHubIssueComment {
 
     // creating new comment record on our end
     waterfall.push((commentCreationBody, watchedRepo, cb) => {
-      const DatabaseTable = require('../../../../DatabaseTable');
+      const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
       DatabaseTable.insert('github_issue_comment', {
         watched_repo: watchedRepo.id,
         issue_id: this.issue.payload.number,
