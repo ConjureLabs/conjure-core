@@ -1,5 +1,3 @@
-'use strict';
-
 const labelSeparator = ' --> ';
 
 module.exports = label => {

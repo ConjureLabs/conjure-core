@@ -1,10 +1,9 @@
-'use strict';
-
 class ReqProxy {
   constructor(options) {
     options = options || {};
 
-    const config = require('../../../modules/config');
+    const appRoot = require('app-root-path');
+    const config = require(`${appRoot}/modules/config`);
 
     this.host = options.host || config.app.publicHost;
     this.protocol = options.protocol || 'http';

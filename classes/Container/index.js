@@ -1,5 +1,3 @@
-'use strict';
-
 class Container {
   constructor(payloadInstance) {
     this.payload = payloadInstance;
