@@ -1,5 +1,3 @@
-'use strict';
-
 // todo: tests!
 
 const appRoot = require('app-root-path');

@@ -1,5 +1,3 @@
-'use strict';
-
 const pgPool = require('pg').Pool;
 const appRoot = require('app-root-path');
 const config = require(`${appRoot}/modules/config`);

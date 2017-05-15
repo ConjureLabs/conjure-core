@@ -1,5 +1,3 @@
-'use strict';
-
 const Repo = require('../');
 
 module.exports = class GitHubRepo extends Repo {
