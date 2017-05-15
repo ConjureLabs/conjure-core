@@ -1,5 +1,3 @@
-'use strict';
-
 const appRoot = require('app-root-path');
 const Container = require(`${appRoot}/classes/Container`);
 const log = require(`${appRoot}/modules/log`)('github container');

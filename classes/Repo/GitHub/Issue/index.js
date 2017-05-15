@@ -1,5 +1,3 @@
-'use strict';
-
 const async = require('async');
 const appRoot = require('app-root-path');
 const log = require(`${appRoot}/modules/log`)('github issue');

@@ -1,5 +1,3 @@
-'use strict';
-
 const rowTableName = Symbol('instance row\'s table name');
 const rowDeleted = Symbol('indicator that row was deleted');
 

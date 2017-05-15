@@ -1,5 +1,3 @@
-'use strict';
-
 const appRoot = require('app-root-path');
 
 const TYPE_BRANCH = Symbol('is related to a branch');

@@ -1,5 +1,3 @@
-'use strict';
-
 class ReqProxy {
   constructor(options) {
     options = options || {};
