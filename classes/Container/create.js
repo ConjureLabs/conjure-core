@@ -1,5 +1,4 @@
-const appRoot = require('app-root-path');
-const log = require(`${appRoot}/modules/log`)('container create');
+const log = require('conjure-core/modules/log')('container create');
 
 // todo: set up a module that handles cases like this
 const asyncBreak = {};
@@ -28,7 +27,7 @@ function containerCreate(callback) {
 
   // make sure the repo/branch is not already spun up
   waterfall.push((watchedRepo, cb) => {
-    const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
+    const DatabaseTable = require('conjure-core/classes/DatabaseTable');
     // todo: detect correct server host, but on develop / test keep localhost
     DatabaseTable.select('container', {
       repo: watchedRepo.id,
@@ -84,7 +83,7 @@ function containerCreate(callback) {
         }
 
         const yml = new Buffer(file.content, 'base64');
-        const Config = require(`${appRoot}/classes/Repo/Config`);
+        const Config = require('conjure-core/classes/Repo/Config');
         const repoConfig = new Config(yml);
 
         // todo: handle invalid yml errors better, send message to client/github
@@ -98,7 +97,7 @@ function containerCreate(callback) {
 
   // create container
   waterfall.push((watchedRepo, repoConfig, gitHubToken, cb) => {
-    const exec = require(`${appRoot}/modules/childProcess/exec`);
+    const exec = require('conjure-core/modules/childProcess/exec');
 
     // todo: handle non-github repos
     
@@ -127,7 +126,7 @@ function containerCreate(callback) {
       return cb(new Error('No container start command defined or known'));
     }
 
-    const exec = require(`${appRoot}/modules/childProcess/exec`);
+    const exec = require('conjure-core/modules/childProcess/exec');
 
     // may need to keep trying, if docker ports are already in use
     function attemptDockerRun() {
@@ -168,7 +167,7 @@ function containerCreate(callback) {
 
   // save reference for container
   waterfall.push((watchedRepo, hostPort, containerId, cb) => {
-    const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
+    const DatabaseTable = require('conjure-core/classes/DatabaseTable');
     // todo: detect correct server host, but on develop / test keep localhost
     DatabaseTable.insert('container', {
       repo: watchedRepo.id,

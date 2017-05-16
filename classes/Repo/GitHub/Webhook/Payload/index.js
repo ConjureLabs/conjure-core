@@ -1,5 +1,3 @@
-const appRoot = require('app-root-path');
-
 const TYPE_BRANCH = Symbol('is related to a branch');
 const TYPE_COMMIT = Symbol('is related to a commit');
 const TYPE_PULL_REQUEST = Symbol('is related to a pull request');
@@ -148,7 +146,7 @@ class WebhookPayload {
 
     const gitHubId = this.payload.sender.id;
 
-    const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
+    const DatabaseTable = require('conjure-core/classes/DatabaseTable');
     DatabaseTable.select('account_github', {
       github_id: gitHubId
     }, (err, rows) => {
@@ -193,7 +191,7 @@ class WebhookPayload {
       return callback(null, this[cached].watchedRepo);
     }
 
-    const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
+    const DatabaseTable = require('conjure-core/classes/DatabaseTable');
     DatabaseTable.select('watched_repo', {
       service_repo_id: this.repoId
     }, (err, rows) => {
