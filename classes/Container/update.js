@@ -1,5 +1,4 @@
-const appRoot = require('app-root-path');
-const log = require(`${appRoot}/modules/log`)('container update');
+const log = require('conjure-core/modules/log')('container update');
 
 function containerUpdate(callback) {
   log.info('starting update');

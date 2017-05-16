@@ -1,5 +1,4 @@
-const appRoot = require('app-root-path');
-const log = require(`${appRoot}/modules/log`)('child process execution');
+const log = require('conjure-core/modules/log')('child process execution');
 
 module.exports = (command, options, callback) => {
   const exec = require('child_process').exec;

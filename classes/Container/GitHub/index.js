@@ -1,8 +1,7 @@
-const appRoot = require('app-root-path');
-const Container = require(`${appRoot}/classes/Container`);
-const log = require(`${appRoot}/modules/log`)('github container');
+const Container = require('conjure-core/classes/Container');
+const log = require('conjure-core/modules/log')('github container');
 const async = require('async');
-const config = require(`${appRoot}/modules/config`);
+const config = require('conjure-core/modules/config');
 
 const {
   protocol,
@@ -22,7 +21,7 @@ class GitHubContainer extends Container {
   create(callback) {
     const waterfall = [];
 
-    const Issue = require(`${appRoot}/classes/Repo/GitHub/Issue`);
+    const Issue = require('conjure-core/classes/Repo/GitHub/Issue');
     const issue = new Issue(this.payload);
 
     // commenting on issue thread to notify that an instance is spinning up
@@ -58,7 +57,7 @@ class GitHubContainer extends Container {
         return callback(err);
       }
 
-      const Issue = require(`${appRoot}/classes/Repo/GitHub/Issue`);
+      const Issue = require('conjure-core/classes/Repo/GitHub/Issue');
       const issue = new Issue(this.payload);
 
       issue.deleteComment(err => {
