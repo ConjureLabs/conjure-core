@@ -1,7 +1,6 @@
 const pgPool = require('pg').Pool;
-const appRoot = require('app-root-path');
-const config = require(`${appRoot}/modules/config`);
-const log = require(`${appRoot}/modules/log`)('database');
+const config = require('conjure-core/modules/config');
+const log = require('conjure-core/modules/log')('database');
 
 const pool = new pgPool(config.database.pg);
 
