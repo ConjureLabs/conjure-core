@@ -23,8 +23,7 @@ module.exports = class DatabaseRow {
       return this;
     }
 
-    const appRoot = require('app-root-path');
-    const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
+    const DatabaseTable = require('conjure-core/classes/DatabaseTable');
 
     // no .id, assuming it's a new row to insert
     if (this.id === undefined) {
@@ -73,7 +72,7 @@ module.exports = class DatabaseRow {
       return this;
     }
 
-    const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
+    const DatabaseTable = require('conjure-core/classes/DatabaseTable');
     DatabaseTable.delete(this[rowTableName], {
       id: this.id
     }, err => {

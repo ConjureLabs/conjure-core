@@ -1,6 +1,5 @@
 const async = require('async');
-const appRoot = require('app-root-path');
-const log = require(`${appRoot}/modules/log`)('github issue comment');
+const log = require('conjure-core/modules/log')('github issue comment');
 
 const getGitHubClient = Symbol('get GitHub api client instance');
 const createComment = Symbol('create new comment');
@@ -75,7 +74,7 @@ class GitHubIssueComment {
 
     // creating new comment record on our end
     waterfall.push((commentCreationBody, watchedRepo, cb) => {
-      const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
+      const DatabaseTable = require('conjure-core/classes/DatabaseTable');
       DatabaseTable.insert('github_issue_comment', {
         watched_repo: watchedRepo.id,
         issue_id: this.issue.payload.number,

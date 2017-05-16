@@ -1,5 +1,4 @@
-const appRoot = require('app-root-path');
-const config = require(`${appRoot}/modules/config`);
+const config = require('conjure-core/modules/config');
 const stripeApi = require('stripe')(config.stripe.secret);
 
 class Stripe {

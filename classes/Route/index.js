@@ -1,5 +1,4 @@
-const appRoot = require('app-root-path');
-const log = require(`${appRoot}/modules/log`)('Route');
+const log = require('conjure-core/modules/log')('Route');
 
 const requireAuthenticationWrapper = Symbol('Require Auth Wrapper');
 const vanillaWrapper = Symbol('Vanilla (non-additive) Wrapper');

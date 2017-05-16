@@ -2,8 +2,7 @@ class ReqProxy {
   constructor(options) {
     options = options || {};
 
-    const appRoot = require('app-root-path');
-    const config = require(`${appRoot}/modules/config`);
+    const config = require('conjure-core/modules/config');
 
     this.host = options.host || config.app.publicHost;
     this.protocol = options.protocol || 'http';
