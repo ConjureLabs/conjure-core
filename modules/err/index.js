@@ -26,3 +26,6 @@ module.exports.PermissionsError = PermissionsError;
 
 class UnexpectedError extends ConjureError {}
 module.exports.UnexpectedError = UnexpectedError;
+
+class ContentError extends ConjureError {}
+module.exports.ContentError = ContentError;
