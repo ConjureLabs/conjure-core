@@ -20,6 +20,10 @@ class ConjureError extends Error {
   get httpStatusCode() {
     return 500;
   }
+
+  get friendlyError() {
+    return 'An error occurred';
+  }
 }
 module.exports.ConjureError = ConjureError;
 
@@ -27,6 +31,10 @@ module.exports.ConjureError = ConjureError;
 class NotFoundError extends ConjureError {
   get httpStatusCode() {
     return 404;
+  }
+
+  get friendlyError() {
+    return 'A needed resource was not found';
   }
 }
 module.exports.NotFoundError = NotFoundError;
@@ -36,13 +44,25 @@ class PermissionsError extends ConjureError {
   get httpStatusCode() {
     return 403;
   }
+
+  get friendlyError() {
+    return 'Invalid permissions';
+  }
 }
 module.exports.PermissionsError = PermissionsError;
 
 // an error occurred where we don't think it should ever
-class UnexpectedError extends ConjureError {}
+class UnexpectedError extends ConjureError {
+  get friendlyError() {
+    return 'An unexpected error occurred';
+  }
+}
 module.exports.UnexpectedError = UnexpectedError;
 
 // missing data, wrong keys passed, etc
-class ContentError extends ConjureError {}
+class ContentError extends ConjureError {
+  get friendlyError() {
+    return 'Content is missing or invalid';
+  }
+}
 module.exports.ContentError = ContentError;
