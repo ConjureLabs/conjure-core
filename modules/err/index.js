@@ -16,15 +16,27 @@ class ConjureError extends Error {
 
     return newError;
   }
+
+  get httpStatusCode() {
+    return 500;
+  }
 }
 module.exports.ConjureError = ConjureError;
 
 // if something was not found (on web, should trigger a 404)
-class NotFoundError extends ConjureError {}
+class NotFoundError extends ConjureError {
+  get httpStatusCode() {
+    return 404;
+  }
+}
 module.exports.NotFoundError = NotFoundError;
 
 // permissions are not valid
-class PermissionsError extends ConjureError {}
+class PermissionsError extends ConjureError {
+  get httpStatusCode() {
+    return 403;
+  }
+}
 module.exports.PermissionsError = PermissionsError;
 
 // an error occurred where we don't think it should ever
