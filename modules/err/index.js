@@ -20,3 +20,6 @@ module.exports.ConjureError = ConjureError;
 
 class NotFoundError extends ConjureError {}
 module.exports.NotFoundError = NotFoundError;
+
+class PermissionsError extends ConjureError {}
+module.exports.PermissionsError = PermissionsError;
