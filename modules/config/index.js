@@ -1,12 +1,22 @@
 const config = {
   app: {
-    domain: 'localhost',
-    host: null, // set later
-    port: process.env.PORT,
-    protocol: 'http',
-    publicHost: null, // set later
-    publicUrl: null, // set later
-    url: null // set later
+    api: {
+      domain: 'localhost',
+      host: null, // set later
+      port: process.env.APP_API_PORT,
+      protocol: 'http',
+      url: null // set later
+    },
+
+    web: {
+      domain: 'localhost',
+      host: null, // set later
+      port: process.env.APP_WEB_PORT,
+      protocol: 'http',
+      publicHost: null, // set later
+      publicUrl: null, // set later
+      url: null // set later
+    }
   },
 
   database: {
@@ -34,9 +44,14 @@ const config = {
   }
 };
 
-config.app.host = `${config.app.domain}:${process.env.PORT}`;
-config.app.publicHost = process.env.CONJURE_APP_PUBLIC_HOST || config.app.host;
-config.app.publicUrl = `${config.app.protocol}://${config.app.publicHost}`;
-config.app.url = `${config.app.protocol}://${config.app.host}`;
+// fill in app.api
+config.app.api.host = `${config.app.api.domain}:${config.app.api.port}`;
+config.app.api.url = `${config.app.api.protocol}://${config.app.api.host}`;
+
+// fill in app.web
+config.app.web.host = `${config.app.web.domain}:${config.app.web.port}`;
+config.app.web.publicHost = process.env.CONJURE_APP_PUBLIC_HOST || config.app.web.host;
+config.app.web.publicUrl = `${config.app.web.protocol}://${config.app.web.publicHost}`;
+config.app.web.url = `${config.app.web.protocol}://${config.app.web.host}`;
 
 module.exports = config;
