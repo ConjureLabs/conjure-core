@@ -3,7 +3,7 @@ const labelSeparator = ' --> ';
 module.exports = label => {
   const labelUsing = `${label || 'Conjure'}${labelSeparator}`;
 
-  return {
+  const methods = {
     log: console.log.bind(console.log, labelUsing),
     info: console.info.bind(console.info, labelUsing),
     dir: console.dir.bind(console.dir, labelUsing),
@@ -11,15 +11,16 @@ module.exports = label => {
     timeStart: console.time.bind(console.time, labelUsing),
     timeEnd: console.time.bind(console.time, labelUsing)
   };
-};
 
-module.exports.dev = label => {
-  if (process.env.NODE_ENV !== 'development') {
-    return Object.keys(module.exports).reduce((noOps, key) => {
-      noOps[key] = () => {};
-      return noOps;
-    });
+  if (process.env.NODE_ENV === 'development') {
+    methods.dev = Object.assign({}, methods);
+    return methods;
   }
 
-  return module.exports;
+  moethods.dev = Object.keys(moethods).reduce((noOps, key) => {
+    noOps[key] = () => {};
+    return noOps;
+  }, {});
+
+  return methods;
 };
