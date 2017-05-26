@@ -1,3 +1,8 @@
+const second = 1000;
+const minute = 60 * second;
+const hour = 60 * minute;
+const day = 24 * hour;
+
 const config = {
   app: {
     api: {
@@ -37,6 +42,11 @@ const config = {
       secret: process.env.GITHUB_CLIENT_SECRET,
       inboundWebhookScret: 'super secret secret'
     }
+  },
+
+  session: {
+    duration: 10 * day,
+    secret: process.env.CONJURE_SESSION_SECRET
   },
 
   stripe: {
