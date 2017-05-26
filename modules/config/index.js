@@ -5,6 +5,8 @@ const config = {
       host: null, // set later
       port: process.env.APP_API_PORT,
       protocol: 'http',
+      publicHost: null, // set later
+      publicUrl: null, // set later
       url: null // set later
     },
 
@@ -13,8 +15,6 @@ const config = {
       host: null, // set later
       port: process.env.APP_WEB_PORT,
       protocol: 'http',
-      publicHost: null, // set later
-      publicUrl: null, // set later
       url: null // set later
     }
   },
@@ -46,12 +46,12 @@ const config = {
 
 // fill in app.api
 config.app.api.host = `${config.app.api.domain}:${config.app.api.port}`;
+config.app.api.publicHost = process.env.CONJURE_API_PUBLIC_HOST || config.app.api.host;
+config.app.api.publicUrl = `${config.app.api.protocol}://${config.app.api.publicHost}`;
 config.app.api.url = `${config.app.api.protocol}://${config.app.api.host}`;
 
 // fill in app.web
 config.app.web.host = `${config.app.web.domain}:${config.app.web.port}`;
-config.app.web.publicHost = process.env.CONJURE_APP_PUBLIC_HOST || config.app.web.host;
-config.app.web.publicUrl = `${config.app.web.protocol}://${config.app.web.publicHost}`;
 config.app.web.url = `${config.app.web.protocol}://${config.app.web.host}`;
 
 module.exports = config;

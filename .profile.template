@@ -1,5 +1,5 @@
 export APP_API_PORT=2999;
 export APP_WEB_PORT=3000;
-export CONJURE_APP_PUBLIC_HOST='asdf.ngrok.io';
+export CONJURE_API_PUBLIC_HOST='asdf.ngrok.io';
 export GITHUB_CLIENT_SECRET='';
 export STRIPE_API_SECRET='';
