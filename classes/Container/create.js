@@ -28,7 +28,6 @@ function containerCreate(callback) {
   // make sure the repo/branch is not already spun up
   waterfall.push((watchedRepo, cb) => {
     const DatabaseTable = require('conjure-core/classes/DatabaseTable');
-    // todo: detect correct server host, but on develop / test keep localhost
     DatabaseTable.select('container', {
       repo: watchedRepo.id,
       branch: branch,
@@ -70,7 +69,6 @@ function containerCreate(callback) {
     gitHubClient
       .repo(`${orgName}/${repoName}`)
       .contents('conjure.yml', branch, (err, file) => {
-        // todo: handle errors, send a message to client/github
         if (
           (err && err.message === 'Not Found') ||
           (!file || file.type !== 'file' || typeof file.content !== 'string')
@@ -86,7 +84,6 @@ function containerCreate(callback) {
         const Config = require('conjure-core/classes/Repo/Config');
         const repoConfig = new Config(yml);
 
-        // todo: handle invalid yml errors better, send message to client/github
         if (repoConfig.valid === false) {
           return cb(new Error('Invalid Conjure YML config'));
         }
