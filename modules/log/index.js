@@ -12,3 +12,14 @@ module.exports = label => {
     timeEnd: console.time.bind(console.time, labelUsing)
   };
 };
+
+module.exports.dev = label => {
+  if (process.env.NODE_ENV !== 'development') {
+    return Object.keys(module.exports).reduce((noOps, key) => {
+      noOps[key] = () => {};
+      return noOps;
+    });
+  }
+
+  return module.exports;
+};

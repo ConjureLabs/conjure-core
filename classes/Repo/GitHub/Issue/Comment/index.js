@@ -55,7 +55,7 @@ class GitHubIssueComment {
         number
       } = this.issue.payload;
 
-      // todo: not use user's account to post comment (may not be possible, unless can get integration access from github)
+      // will need integration access from github, in order to post as ourselves, not the user
       gitHubClient
         .issue(`${orgName}/${repoName}`, number)
         .createComment({
@@ -123,7 +123,7 @@ class GitHubIssueComment {
         number
       } = this.issue.payload;
 
-      // todo: not use user's account to post comment (may not be possible, unless can get integration access from github)
+      // will need integration access from github, in order to post as ourselves, not the user
       gitHubClient
         .issue(`${orgName}/${repoName}`, number)
         .updateComment(this.commentRow.comment_id, {
@@ -184,7 +184,7 @@ class GitHubIssueComment {
         number
       } = this.issue.payload;
 
-      // todo: not use user's account to post comment (may not be possible, unless can get integration access from github)
+      // will need integration access from github, in order to post as ourselves, not the user
       gitHubClient
         .issue(`${orgName}/${repoName}`, number)
         .deleteComment(commentId, err => {

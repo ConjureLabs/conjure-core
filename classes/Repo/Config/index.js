@@ -3,8 +3,6 @@ const log = require('conjure-core/modules/log')('repo conjure config');
 const internalDefinition = Symbol('parsed input object definition');
 const singleLanguageKey = Symbol('get single language being used');
 
-// todo: validate port is valid, etc
-
 class Config {
   constructor(ymlInput) {
     const yaml = require('node-yaml');
@@ -48,7 +46,6 @@ class MachineConfig {
       [];
   }
 
-  // todo: support arrays?
   get setup() {
     if (this[internalDefinition].setup) {
       return this[internalDefinition].setup;
@@ -66,7 +63,6 @@ class MachineConfig {
     }
   }
 
-  // todo: invalidate config if no start possible, etc - can bubble invalid machine config up to main config
   get start() {
     if (this[internalDefinition].start) {
       return this[internalDefinition].start;
