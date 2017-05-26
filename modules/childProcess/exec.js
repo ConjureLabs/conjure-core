@@ -3,8 +3,7 @@ const log = require('conjure-core/modules/log')('child process execution');
 module.exports = (command, options, callback) => {
   const exec = require('child_process').exec;
 
-  // todo: logging for debug, for now, but should supress this in non-dev
-  log.info(command);
+  log.dev.info(command);
 
   exec(command, options, (err, stdout, stderr) => {
     if (err) {

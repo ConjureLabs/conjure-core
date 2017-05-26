@@ -2,7 +2,6 @@
 
 const slice = Array.prototype.slice;
 
-// todo: add a common prefix to any symbol constant?
 const queryCallback = Symbol('database.query callback');
 const staticProxy = Symbol('static method, proxy to instance method');
 
@@ -15,7 +14,6 @@ class DatabaseQueryLiteral extends String {
 
 class DatabaseQueryCast extends DatabaseQueryLiteral {
   constructor(str, castTo) {
-    // todo: find a better, future-proof way of accessing pg escaping (or is this fine?)
     const prepareValue = require('pg/lib/utils').prepareValue;
     super(`'${prepareValue(str)}'::${prepareValue(castTo)}`);
   }
