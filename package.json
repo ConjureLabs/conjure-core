@@ -17,6 +17,7 @@
   "homepage": "https://github.com/WiskeyTango/conjure-core#readme",
   "dependencies": {
     "app-root-path": "^2.0.1",
+    "cors": "^2.8.3",
     "stripe": "^4.19.0"
   }
 }
