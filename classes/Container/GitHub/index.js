@@ -7,7 +7,7 @@ const {
   protocol,
   domain,
   host
-} = config.app;
+} = config.app.web;
 
 const gitHubCommentSignature = [
   '',
