@@ -1,8 +1,5 @@
 const log = require('conjure-core/modules/log')('container create');
 
-// todo: set up a module that handles cases like this
-const asyncBreak = {};
-
 let workerPort = parseInt(process.env.PORT, 10);
 const bashNoOp = ':';
 
@@ -18,15 +15,15 @@ function containerCreate(callback) {
   const uid = require('uid');
 
   const containerUid = uid(24);
-  const waterfall = [];
+  const waterfallSteps = [];
 
   // get watched repo record
-  waterfall.push(cb => {
+  waterfallSteps.push(cb => {
     this.payload.getWatchedRepoRecord(cb);
   });
 
   // make sure the repo/branch is not already spun up
-  waterfall.push((watchedRepo, cb) => {
+  waterfallSteps.push((watchedRepo, cb, asyncBreak) => {
     const DatabaseTable = require('conjure-core/classes/DatabaseTable');
     DatabaseTable.select('container', {
       repo: watchedRepo.id,
@@ -38,7 +35,7 @@ function containerCreate(callback) {
       }
 
       if (records.length) {
-        return cb(asyncBreak);
+        return asyncBreak(null);
       }
 
       cb(null, watchedRepo);
@@ -46,7 +43,7 @@ function containerCreate(callback) {
   });
 
   // get github client
-  waterfall.push((watchedRepo, cb) => {
+  waterfallSteps.push((watchedRepo, cb) => {
     // todo: store github repo key on repo level, since 'sender' may differ
     this.payload.getGitHubAccount((err, gitHubAccount) => {
       if (err) {
@@ -65,7 +62,7 @@ function containerCreate(callback) {
   });
 
   // get yml config
-  waterfall.push((watchedRepo, gitHubClient, gitHubToken, cb) => {
+  waterfallSteps.push((watchedRepo, gitHubClient, gitHubToken, cb) => {
     gitHubClient
       .repo(`${orgName}/${repoName}`)
       .contents('conjure.yml', branch, (err, file) => {
@@ -93,7 +90,7 @@ function containerCreate(callback) {
   });
 
   // create container
-  waterfall.push((watchedRepo, repoConfig, gitHubToken, cb) => {
+  waterfallSteps.push((watchedRepo, repoConfig, gitHubToken, cb) => {
     const exec = require('conjure-core/modules/childProcess/exec');
 
     // todo: handle non-github repos
@@ -118,7 +115,7 @@ function containerCreate(callback) {
   });
 
   // run container
-  waterfall.push((watchedRepo, repoConfig, cb) => {
+  waterfallSteps.push((watchedRepo, repoConfig, cb) => {
     if (repoConfig.machine.start === null) {
       return cb(new Error('No container start command defined or known'));
     }
@@ -163,7 +160,7 @@ function containerCreate(callback) {
   });
 
   // save reference for container
-  waterfall.push((watchedRepo, hostPort, containerId, cb) => {
+  waterfallSteps.push((watchedRepo, hostPort, containerId, cb) => {
     const DatabaseTable = require('conjure-core/classes/DatabaseTable');
     // todo: detect correct server host, but on develop / test keep localhost
     DatabaseTable.insert('container', {
@@ -181,12 +178,8 @@ function containerCreate(callback) {
     });
   });
 
-  const async = require('async');
-  async.waterfall(waterfall, (err, hostPort) => {
-    if (err === asyncBreak) {
-      return callback();
-    }
-
+  const waterfall = require('conjure-core/modules/async/waterfall');
+  waterfall(waterfallSteps, (err, hostPort) => {
     callback(err, hostPort);
   });
 }

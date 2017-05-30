@@ -1,8 +1,5 @@
 const log = require('conjure-core/modules/log')('container destroy');
 
-// todo: set up a module that handles cases like this
-const asyncBreak = {};
-
 function containerDestroy(callback) {
   log.info('starting destroy');
 
@@ -10,15 +7,15 @@ function containerDestroy(callback) {
     branch
   } = this.payload;
 
-  const waterfall = [];
+  const waterfallSteps = [];
 
   // get watched repo record
-  waterfall.push(cb => {
+  waterfallSteps.push(cb => {
     this.payload.getWatchedRepoRecord(cb);
   });
 
   // make sure the repo/branch is spun up
-  waterfall.push((watchedRepo, cb) => {
+  waterfallSteps.push((watchedRepo, cb, asyncBreak) => {
     const DatabaseTable = require('conjure-core/classes/DatabaseTable');
     // todo: detect correct server host, but on develop / test keep localhost
     DatabaseTable.select('container', {
@@ -31,7 +28,7 @@ function containerDestroy(callback) {
       }
 
       if (!records.length) {
-        return cb(asyncBreak);
+        return asyncBreak();
       }
 
       cb(null, watchedRepo, records);
@@ -39,7 +36,7 @@ function containerDestroy(callback) {
   });
 
   // spin down vms
-  waterfall.push((watchedRepo, runningContainerRecords, cb) => {
+  waterfallSteps.push((watchedRepo, runningContainerRecords, cb) => {
     const exec = require('conjure-core/modules/childProcess/exec');
 
     for (let i = 0; i < runningContainerRecords.length; i++) {
@@ -60,7 +57,7 @@ function containerDestroy(callback) {
   });
 
   // remove db reference to proxy
-  waterfall.push((watchedRepo, cb) => {
+  waterfallSteps.push((watchedRepo, cb) => {
     const DatabaseTable = require('conjure-core/classes/DatabaseTable');
     DatabaseTable.update('container', {
       is_active: false,
@@ -74,12 +71,8 @@ function containerDestroy(callback) {
     });
   });
 
-  const async = require('async');
-  async.waterfall(waterfall, err => {
-    if (err === asyncBreak) {
-      return callback();
-    }
-
+  const waterfall = require('conjure-core/modules/async/waterfallSteps');
+  waterfall(waterfallSteps, err => {
     callback(err);
   });
 }
