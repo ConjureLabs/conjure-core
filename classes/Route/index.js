@@ -1,20 +1,18 @@
 const cors = require('cors');
 const config = require('conjure-core/modules/config');
 const log = require('conjure-core/modules/log')('Route');
-const UniqueArray = require('conjure-core/classes/Array/UniqueArray');
 
 const requireAuthenticationWrapper = Symbol('Require Auth Wrapper');
 const vanillaWrapper = Symbol('Vanilla (non-additive) Wrapper');
-
-const corsOrigins = new UniqueArray();
-corsOrigins.push(config.app.api.host);
-corsOrigins.push(config.app.web.host);
 
 const corsOptions = {
   credentials: true,
   methods: ['GET', 'PUT', 'PATCH', 'POST', 'DELETE', 'HEAD', 'OPTIONS'],
   optionsSuccessStatus: 200,
-  origin: corsOrigins.native,
+  origin: [
+    config.app.api.url,
+    config.app.web.url
+  ],
   preflightContinue: true
 }
 
