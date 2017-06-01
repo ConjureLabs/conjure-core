@@ -18,6 +18,7 @@
   "dependencies": {
     "app-root-path": "^2.0.1",
     "cors": "^2.8.3",
+    "octonode": "^0.7.13",
     "stripe": "^4.19.0"
   }
 }
