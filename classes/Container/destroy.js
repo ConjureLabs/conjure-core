@@ -71,7 +71,7 @@ function containerDestroy(callback) {
     });
   });
 
-  const waterfall = require('conjure-core/modules/async/waterfallSteps');
+  const waterfall = require('conjure-core/modules/async/waterfall');
   waterfall(waterfallSteps, err => {
     callback(err);
   });
