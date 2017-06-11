@@ -27,7 +27,6 @@ class Route extends Array {
 
     this.requireAuthentication = options.requireAuthentication === true;
     this.wildcardRoute = options.wildcard === true;
-    this.nextjs = options.nextjs || false; // e.g. '/landing' for landing view
 
     for (let key in options.blacklistedEnv) {
       const envVar = process.env[key];
