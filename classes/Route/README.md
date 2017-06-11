@@ -63,3 +63,11 @@ route.push((req, res, next) => {
 
 module.exports = route;
 ```
+
+#### Child Overrides
+
+##### Modifying route before passing to Express
+
+You can alter anything within the `this` namespace (including the handlers, since it is an array) by creating a child class that extends `Route`, and providing an override method for `expressRouterPrep`.
+
+`expressRouterPrep` is called at the start of `expressRouter`.

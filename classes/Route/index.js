@@ -27,6 +27,7 @@ class Route extends Array {
 
     this.requireAuthentication = options.requireAuthentication === true;
     this.wildcardRoute = options.wildcard === true;
+    this.nextjs = options.nextjs || false; // e.g. '/landing' for landing view
 
     for (let key in options.blacklistedEnv) {
       const envVar = process.env[key];
@@ -53,7 +54,13 @@ class Route extends Array {
     return handler;
   }
 
+  expressRouterPrep() {
+    // placeholder
+  }
+
   expressRouter(verb, expressPath) {
+    expressRouterPrep();
+
     const express = require('express');
     const router = express.Router();
 
