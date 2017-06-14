@@ -58,7 +58,7 @@ class Route extends Array {
   }
 
   expressRouter(verb, expressPath) {
-    expressRouterPrep();
+    this.expressRouterPrep();
 
     const express = require('express');
     const router = express.Router();
