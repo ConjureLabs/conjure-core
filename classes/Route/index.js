@@ -28,6 +28,8 @@ class Route extends Array {
     this.requireAuthentication = options.requireAuthentication === true;
     this.wildcardRoute = options.wildcard === true;
 
+    this.skippedHandler = options.skippedHandler || null;
+
     for (let key in options.blacklistedEnv) {
       const envVar = process.env[key];
       const blacklistedArray = options.blacklistedEnv[key];
@@ -42,6 +44,9 @@ class Route extends Array {
   [requireAuthenticationWrapper](handler) {
     return function(req, res, next) {
       if (!req.isAuthenticated()) {
+        if (typeof this.skippedHandler === 'function') {
+          return this.skippedHandler(req, res, next);
+        }
         return next();
       }
 
