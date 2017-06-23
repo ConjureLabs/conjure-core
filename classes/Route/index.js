@@ -47,7 +47,7 @@ class Route extends Array {
     return function(req, res, next) {
       if (!req.isAuthenticated()) {
         if (typeof skippedHandler === 'function') {
-          return skippedHandler(req, res, next);
+          return skippedHandler.apply(this, arguments);
         }
         return next();
       }
