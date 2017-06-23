@@ -81,7 +81,7 @@ class Route extends Array {
       // see https://github.com/expressjs/cors#enabling-cors-pre-flight
       router.options(expressPathUsed, cors(corsOptions));
       router[expressVerb](expressPathUsed, cors(corsOptions), (
-        this.requireAuthentication ? this[requireAuthenticationWrapper](this[i]) : this[i]
+        this.requireAuthentication ? this[requireAuthenticationWrapper].call(this, this[i]) : this[i]
       ));
     }
 
