@@ -64,6 +64,23 @@ route.push((req, res, next) => {
 module.exports = route;
 ```
 
+##### Skipped Handler
+
+If a route is skipped, because of invalid criteria like not passing `requireAuthentication`, then it will, by default, call `next()` in the Express routes. To override that, you can supply `skippedHandler`.
+
+```js
+const route = new Route({
+  requireAuthentication: true,
+  skippedHandler: (req, res, next) => {
+    // ...
+  }
+});
+
+route.push((req, res, next) => {
+  // if this route is not executed, because the user is not authed, then `skippedHandler` will be called instead of `next`
+});
+```
+
 #### Child Overrides
 
 ##### Modifying route before passing to Express
