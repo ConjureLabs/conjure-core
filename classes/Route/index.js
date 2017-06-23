@@ -42,10 +42,12 @@ class Route extends Array {
   }
 
   [requireAuthenticationWrapper](handler) {
+    const skippedHandler = this.skippedHandler;
+
     return function(req, res, next) {
       if (!req.isAuthenticated()) {
-        if (typeof this.skippedHandler === 'function') {
-          return this.skippedHandler(req, res, next);
+        if (typeof skippedHandler === 'function') {
+          return skippedHandler(req, res, next);
         }
         return next();
       }
@@ -81,7 +83,7 @@ class Route extends Array {
       // see https://github.com/expressjs/cors#enabling-cors-pre-flight
       router.options(expressPathUsed, cors(corsOptions));
       router[expressVerb](expressPathUsed, cors(corsOptions), (
-        this.requireAuthentication ? this[requireAuthenticationWrapper].call(this, this[i]) : this[i]
+        this.requireAuthentication ? this[requireAuthenticationWrapper](this[i]) : this[i]
       ));
     }
 
