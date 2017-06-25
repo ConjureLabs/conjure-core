@@ -4,6 +4,6 @@ module.exports = function sortInsensitive(arr, key) {
     const aVal = key === undefined ? a : a[key];
     const bVal = key === undefined ? b : b[key];
 
-    return aVal.toLowerCase().localeCompare(bVal.toLowerCase());
+    return aVal.toString().toLowerCase().localeCompare(bVal.toString().toLowerCase());
   });
 };
