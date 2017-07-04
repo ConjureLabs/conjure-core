@@ -88,3 +88,18 @@ route.push((req, res, next) => {
 You can alter anything within the `this` namespace (including the handlers, since it is an array) by creating a child class that extends `Route`, and providing an override method for `expressRouterPrep`.
 
 `expressRouterPrep` is called at the start of `expressRouter`.
+
+#### Direct Calls
+
+If have a repo like API, and want to install the module within another repo (say, web) and call it directly, you can do so by passing the parent repo's route request object, and a callback.
+
+```js
+// this is assumed to be within a parent repo
+route.push((req, res, next) => {
+  const getOrgsApi = require('conjure-api/server/routes/api/orgs/get.js');
+
+  getOrgsApi(req, (err, result) => {
+    // ...
+  });
+});
+```
