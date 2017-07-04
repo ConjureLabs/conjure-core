@@ -89,6 +89,29 @@ class Route extends Array {
 
     return router;
   }
+
+  direct(req, callback) {
+    const tasks = this.map(handler => {
+      return (callback, breakFlow) => {
+        const resProxy = {
+          send: data => {
+            breakFlow(data);
+          }
+        };
+
+        handler(req, resProxy, err => {
+          if (err) {
+            return callback(err);
+          }
+
+          callback();
+        });
+      };
+    });
+
+    const waterfall = require('conjure-core/modules/async/waterfall');
+    waterfall(tasks, callback);
+  }
 }
 
 module.exports = Route;

@@ -103,3 +103,5 @@ route.push((req, res, next) => {
   });
 });
 ```
+
+It is possible that the `.direct` callback will not receive any data, if (within the route) `next` is called, and `res.send` is never fired.
