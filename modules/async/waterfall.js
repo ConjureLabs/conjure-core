@@ -1,6 +1,6 @@
 // using a proxy to waterfallWorker to avoid arg exposure
-module.exports = function waterfall(arr, callback) {
-  waterfallWorker(arr, [], callback);
+module.exports = function waterfall(arr, callback, ...initialArgs) {
+  waterfallWorker(arr, initialArgs, callback);
 };
 
 function waterfallWorker(arr, args, callback) {
