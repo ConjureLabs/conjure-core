@@ -64,3 +64,23 @@ waterfall(tasks, (err, a, b, c) => {
   // err === null, a === 'x', b === 'y', c === 'z'
 });
 ```
+
+## Injecting initial waterfall arguments
+
+```js
+const waterfall = require('conjure-core/modules/async/waterfall');
+
+const tasks = [];
+
+tasks.push((a, callback) => {
+  callback(null, a, b');
+});
+
+tasks.push((a, b, callback) => {
+  callback(null, a, b, 'c');
+});
+
+waterfall(tasks, (err, a, b, c) => {
+  // err === null, a === 'a', b === 'b', c === 'c'
+}, 'a');
+```
