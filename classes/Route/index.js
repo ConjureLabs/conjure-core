@@ -91,7 +91,7 @@ class Route extends Array {
   }
 
   direct(req, callback) {
-    const tasks = this.map(handler => {
+    const tasks = this.slice().map(handler => {
       return (callback, breakFlow) => {
         const resProxy = {
           send: data => {
