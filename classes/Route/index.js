@@ -106,7 +106,8 @@ class Route extends Array {
       return (callback, breakFlow) => {
         const resProxy = {
           send: data => {
-            breakFlow(data);
+            callback(null, data);
+            return breakFlow();
           }
         };
 
