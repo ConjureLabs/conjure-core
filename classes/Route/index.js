@@ -113,10 +113,8 @@ class Route extends Array {
     });
 
     const waterfall = require('conjure-core/modules/async/waterfall');
-    waterfall(tasks, err => {
-      callback(err);
-    }, data => {
-      callback(null, data);
+    waterfall(tasks, (err, data) => {
+      callback(err, data);
     });
     return this;
   }
