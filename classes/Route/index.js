@@ -31,6 +31,7 @@ class Route extends Array {
     this.skippedHandler = options.skippedHandler || null;
 
     this.directTasksCache = null; // filled on first .direct call
+    this.direct = this.direct.bind(this);
 
     for (let key in options.blacklistedEnv) {
       const envVar = process.env[key];
