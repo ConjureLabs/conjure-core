@@ -30,8 +30,7 @@ class Route extends Array {
 
     this.skippedHandler = options.skippedHandler || null;
 
-    this.directTasksCache = null; // filled on first .direct call
-    this.direct = this.direct.bind(this);
+    this.direct = this.direct.bind(this); // this method was losing
 
     for (let key in options.blacklistedEnv) {
       const envVar = process.env[key];
@@ -94,19 +93,8 @@ class Route extends Array {
   }
 
   direct(req, callback) {
-    // if task workers already available, start flow
-    if (Array.isArray(this.directTasksCache)) {
-      const waterfall = require('conjure-core/modules/async/waterfall');
-      waterfall(this.directTasksCache, err => {
-        callback(err);
-      }, data => {
-        callback(null, data);
-      });
-      return this;
-    }
-
     // build up a cache on task workers
-    this.directTasksCache = [].concat(this).map(handler => {
+    const tasks = [].concat(this).map(handler => {
       return (callback, breakFlow) => {
         const resProxy = {
           send: data => {
@@ -124,8 +112,13 @@ class Route extends Array {
       };
     });
 
-    // now that this.directTasksCache is filled in, re-run this method to cause it to start
-    return this.direct(req, callback);
+    const waterfall = require('conjure-core/modules/async/waterfall');
+    waterfall(tasks, err => {
+      callback(err);
+    }, data => {
+      callback(null, data);
+    });
+    return this;
   }
 }
 
