@@ -97,7 +97,11 @@ class Route extends Array {
     // if task workers already available, start flow
     if (Array.isArray(this.directTasksCache)) {
       const waterfall = require('conjure-core/modules/async/waterfall');
-      waterfall(this.directTasksCache, callback);
+      waterfall(this.directTasksCache, err => {
+        callback(err);
+      }, data => {
+        callback(null, data);
+      });
       return this;
     }
 
@@ -106,8 +110,7 @@ class Route extends Array {
       return (callback, breakFlow) => {
         const resProxy = {
           send: data => {
-            callback(null, data);
-            return breakFlow();
+            breakFlow(data);
           }
         };
 
