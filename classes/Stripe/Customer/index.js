@@ -24,11 +24,29 @@ class Customer extends Stripe {
     return this[createCustomer](callback);
   }
 
+  static retrieve(conjureId, stripeId, callback) {
+    Customer.api.customers.retrieve({
+      id: stripeId
+    }, (err, customerData) => {
+      if (err) {
+        return callback(err);
+      }
+
+      callback(null, new Customer(conjureId, {
+        id: customerData.id,
+        email: customerData.email,
+        name: customerData.metadata.name
+      }, customerData));
+    });
+
+    return this;
+  }
+
   [createCustomer](callback) {
     Customer.api.customers.create({
       email: this.email,
       metadata: {
-        conureId: this.conjureId,
+        conjureId: this.conjureId,
         name: this.name
       }
     }, (err, customerData) => {
