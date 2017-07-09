@@ -92,7 +92,12 @@ class Route extends Array {
     return router;
   }
 
-  direct(req, callback) {
+  direct(req, args, callback) {
+    req = Object.assign(req, {
+      body: args,
+      query: args
+    });
+
     // build up a cache on task workers
     const tasks = [].concat(this).map(handler => {
       return (callback, breakFlow) => {
