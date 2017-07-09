@@ -1,3 +1,6 @@
+const ContentError = require('conjure-core/modules/err').ContentError;
+const UserError = require('conjure-core/modules/err').UserError;
+
 const slice = Array.prototype.slice;
 
 /*
@@ -61,7 +64,7 @@ class UniqueArray extends Array {
     super();
 
     if (typeof uniqueKey !== 'string' || !uniqueKey.trim()) {
-      throw new Error('UniqueArray requires a key, to filter contents with');
+      throw new ContentError('UniqueArray requires a key, to filter contents with');
     }
 
     this.uniqueKey = uniqueKey.trim();
@@ -88,11 +91,11 @@ class UniqueArray extends Array {
   }
 
   copyWithin() {
-    throw new Error('Can not call .copyWithin() on a UniqueArray');
+    throw new UserError('Can not call .copyWithin() on a UniqueArray');
   }
 
   fill() {
-    throw new Error('Can not call .fill() on a UniqueArray');
+    throw new UserError('Can not call .fill() on a UniqueArray');
   }
 
   filter(func, bind) {
@@ -126,11 +129,11 @@ class UniqueArray extends Array {
   }
 
   reduce() {
-    throw new Error('You can not .reduce() a UniqueArray - Use .native to get a native array');
+    throw new UserError('You can not .reduce() a UniqueArray - Use .native to get a native array');
   }
 
   reduceRight() {
-    throw new Error('You can not .reduceRight() a UniqueArray - Use .native to get a native array');
+    throw new UserError('You can not .reduceRight() a UniqueArray - Use .native to get a native array');
   }
 
   reverse() {
@@ -138,7 +141,7 @@ class UniqueArray extends Array {
   }
 
   sort() {
-    throw new Error('You can not .sort() a UniqueArray - Use .native to get a native array');
+    throw new UserError('You can not .sort() a UniqueArray - Use .native to get a native array');
   }
 
   shift() {

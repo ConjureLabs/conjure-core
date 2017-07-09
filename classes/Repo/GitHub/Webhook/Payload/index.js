@@ -1,3 +1,5 @@
+const UnexpectedError = require('conjure-core/modules/err').UnexpectedError;
+
 const TYPE_BRANCH = Symbol('is related to a branch');
 const TYPE_COMMIT = Symbol('is related to a commit');
 const TYPE_PULL_REQUEST = Symbol('is related to a pull request');
@@ -201,7 +203,7 @@ class WebhookPayload {
 
       if (!rows.length) {
         // todo: this may be legit if a PR is changed post-enabling conjure - maybe just log a warning?
-        return callback(new Error('this repo is not being watched by Conjure'));
+        return callback(new UnexpectedError('this repo is not being watched by Conjure'));
       }
 
       this[cached].watchedRepo = rows[0];

@@ -1,4 +1,6 @@
 const async = require('async');
+const NotFoundError = require('conjure-core/modules/err').NotFoundError;
+const UnexpectedError = require('conjure-core/modules/err').UnexpectedError;
 const log = require('conjure-core/modules/log')('github issue comment');
 
 const getGitHubClient = Symbol('get GitHub api client instance');
@@ -18,7 +20,7 @@ class GitHubIssueComment {
       }
 
       if (!gitHubAccount) {
-        return callback(new Error('No github account record found'));
+        return callback(new NotFoundError('No github account record found'));
       }
 
       const github = require('octonode');
@@ -109,7 +111,7 @@ class GitHubIssueComment {
     waterfall.push(cb => {
       // this should not happen
       if (this.commentRow.is_active !== true) {
-        return cb(new Error('Can not update comment that is not longer active'));
+        return cb(new ErUror('Can not update comment that is not longer active'));
       }
 
       cb();
@@ -151,7 +153,7 @@ class GitHubIssueComment {
 
   delete(callback) {
     if (!this.commentRow) {
-      return callback(new Error('Can not delete a comment without referencing existing row'));
+      return callback(new UnexpectedError('Can not delete a comment without referencing existing row'));
     }
 
     log.info('deleting existing issue comment, on github');

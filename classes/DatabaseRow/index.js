@@ -1,3 +1,5 @@
+const UnexpectedError = require('conjure-core/modules/err').UnexpectedError;
+
 const rowTableName = Symbol('instance row\'s table name');
 const rowDeleted = Symbol('indicator that row was deleted');
 
@@ -19,7 +21,7 @@ module.exports = class DatabaseRow {
    */
   save(callback) {
     if (this[rowDeleted] === true) {
-      callback(new Error('This row was previously deleted'));
+      callback(new UnexpectedError('This row was previously deleted'));
       return this;
     }
 
@@ -33,11 +35,11 @@ module.exports = class DatabaseRow {
         }
 
         if (!rows.length) {
-          return callback(new Error('Expected DatabaseTable.insert to return new table row'));
+          return callback(new UnexpectedError('Expected DatabaseTable.insert to return new table row'));
         }
 
         if (rows.length > 1) {
-          return callback(new Error('Expected DatabaseTable.insert to return a single new table row'));
+          return callback(new UnexpectedError('Expected DatabaseTable.insert to return a single new table row'));
         }
 
         for (let key in rows[0]) {
@@ -63,12 +65,12 @@ module.exports = class DatabaseRow {
 
   delete(callback) {
     if (this[rowDeleted] === true) {
-      callback(new Error('This row was previously deleted'));
+      callback(new UnexpectedError('This row was previously deleted'));
       return this;
     }
 
     if (this.id === undefined) {
-      callback(new Error('Exepected row .id to exist, for deletion'));
+      callback(new UnexpectedError('Exepected row .id to exist, for deletion'));
       return this;
     }
 

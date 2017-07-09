@@ -27,7 +27,7 @@ class ConjureError extends Error {
 }
 module.exports.ConjureError = ConjureError;
 
-// if something was not found (on web, should trigger a 404)
+// if something was not found (on web, should trigger a 404, if on web)
 class NotFoundError extends ConjureError {
   get httpStatusCode() {
     return 404;
@@ -66,3 +66,9 @@ class ContentError extends ConjureError {
   }
 }
 module.exports.ContentError = ContentError;
+
+// if user triggered an error
+class UserError extends ConjureError {
+}
+module.exports.UserError = UserError;
+
