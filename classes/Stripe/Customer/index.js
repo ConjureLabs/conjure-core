@@ -5,6 +5,8 @@ const updateCustomer = Symbol('update existing customer');
 
 class Customer extends Stripe {
   constructor(conjureId, data, rawData) {
+    super(...arguments);
+
     if (data.id) {
       this.id = data.id;
     }

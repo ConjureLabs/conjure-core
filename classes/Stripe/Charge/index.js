@@ -5,6 +5,8 @@ const updateCharge = Symbol('update existing charge');
 
 class Charge extends Stripe {
   constructor(customerInstance, cardInstance, data, rawData) {
+    super(...arguments);
+
     if (data.id) {
       this.id = data.id;
     }
