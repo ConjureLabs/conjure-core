@@ -1,4 +1,5 @@
 const Stripe = require('../');
+const UnexpectedError = require('conjure-core/modules/err').UnexpectedError;
 
 const createCard = Symbol('create card');
 const updateCard = Symbol('update existing card');
@@ -10,6 +11,8 @@ class Card extends Stripe {
     if (data.id) {
       this.id = data.id;
     }
+
+    this.customer = customerInstance;
 
     this.cvc = data.cvc;
     this.name = data.name;
@@ -45,7 +48,11 @@ class Card extends Stripe {
   }
 
   [createCard](callback) {
-    Card.api.customers.createSource(customerInstance.id, {
+    if (!this.customer || !this.customer.id) {
+      return callback(new UnexpectedError('No stripe customer id present'));
+    }
+
+    Card.api.customers.createSource(this.customer.id, {
       source: {
         object: 'card',
         exp_month: this.expiration.month,
@@ -74,7 +81,11 @@ class Card extends Stripe {
   }
 
   [updateCard](callback) {
-    Card.api.customers.updateCard(customerInstance.id, this.id, {
+    if (!this.customer || !this.customer.id) {
+      return callback(new UnexpectedError('No stripe customer id present'));
+    }
+
+    Card.api.customers.updateCard(this.customer.id, this.id, {
       source: {
         object: 'card',
         exp_month: this.expiration.month,
