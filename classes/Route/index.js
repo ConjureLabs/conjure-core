@@ -93,6 +93,8 @@ class Route extends Array {
   }
 
   direct(req, args, callback) {
+    args = args == null ? {} : args;
+
     req = Object.assign(req, {
       body: args,
       query: args
