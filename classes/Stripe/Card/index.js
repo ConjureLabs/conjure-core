@@ -5,6 +5,8 @@ const updateCard = Symbol('update existing card');
 
 class Card extends Stripe {
   constructor(customerInstance, data, rawData) {
+    super(...arguments);
+
     if (data.id) {
       this.id = data.id;
     }
