@@ -27,9 +27,7 @@ class Customer extends Stripe {
   }
 
   static retrieve(conjureId, stripeId, callback) {
-    Customer.api.customers.retrieve({
-      id: stripeId
-    }, (err, customerData) => {
+    Customer.api.customers.retrieve(stripeId, (err, customerData) => {
       if (err) {
         return callback(err);
       }
