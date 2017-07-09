@@ -95,14 +95,14 @@ class Route extends Array {
   direct(req, args, callback) {
     args = args == null ? {} : args;
 
-    req = Object.assign(req, {
+    req = Object.assign({}, req, {
       body: args,
       query: args
     });
 
     // build up a cache on task workers
     const tasks = [].concat(this).map(handler => {
-      return (callback, breakFlow) => {
+      return (cb, breakFlow) => {
         const resProxy = {
           send: data => {
             breakFlow(data);
@@ -111,10 +111,10 @@ class Route extends Array {
 
         handler(req, resProxy, err => {
           if (err) {
-            return callback(err);
+            return cb(err);
           }
 
-          callback();
+          cb();
         });
       };
     });
