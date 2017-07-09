@@ -45,7 +45,7 @@ class Card extends Stripe {
   }
 
   [createCard](callback) {
-    Customer.api.customers.createSource(customerInstance.id, {
+    Card.api.customers.createSource(customerInstance.id, {
       source: {
         object: 'card',
         exp_month: this.expiration.month,
@@ -74,7 +74,7 @@ class Card extends Stripe {
   }
 
   [updateCard](callback) {
-    Customer.api.customers.updateCard(customerInstance.id, this.id, {
+    Card.api.customers.updateCard(customerInstance.id, this.id, {
       source: {
         object: 'card',
         exp_month: this.expiration.month,
