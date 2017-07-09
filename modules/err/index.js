@@ -71,4 +71,3 @@ module.exports.ContentError = ContentError;
 class UserError extends ConjureError {
 }
 module.exports.UserError = UserError;
-
