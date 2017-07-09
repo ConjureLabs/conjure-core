@@ -1,5 +1,8 @@
 // todo: tests!
 
+const UnexpectedError = require('conjure-core/modules/err').UnexpectedError;
+const ContentError = require('conjure-core/modules/err').ContentError;
+
 const slice = Array.prototype.slice;
 
 const queryCallback = Symbol('database.query callback');
@@ -88,14 +91,14 @@ module.exports = class DatabaseTable {
     const newRows = args; // anything left in arguments will be considered new row objects
 
     if (!newRows.length) {
-      callback(new Error('There were no rows to insert'));
+      callback(new UnexpectedError('There were no rows to insert'));
       return this;
     }
 
     const columnNames = findAllColumnNames(newRows);
 
     if (columnNames.includes('id')) {
-      callback(new Error('Cannot insert a row that has .id'));
+      callback(new ContentError('Cannot insert a row that has .id'));
       return this;
     }
 

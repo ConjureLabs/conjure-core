@@ -1,5 +1,6 @@
 const pgPool = require('pg').Pool;
 const config = require('conjure-core/modules/config');
+const ContentError = require('conjure-core/modules/err').ContentError;
 const log = require('conjure-core/modules/log')('database');
 
 const pool = new pgPool(config.database.pg);
@@ -14,7 +15,7 @@ function query(/* query, [queryArgs], callback */) {
   let callback = args.pop();
 
   if (typeof callback !== 'function') {
-    throw new Error('Expected last argument to query() to be a callback');
+    throw new ContentError('Expected last argument to query() to be a callback');
   }
 
   pool.connect((err, client, done) => {

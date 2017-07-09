@@ -1,3 +1,4 @@
+const ContentError = require('conjure-core/modules/err').ContentError;
 const log = require('conjure-core/modules/log')('container create');
 
 let workerPort = parseInt(process.env.PORT, 10);
@@ -51,7 +52,7 @@ function containerCreate(callback) {
       }
 
       if (!gitHubAccount) {
-        return cb(new Error('No github account record found'));
+        return cb(new ContentError('No github account record found'));
       }
 
       const github = require('octonode');
@@ -70,7 +71,7 @@ function containerCreate(callback) {
           (err && err.message === 'Not Found') ||
           (!file || file.type !== 'file' || typeof file.content !== 'string')
         ) {
-          return cb(new Error('No Conjure YML config present in repo'));
+          return cb(new ContentError('No Conjure YML config present in repo'));
         }
 
         if (err) {
@@ -82,7 +83,7 @@ function containerCreate(callback) {
         const repoConfig = new Config(yml);
 
         if (repoConfig.valid === false) {
-          return cb(new Error('Invalid Conjure YML config'));
+          return cb(new ContentError('Invalid Conjure YML config'));
         }
 
         cb(null, watchedRepo, repoConfig, gitHubToken);
@@ -117,7 +118,7 @@ function containerCreate(callback) {
   // run container
   waterfallSteps.push((watchedRepo, repoConfig, cb) => {
     if (repoConfig.machine.start === null) {
-      return cb(new Error('No container start command defined or known'));
+      return cb(new ContentError('No container start command defined or known'));
     }
 
     const exec = require('conjure-core/modules/childProcess/exec');
