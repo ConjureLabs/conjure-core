@@ -98,7 +98,7 @@ If have a repo like API, and want to install the module within another repo (say
 route.push((req, res, next) => {
   const getOrgsApi = require('conjure-api/server/routes/api/orgs/get.js');
 
-  getOrgsApi.direct(req, (err, result) => {
+  getOrgsApi.direct(req, { arg: 'val' }, (err, result) => {
     // ...
   });
 });
