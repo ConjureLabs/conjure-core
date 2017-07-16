@@ -15,7 +15,7 @@ const config = {
     },
 
     web: {
-      domain: process.env.CONJURE_WEB.DOMAIN,
+      domain: process.env.CONJURE_WEB_DOMAIN,
       port: process.env.CONJURE_WEB_PORT,
       protocol: process.env.CONJURE_WEB_PROTOCOL,
       url: null // set later
