@@ -3,17 +3,13 @@ const log = require('conjure-core/modules/log')('github container');
 const async = require('async');
 const config = require('conjure-core/modules/config');
 
-const {
-  protocol,
-  domain,
-  host
-} = config.app.web;
+const webUrl = config.app.web.url;
 
 const gitHubCommentSignature = [
   '',
   '---',
   '',
-  `__This message was generated via [<kbd>⎔ Conjure.sh</kbd>](${protocol}://${host})__`
+  `__This message was generated via [<kbd>⎔ Conjure.sh</kbd>](${webUrl})__`
 ];
 
 class GitHubContainer extends Container {
@@ -41,7 +37,7 @@ class GitHubContainer extends Container {
     });
 
     waterfall.push((hostPort, containerUid, cb) => {
-      const containerUrl = `${protocol}://${domain}/c/${containerUid}/`;
+      const containerUrl = `${webUrl}/c/${containerUid}/`;
       issue.upsertComment([
         `:octocat: [You can view this branch at ${containerUrl}](${containerUrl})`
       ].concat(gitHubCommentSignature).join('\n'), err => {
