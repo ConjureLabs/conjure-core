@@ -11,6 +11,7 @@ const config = {
       port: process.env.CONJURE_API_PORT,
       protocol: process.env.CONJURE_API_PROTOCOL,
       publicDomain: null, // set later
+      publicHost: null, // set later
       publicUrl: null, // set later
       url: null // set later
     },
@@ -57,6 +58,7 @@ const config = {
 // fill in app.api
 config.app.api.host = process.env.NODE_ENV === 'development' ? `${config.app.api.domain}:${config.app.api.port}` : config.app.api.domain;
 config.app.api.publicDomain = process.env.CONJURE_API_PUBLIC_HOST || config.app.api.domain;
+config.app.api.publicHost = process.env.NODE_ENV === 'development' ? `${config.app.api.publicHost}:${config.app.api.port}` : config.app.api.publicHost;
 config.app.api.publicUrl = `${config.app.api.protocol}://${config.app.api.publicHost}`;
 config.app.api.url = `${config.app.api.protocol}://${config.app.api.host}`;
 
