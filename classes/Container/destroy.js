@@ -61,7 +61,8 @@ function containerDestroy(callback) {
     const DatabaseTable = require('conjure-core/classes/DatabaseTable');
     DatabaseTable.update('container', {
       is_active: false,
-      active_stop: new Date()
+      active_stop: new Date(),
+      updated: new Date()
     }, {
       repo: watchedRepo.id,
       branch: branch,
