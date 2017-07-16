@@ -1,4 +1,5 @@
 const ContentError = require('conjure-core/modules/err').ContentError;
+const UnexpectedError = require('conjure-core/modules/err').UnexpectedError;
 const config = require('conjure-core/modules/config');
 const log = require('conjure-core/modules/log')('container create');
 
@@ -100,8 +101,16 @@ function containerCreate(callback) {
       url_uid: containerUid,
       is_active: false,
       added: new Date()
-    }, (err, record) => {
-      cb(err, watchedRepo, repoConfig, gitHubToken, record.id);
+    }, (err, rows) => {
+      if (err) {
+        return cb(err);
+      }
+
+      if (!Array.isArray(rows) || !rows.length) {
+        return cb(new UnexpectedError('Container record failed to insert'));
+      }
+
+      cb(null, watchedRepo, repoConfig, gitHubToken, rows[0].id);
     });
   });
 
