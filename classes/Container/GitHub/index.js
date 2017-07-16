@@ -41,8 +41,9 @@ class GitHubContainer extends Container {
     });
 
     waterfall.push((hostPort, containerUid, cb) => {
+      const containerUrl = `${protocol}://${domain}/c/${containerUid}/`;
       issue.upsertComment([
-        `:octocat: [You can view this branch at ${protocol}://${domain}/c/${containerUid}/](${protocol}://${domain}/c/${containerUid}/)`
+        `:octocat: [You can view this branch at ${containerUrl}](${containerUrl})`
       ].concat(gitHubCommentSignature).join('\n'), err => {
         cb(err);
       });
