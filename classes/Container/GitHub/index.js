@@ -23,7 +23,7 @@ class GitHubContainer extends Container {
     // commenting on issue thread to notify that an instance is spinning up
     waterfall.push(cb => {
       issue.upsertComment([
-        `:hourglass_flowing_sand: [Conjure.sh](${protocol}://${host}) is spinning up this branch`,
+        `:hourglass_flowing_sand: [Conjure.sh](${webUrl}) is spinning up this branch`,
       ].concat(gitHubCommentSignature).join('\n'), err => {
         cb(err);
       });
