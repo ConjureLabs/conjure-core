@@ -181,7 +181,7 @@ function containerCreate(callback) {
 
   const waterfall = require('conjure-core/modules/async/waterfall');
   waterfall(waterfallSteps, (err, hostPort) => {
-    callback(err, hostPort);
+    callback(err, hostPort, containerUid);
   });
 }
 
