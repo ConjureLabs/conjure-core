@@ -1,6 +1,17 @@
-export APP_API_PORT=2999;
-export APP_WEB_PORT=3000;
+export CONJURE_WEB_DOMAIN='conjure.dev';
+export CONJURE_WEB_PROTOCOL='http';
+export CONJURE_WEB_PORT=3000;
+
+export CONJURE_API_DOMAIN='conjure.dev';
+export CONJURE_API_PROTOCOL='http';
+export CONJURE_API_PORT=2999;
 export CONJURE_API_PUBLIC_HOST='asdf.ngrok.io';
+
 export CONJURE_SESSION_SECRET='';
-export GITHUB_CLIENT_SECRET='';
-export STRIPE_API_SECRET='';
+export CONJURE_GITHUB_CLIENT_SECRET='';
+export CONJURE_STRIPE_API_SECRET='';
+
+export CONJURE_PG_USER='conjure_admin';
+export CONJURE_PG_PASS='';
+export CONJURE_PG_DB='conjure';
+export CONJURE_PG_HOST='localhost';
