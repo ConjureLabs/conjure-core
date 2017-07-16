@@ -99,7 +99,7 @@ function containerCreate(callback) {
       repo: watchedRepo.id,
       branch: branch,
       url_uid: containerUid,
-      is_active: false,
+      is_active: true,
       added: new Date()
     }, (err, rows) => {
       if (err) {
