@@ -7,6 +7,7 @@ const config = {
   app: {
     api: {
       domain: process.env.CONJURE_API_DOMAIN,
+      host: null, // set later
       port: process.env.CONJURE_API_PORT,
       protocol: process.env.CONJURE_API_PROTOCOL,
       publicDomain: null, // set later
@@ -16,6 +17,7 @@ const config = {
 
     web: {
       domain: process.env.CONJURE_WEB_DOMAIN,
+      host: null, // set later
       port: process.env.CONJURE_WEB_PORT,
       protocol: process.env.CONJURE_WEB_PROTOCOL,
       url: null // set later
@@ -53,11 +55,13 @@ const config = {
 };
 
 // fill in app.api
+config.app.api.host = `${config.app.api.domain}:${config.app.api.port}`;
 config.app.api.publicDomain = process.env.CONJURE_API_PUBLIC_HOST || config.app.api.domain;
-config.app.api.publicUrl = `${config.app.api.protocol}://${config.app.api.publicDomain}`;
-config.app.api.url = `${config.app.api.protocol}://${config.app.api.domain}`;
+config.app.api.publicUrl = `${config.app.api.protocol}://${config.app.api.publicHost}`;
+config.app.api.url = `${config.app.api.protocol}://${config.app.api.host}`;
 
 // fill in app.web
-config.app.web.url = `${config.app.web.protocol}://${config.app.web.domain}`;
+config.app.web.host = `${config.app.web.domain}:${config.app.web.port}`;
+config.app.web.url = `${config.app.web.protocol}://${config.app.web.host}`;
 
 module.exports = config;

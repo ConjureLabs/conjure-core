@@ -168,7 +168,7 @@ function containerCreate(callback) {
     DatabaseTable.insert('container', {
       repo: watchedRepo.id,
       branch: branch,
-      host: `${url_uid}.${config.web.host}`,
+      domain: `c${url_uid}.${config.web.domain}`,
       port: hostPort,
       container_id: containerId,
       url_uid: containerUid,
