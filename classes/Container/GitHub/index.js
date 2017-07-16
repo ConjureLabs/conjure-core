@@ -31,13 +31,13 @@ class GitHubContainer extends Container {
 
     // create vm
     waterfall.push(cb => {
-      super.create((err, hostPort, containerUid) => {
-        cb(err, hostPort, containerUid);
+      super.create((err, containerDomain) => {
+        cb(err, containerDomain);
       });
     });
 
-    waterfall.push((hostPort, containerUid, cb) => {
-      const containerUrl = `${webUrl}/c/${containerUid}/`;
+    waterfall.push((containerDomain, cb) => {
+      const containerUrl = `${webProtocol}://${containerDomain}`;
       issue.upsertComment([
         `:octocat: [You can view this branch at ${containerUrl}](${containerUrl})`
       ].concat(gitHubCommentSignature).join('\n'), err => {

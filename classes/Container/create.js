@@ -164,11 +164,11 @@ function containerCreate(callback) {
   // save reference for container
   waterfallSteps.push((watchedRepo, hostPort, containerId, cb) => {
     const DatabaseTable = require('conjure-core/classes/DatabaseTable');
-    // todo: detect correct server host, but on develop / test keep localhost
+    const containerDomain = `c${url_uid}.${config.web.domain}`;
     DatabaseTable.insert('container', {
       repo: watchedRepo.id,
       branch: branch,
-      domain: `c${url_uid}.${config.web.domain}`,
+      domain: containerDomain,
       port: hostPort,
       container_id: containerId,
       url_uid: containerUid,
@@ -176,13 +176,13 @@ function containerCreate(callback) {
       active_start: new Date(),
       added: new Date()
     }, err => {
-      cb(err, hostPort);
+      cb(err, containerDomain);
     });
   });
 
   const waterfall = require('conjure-core/modules/async/waterfall');
-  waterfall(waterfallSteps, (err, hostPort) => {
-    callback(err, hostPort, containerUid);
+  waterfall(waterfallSteps, (err, containerDomain) => {
+    callback(err, containerDomain);
   });
 }
 
