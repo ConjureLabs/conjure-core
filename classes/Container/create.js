@@ -164,7 +164,7 @@ function containerCreate(callback) {
   // save reference for container
   waterfallSteps.push((watchedRepo, hostPort, containerId, cb) => {
     const DatabaseTable = require('conjure-core/classes/DatabaseTable');
-    const containerDomain = `c${url_uid}.${config.web.domain}`;
+    const containerDomain = `c${containerUid}.${config.app.web.domain}`;
     DatabaseTable.insert('container', {
       repo: watchedRepo.id,
       branch: branch,
