@@ -4,9 +4,8 @@ class ReqProxy {
 
     const config = require('conjure-core/modules/config');
 
-    this.host = options.host || config.app.api.publicHost;
+    this.domain = options.domain || config.app.api.publicDomain;
     this.protocol = options.protocol || 'http';
-    this.port = options.port || config.app.api.port;
     this.path = options.path || '';
     this.method = typeof options.method === 'string' ? options.method.toUpperCase() : 'GET';
     this.encoding = options.encoding || 'utf8';
@@ -14,7 +13,7 @@ class ReqProxy {
 
   forward(req, res) {
     const request = require('request');
-    request(`${this.protocol}://${this.host}:${this.port}${this.path}`).pipe(res);
+    request(`${this.protocol}://${this.domain}${this.path}`).pipe(res);
   }
 }
 

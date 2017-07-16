@@ -1,4 +1,5 @@
 const ContentError = require('conjure-core/modules/err').ContentError;
+const config = require('conjure-core/modules/config');
 const log = require('conjure-core/modules/log')('container create');
 
 let workerPort = parseInt(process.env.PORT, 10);
@@ -167,7 +168,7 @@ function containerCreate(callback) {
     DatabaseTable.insert('container', {
       repo: watchedRepo.id,
       branch: branch,
-      host: 'localhost',
+      host: `${url_uid}.${config.web.host}`,
       port: hostPort,
       container_id: containerId,
       url_uid: containerUid,
