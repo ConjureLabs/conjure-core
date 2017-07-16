@@ -3,6 +3,7 @@ const log = require('conjure-core/modules/log')('github container');
 const async = require('async');
 const config = require('conjure-core/modules/config');
 
+const webProtocol = config.app.web.protocol;
 const webUrl = config.app.web.url;
 
 const gitHubCommentSignature = [
