@@ -91,8 +91,22 @@ function containerCreate(callback) {
       });
   });
 
-  // create container
+  // create record for container
   waterfallSteps.push((watchedRepo, repoConfig, gitHubToken, cb) => {
+    const DatabaseTable = require('conjure-core/classes/DatabaseTable');
+    DatabaseTable.insert('container', {
+      repo: watchedRepo.id,
+      branch: branch,
+      url_uid: containerUid,
+      is_active: false,
+      added: new Date()
+    }, (err, record) => {
+      cb(err, watchedRepo, repoConfig, gitHubToken, record.id);
+    });
+  });
+
+  // create container
+  waterfallSteps.push((watchedRepo, repoConfig, gitHubToken, containerRowId, cb) => {
     const exec = require('conjure-core/modules/childProcess/exec');
 
     // todo: handle non-github repos
@@ -112,12 +126,12 @@ function containerCreate(callback) {
     exec(command, {
       cwd: process.env.CONJURE_WORKER_DIR
     }, err => {
-      cb(err, watchedRepo, repoConfig);
+      cb(err, watchedRepo, repoConfig, containerRowId);
     });
   });
 
   // run container
-  waterfallSteps.push((watchedRepo, repoConfig, cb) => {
+  waterfallSteps.push((watchedRepo, repoConfig, containerRowId, cb) => {
     if (repoConfig.machine.start === null) {
       return cb(new ContentError('No container start command defined or known'));
     }
@@ -155,26 +169,25 @@ function containerCreate(callback) {
           return;
         }
 
-        cb(null, watchedRepo, hostPort, stdout);
+        cb(null, watchedRepo, containerRowId, hostPort, stdout);
       });
     }
     attemptDockerRun();
   });
 
-  // save reference for container
-  waterfallSteps.push((watchedRepo, hostPort, containerId, cb) => {
+  // update reference for container
+  waterfallSteps.push((watchedRepo, containerRowId, hostPort, containerId, cb) => {
     const DatabaseTable = require('conjure-core/classes/DatabaseTable');
     const containerDomain = `c${containerUid}.${config.app.web.domain}`;
-    DatabaseTable.insert('container', {
-      repo: watchedRepo.id,
-      branch: branch,
+    DatabaseTable.update('container', {
       domain: containerDomain,
       port: hostPort,
       container_id: containerId,
-      url_uid: containerUid,
       is_active: true,
       active_start: new Date(),
-      added: new Date()
+      updated: new Date()
+    }, {
+      id: containerRowId
     }, err => {
       cb(err, containerDomain);
     });
