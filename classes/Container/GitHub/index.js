@@ -40,7 +40,7 @@ class GitHubContainer extends Container {
     waterfall.push((containerDomain, cb) => {
       const containerUrl = `${webProtocol}://${containerDomain}`;
       issue.upsertComment([
-        `:octocat: [You can view this branch at ${containerUrl}](${containerUrl})`
+        `:octocat: [You can view this branch on Conjure](${containerUrl})`
       ].concat(gitHubCommentSignature).join('\n'), err => {
         cb(err);
       });
