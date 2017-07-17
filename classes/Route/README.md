@@ -89,19 +89,31 @@ You can alter anything within the `this` namespace (including the handlers, sinc
 
 `expressRouterPrep` is called at the start of `expressRouter`.
 
-#### Direct Calls
+#### Directly passing (req, res, next)
 
-If have a repo like API, and want to install the module within another repo (say, web) and call it directly, you can do so by passing the parent repo's route request object, and a callback.
+If you have a route that you want to kick the `req`, `res` and `next` objects into a `Route` instance, you can do so by using `.process`.
+
+```js
+route.push((req, res, next) => {
+  const getOrgsApi = require('conjure-api/server/routes/api/orgs/get.js');
+
+  getOrgsApi.process(req, res, next); // this will now have the identical outcome a
+});
+```
+
+#### Server-side Calls
+
+If have a repo like API, and want to install the module within another repo (say, web) and call it, you can do so by passing the parent repo's route request object, and a callback.
 
 ```js
 // this is assumed to be within a parent repo
 route.push((req, res, next) => {
   const getOrgsApi = require('conjure-api/server/routes/api/orgs/get.js');
 
-  getOrgsApi.direct(req, { arg: 'val' }, (err, result) => {
+  getOrgsApi.call(req, { arg: 'val' }, (err, result) => {
     // ...
   });
 });
 ```
 
-It is possible that the `.direct` callback will not receive any data, if (within the route) `next` is called, and `res.send` is never fired.
+It is possible that the `.call` callback will not receive any data, if (within the route) `next` is called, and `res.send` is never fired.

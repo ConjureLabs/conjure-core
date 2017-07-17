@@ -30,7 +30,8 @@ class Route extends Array {
 
     this.skippedHandler = options.skippedHandler || null;
 
-    this.direct = this.direct.bind(this); // this method was losing
+    this.process = this.process.bind(this);
+    this.call = this.call.bind(this);
 
     for (let key in options.blacklistedEnv) {
       const envVar = process.env[key];
@@ -76,12 +77,12 @@ class Route extends Array {
       return router;
     }
 
+    log.info(verb.toUpperCase(), expressPathUsed);
+
     const expressPathUsed = this.wildcardRoute ? expressPath.replace(/\/$/, '') + '*' : expressPath;
     const expressVerb = verb.toLowerCase();
 
     for (let i = 0; i < this.length; i++) {
-      log.info(verb.toUpperCase(), expressPathUsed);
-
       // see https://github.com/expressjs/cors#enabling-cors-pre-flight
       router.options(expressPathUsed, cors(corsOptions));
       router[expressVerb](expressPathUsed, cors(corsOptions), (
@@ -92,7 +93,32 @@ class Route extends Array {
     return router;
   }
 
-  direct(req, args, callback) {
+  process(req, res, next) {
+    const stack = [];
+
+    for (let i = 0; i < this.length; i++) {
+      stack.push(this.requireAuthentication ? this[requireAuthenticationWrapper](this[i]) : this[i]);
+    }
+
+    // build up a cache on task workers
+    const tasks = stack.map(handler => {
+      return cb => {
+        handler(req, res, err => {
+          if (err) {
+            return cb(err);
+          }
+
+          cb();
+        });
+      };
+    });
+
+    const waterfall = require('conjure-core/modules/async/waterfall');
+    waterfall(tasks, next);
+    return this;
+  }
+
+  call(req, args, callback) {
     args = args == null ? {} : args;
 
     req = Object.assign({}, req, {
