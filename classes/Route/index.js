@@ -77,10 +77,10 @@ class Route extends Array {
       return router;
     }
 
-    log.info(verb.toUpperCase(), expressPathUsed);
-
     const expressPathUsed = this.wildcardRoute ? expressPath.replace(/\/$/, '') + '*' : expressPath;
     const expressVerb = verb.toLowerCase();
+
+    log.info(verb.toUpperCase(), expressPathUsed);
 
     for (let i = 0; i < this.length; i++) {
       // see https://github.com/expressjs/cors#enabling-cors-pre-flight
