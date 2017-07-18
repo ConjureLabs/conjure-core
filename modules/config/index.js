@@ -58,7 +58,7 @@ const config = {
 // fill in app.api
 config.app.api.host = process.env.NODE_ENV === 'development' ? `${config.app.api.domain}:${config.app.api.port}` : config.app.api.domain;
 config.app.api.publicDomain = process.env.CONJURE_API_PUBLIC_HOST || config.app.api.domain;
-config.app.api.publicHost = process.env.NODE_ENV === 'development' ? `${config.app.api.publicHost}:${config.app.api.port}` : config.app.api.publicHost;
+config.app.api.publicHost = process.env.NODE_ENV === 'development' ? `${config.app.api.publicDomain}:${config.app.api.port}` : config.app.api.publicDomain;
 config.app.api.publicUrl = `${config.app.api.protocol}://${config.app.api.publicHost}`;
 config.app.api.url = `${config.app.api.protocol}://${config.app.api.host}`;
 
