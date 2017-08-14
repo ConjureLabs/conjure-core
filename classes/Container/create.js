@@ -47,7 +47,6 @@ function containerCreate(callback) {
 
   // get github client
   waterfallSteps.push((watchedRepo, cb) => {
-    // todo: store github repo key on repo level, since 'sender' may differ
     this.payload.getGitHubAccount((err, gitHubAccount) => {
       if (err) {
         return cb(err);

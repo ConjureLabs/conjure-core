@@ -141,6 +141,11 @@ class WebhookPayload {
     return payload.before;
   }
 
+  /*
+    gets the github account record for the given payload
+    this may be the author that triggered the webhook payload,
+    or may be another user on the repo (if the author is not on Conjure)
+   */
   getGitHubAccount(callback) {
     if (this[cached].gitHubAccount) {
       return callback(null, this[cached].gitHubAccount);
