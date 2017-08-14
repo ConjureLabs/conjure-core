@@ -116,7 +116,8 @@ module.exports = class DatabaseTable {
   upsert(insertContent, updateContent, updateConstraints, callback) {
     this.insert(insertContent, function(err) {
       if (!err) {
-        return callback.apply(callback, slice.call(arguments));
+        const args = slice.call(arguments);
+        return callback(...args);
       }
 
       if (err && typeof err.message === 'string' && err.message.substr(0, 13) === 'duplicate key') {
