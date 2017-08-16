@@ -154,6 +154,7 @@ class WebhookPayload {
     const gitHubId = this.payload.sender.id;
 
     const DatabaseTable = require('conjure-core/classes/DatabaseTable');
+    // attempting to pull conjure account record for the payload author
     DatabaseTable.select('account_github', {
       github_id: gitHubId
     }, (err, rows) => {
@@ -161,11 +162,58 @@ class WebhookPayload {
         return callback(err);
       }
 
-      this[cached].gitHubAccount = rows[0];
+      // assuming paylaod author has RW access (since triggered a PR)
 
-      // callback handler should deal with undefined row
-      callback(null, rows[0]);
+      // if we have an associated record for the payload author...
+      if (Array.isArray(rows) && rows.length) {
+        this[cached].gitHubAccount = rows[0];
+
+        // callback handler should deal with undefined row
+        return callback(null, rows[0]);
+      }
+
+      // no associated record to payload author - will try to look up a different user in our system
+      DatabaseTable.select('account_repo', {
+        service: 'github',
+        service_repo_id: this.repoId,
+        access_rights: 'rw'
+      }, (err, rows) => {
+        if (err) {
+          return callback(err);
+        }
+
+        // prune out a possible row for the previously queried github id
+        if (Array.isArray(rows) && rows.length && rows[0].account === gitHubId) {
+          rows.shift();
+        }
+
+        // if nothing, callback with nothing
+        if (!Array.isArray(rows) || !rows.length) {
+          return callback(null, null);
+        }
+
+        // have another record - pulling github account record
+        DatabaseTable.select('account_github', {
+          account: rows[0].account
+        }, (err, rows) => {
+          if (err) {
+            return callback(err);
+          }
+
+          // this should not happen
+          if (!Array.isArray(rows) || !rows.length) {
+            return callback(null, null);
+          }
+
+          this[cached].gitHubAccount = rows[0];
+
+          // callback handler should deal with undefined row
+          return callback(null, rows[0]);
+        });
+      });
     });
+
+    return this;
   }
 
   // will likely fail if not a pull request payload
