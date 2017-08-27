@@ -5,6 +5,7 @@ const ContentError = require('conjure-core/modules/err').ContentError;
 const createCard = Symbol('create card');
 const updateCard = Symbol('update existing card');
 
+// todo: this class is used for entry (full data) and summaries (partial, & last4), which is confusing - should get refactored
 class Card extends Stripe {
   constructor(customerInstance, data, rawData) {
     super(...arguments);
@@ -18,6 +19,9 @@ class Card extends Stripe {
     this.cvc = data.cvc;
     this.name = data.name;
     this.number = data.number;
+
+    // last4 is used for summaries, not for entry
+    this.last4 = data.last4;
 
     const expiration = data.expiration || {};
     this.expiration = {
