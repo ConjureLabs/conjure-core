@@ -20,8 +20,9 @@ class Card extends Stripe {
     this.name = data.name;
     this.number = data.number;
 
-    // last4 is used for summaries, not for entry
+    // last4 and brand are used for summaries, not for entry
     this.last4 = data.last4;
+    this.brand = data.brand;
 
     const expiration = data.expiration || {};
     this.expiration = {
@@ -131,6 +132,7 @@ class Card extends Stripe {
           year: cardData.exp_year
         },
         last4: cardData.last4,
+        brand: cardData.brand,
         name: cardData.name
       }, cardData);
 
