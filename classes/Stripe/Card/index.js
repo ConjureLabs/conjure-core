@@ -1,5 +1,6 @@
 const Stripe = require('../');
 const UnexpectedError = require('conjure-core/modules/err').UnexpectedError;
+const ContentError = require('conjure-core/modules/err').ContentError;
 
 const createCard = Symbol('create card');
 const updateCard = Symbol('update existing card');
@@ -103,6 +104,33 @@ class Card extends Stripe {
     }, (err, cardData) => {
       this.rawData = cardData;
       return callback(err, this);
+    });
+  }
+
+  static retrieve(customerInstance, stripeCardId, callback) {
+    if (typeof stripeCardId !== 'string' || !stripeCardId) {
+      return callback(new ContentError('No stripe card id provided'));
+    }
+
+    Card.api.customers.retrieveCard(customerInstance.id, stripeCardId, (err, cardData) => {
+      if (err) {
+        return callback(err);
+      }
+
+      const retrieved = new Card(customerInstance, {
+        id: stripeCardId,
+        address: {
+          country: cardData.country
+        },
+        expiration: {
+          month: cardData.exp_month,
+          year: cardData.exp_year
+        },
+        last4: cardData.last4,
+        name: cardData.name
+      }, cardData);
+
+      callback(null, retrieved);
     });
   }
 }
