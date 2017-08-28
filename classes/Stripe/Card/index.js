@@ -139,6 +139,16 @@ class Card extends Stripe {
       callback(null, retrieved);
     });
   }
+
+  static delete(customerInstance, stripeCardId, callback) {
+    if (typeof stripeCardId !== 'string' || !stripeCardId) {
+      return callback(new ContentError('No stripe card id provided'));
+    }
+
+    Card.api.customers.deleteCard(customerInstance.id, stripeCardId, (err, confirmation) => {
+      callback(err, confirmation);
+    });
+  }
 }
 
 module.exports = Card;
