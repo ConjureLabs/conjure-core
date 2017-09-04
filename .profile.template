@@ -15,3 +15,8 @@ export CONJURE_PG_USER='conjure_admin';
 export CONJURE_PG_PASS='';
 export CONJURE_PG_DB='conjure';
 export CONJURE_PG_HOST='localhost';
+
+export CONJURE_MQ_HOST='localhost';
+export CONJURE_MQ_LOGIN='guest';
+export CONJURE_MQ_PASS='guest';
+export CONJURE_MQ_SSL_ENABLED=false;

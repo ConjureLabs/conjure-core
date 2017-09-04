@@ -37,6 +37,17 @@ const config = {
     }
   },
 
+  mq: {
+    host: process.env.CONJURE_MQ_HOST,
+    port: 5672,
+    login: process.env.CONJURE_MQ_LOGIN,
+    password: process.env.CONJURE_MQ_PASS,
+    connectionTimeout: 10000,
+    ssl: {
+      enabled: process.env.CONJURE_MQ_SSL_ENABLED
+    }
+  },
+
   services: {
     github: {
       id: 'a2f05da23445befbe47a',
