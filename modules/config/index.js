@@ -44,7 +44,7 @@ const config = {
     password: process.env.CONJURE_MQ_PASS,
     connectionTimeout: 10000,
     ssl: {
-      enabled: process.env.CONJURE_MQ_SSL_ENABLED
+      enabled: process.env.CONJURE_MQ_SSL_ENABLED === 'false' ? false : true
     }
   },
 
