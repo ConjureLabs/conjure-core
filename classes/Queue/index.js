@@ -31,15 +31,13 @@ function getConnection(callback) {
 }
 
 const pendingQueueReady = Symbol('pending queue ready');
-class MqService {
+class Queue {
   // see https://github.com/postwait/node-amqp#connectionqueuename-options-opencallback for options
   constructor(name, options) {
     this[pendingQueueReady] = [];
 
     getConnection(connection => {
       connection.queue(name, options, queue => {
-        queue = new Queue(queue);
-
         this.onQueueReady = callback => callback(null, queue);
 
         for (let i = 0; i < this[pendingQueueReady].length; i++) {
@@ -81,20 +79,20 @@ class MqService {
       });
     });
   }
-}
-
-class Queue {
-  constructor(rawQueue) {
-    this.rawQueue = rawQueue;
-  }
 
   subscribe(callback) {
-    // see https://github.com/postwait/node-amqp#queuesubscribeoptions-listener
-    this.rawQueue.subscribe({
-      ack: true,
-      prefetchCount: 1
-    }, (message, headers, deliveryInfo, ack) => {
-      callback(null, new Message(message, ack));
+    this.onQueueReady((err, queue) => {
+      if (err) {
+        return callback(err);
+      }
+
+      // see https://github.com/postwait/node-amqp#queuesubscribeoptions-listener
+      queue.subscribe({
+        ack: true,
+        prefetchCount: 1
+      }, (message, headers, deliveryInfo, ack) => {
+        callback(null, new Message(message, ack));
+      });
     });
   }
 }
@@ -110,4 +108,4 @@ class Message {
   }
 }
 
-module.exports = MqService;
+module.exports = Queue;
