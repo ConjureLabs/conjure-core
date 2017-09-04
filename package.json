@@ -16,6 +16,7 @@
   },
   "homepage": "https://github.com/WiskeyTango/conjure-core#readme",
   "dependencies": {
+    "amqp": "^0.2.6",
     "app-root-path": "^2.0.1",
     "cors": "^2.8.3",
     "octonode": "^0.7.13",

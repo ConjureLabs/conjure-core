@@ -9,6 +9,12 @@ ajv@^4.9.1:
     co "^4.6.0"
     json-stable-stringify "^1.0.1"
 
+amqp@^0.2.6:
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/amqp/-/amqp-0.2.6.tgz#d97fee5143026fa0b4fd6a5d56485f0448eb37ca"
+  dependencies:
+    lodash "^4.0.0"
+
 app-root-path@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/app-root-path/-/app-root-path-2.0.1.tgz#cd62dcf8e4fd5a417efc664d2e5b10653c651b46"
@@ -210,6 +216,10 @@ jsprim@^1.2.2:
 lodash.isplainobject@^4.0.6:
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz#7c526a52d89b45c45cc690b88163be0497f550cb"
+
+lodash@^4.0.0:
+  version "4.17.4"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 
 mime-db@~1.27.0:
   version "1.27.0"
