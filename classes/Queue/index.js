@@ -12,6 +12,9 @@ function getConnection(callback) {
   const amqp = require('amqp');
   const log = require('conjure-core/modules/log')('MQ');
   const config = require('conjure-core/modules/config').mq;
+
+  console.log(config);
+
   const connection = amqp.createConnection(config);
 
   connection.on('error', err => {
@@ -36,7 +39,12 @@ class Queue {
   constructor(exchangeName, queueName) {
     this[pendingQueueReady] = [];
 
-    getConnection(connection => {
+    getConnection((err, connection) => {
+      if (err) {
+        // todo: handle errs?
+        throw err;
+      }
+
       // see https://github.com/postwait/node-amqp#connectionexchangename-options-opencallback
       connection.exchange(exchangeName, {
         type: 'topic',
@@ -57,7 +65,7 @@ class Queue {
           this[onQueueReady] = callback => callback(null, exchange, queue);
 
           for (let i = 0; i < this[pendingQueueReady].length; i++) {
-            this[pendingQueueReady](null, exchange, queue);
+            this[pendingQueueReady][i](null, exchange, queue);
           }
 
           this[pendingQueueReady] = null;
@@ -67,7 +75,7 @@ class Queue {
   }
 
   // will be replaced with a direct callback call when queue is ready
-  [onQueueReady](callback) => {
+  [onQueueReady](callback) {
     this[pendingQueueReady].push(callback);
   }
 
