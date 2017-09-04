@@ -31,14 +31,15 @@ function getConnection(callback) {
 }
 
 const pendingQueueReady = Symbol('pending queue ready');
+const onQueueReady = Symbol('on queue ready event')
 class Queue {
   // see https://github.com/postwait/node-amqp#connectionqueuename-options-opencallback for options
-  constructor(name, options) {
+  constructor(name, options = {}) {
     this[pendingQueueReady] = [];
 
     getConnection(connection => {
       connection.queue(name, options, queue => {
-        this.onQueueReady = callback => callback(null, queue);
+        this[onQueueReady] = callback => callback(null, queue);
 
         for (let i = 0; i < this[pendingQueueReady].length; i++) {
           this[pendingQueueReady](null, queue);
@@ -50,13 +51,13 @@ class Queue {
   }
 
   // will be replaced with a direct callback call when queue is ready
-  onQueueReady(callback) => {
+  [onQueueReady](callback) => {
     this[pendingQueueReady].push(callback);
   }
 
   publish(routingKey, body, callback) {
     // when queue is ready, so should be the connection
-    this.onQueueReady(err => {
+    this[onQueueReady](err => {
       if (err) {
         // todo: what to do here?
         throw err;
@@ -81,7 +82,7 @@ class Queue {
   }
 
   subscribe(callback) {
-    this.onQueueReady((err, queue) => {
+    this[onQueueReady]((err, queue) => {
       if (err) {
         return callback(err);
       }
