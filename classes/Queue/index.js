@@ -31,21 +31,37 @@ function getConnection(callback) {
 }
 
 const pendingQueueReady = Symbol('pending queue ready');
-const onQueueReady = Symbol('on queue ready event')
+const onQueueReady = Symbol('on queue ready event');
 class Queue {
-  // see https://github.com/postwait/node-amqp#connectionqueuename-options-opencallback for options
-  constructor(name, options = {}) {
+  constructor(exchangeName, queueName) {
     this[pendingQueueReady] = [];
 
     getConnection(connection => {
-      connection.queue(name, options, queue => {
-        this[onQueueReady] = callback => callback(null, queue);
+      // see https://github.com/postwait/node-amqp#connectionexchangename-options-opencallback
+      connection.exchange(exchangeName, {
+        type: 'topic',
+        passive: false,
+        durable: true, // keep true to persist exchange
+        autoDelete: false,
+        noDeclare: false,
+        confirm: true // causes exchange.publish to fire callback w/ failure bool
+      }, exchange => {
+        // see https://github.com/postwait/node-amqp#connectionqueuename-options-opencallback
+        connection.queue(queueName, {
+          passive: false,
+          durable: true, // keep true to persist queue
+          exclusive: false,
+          autoDelete: false,
+          noDeclare: false
+        }, queue => {
+          this[onQueueReady] = callback => callback(null, exchange, queue);
 
-        for (let i = 0; i < this[pendingQueueReady].length; i++) {
-          this[pendingQueueReady](null, queue);
-        }
+          for (let i = 0; i < this[pendingQueueReady].length; i++) {
+            this[pendingQueueReady](null, exchange, queue);
+          }
 
-        this[pendingQueueReady] = null;
+          this[pendingQueueReady] = null;
+        });
       });
     });
   }
@@ -55,16 +71,14 @@ class Queue {
     this[pendingQueueReady].push(callback);
   }
 
-  publish(routingKey, body, callback) {
-    // when queue is ready, so should be the connection
-    this[onQueueReady](err => {
+  publish(routingKey, message, callback = function() {}) {
+    this[onQueueReady]((err, exchange) => {
       if (err) {
-        // todo: what to do here?
-        throw err;
+        return callback(err);
       }
 
-      // see https://github.com/postwait/node-amqp#exchangepublishroutingkey-message-options-callback for options
-      this.connection.publish(routingKey, body, {
+      // see https://github.com/postwait/node-amqp#exchangepublishroutingkey-message-options-callback
+      exchange.publish(routingKey, message, {
         mandatory: true,
         deliveryMode: 2, // persistent
         priority: 1, // todo: make priority adjustable?
@@ -82,7 +96,7 @@ class Queue {
   }
 
   subscribe(callback) {
-    this[onQueueReady]((err, queue) => {
+    this[onQueueReady]((err, _, queue) => {
       if (err) {
         return callback(err);
       }
@@ -104,7 +118,7 @@ class Message {
     this.rawAck = rawAck;
   }
 
-  done() {
+  ack() {
     this.rawAck.acknowledge();
   }
 }
