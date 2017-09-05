@@ -120,7 +120,7 @@ class Queue {
       }
 
       // override .ack() to trigger another subscribe
-      const originalAck = message.ack;
+      const originalAck = message.ack.bind(message);
       message.ack = () => {
         originalAck();
         this.subscribe(callback);
