@@ -125,6 +125,7 @@ class Queue {
         originalAck();
         this.subscribe(callback);
       };
+      callback(null, message);
     });
   }
 }
