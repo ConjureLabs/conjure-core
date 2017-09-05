@@ -99,7 +99,7 @@ class Queue {
     });
   }
 
-  subscribe(callback) {
+  subscribeOnce(callback) {
     return this[onQueueReady]((err, _, queue) => {
       if (err) {
         return callback(err);
@@ -111,11 +111,27 @@ class Queue {
       }, (message, headers, deliveryInfo, ack) => callback(null, new Message(message, ack)));
     });
   }
+
+  subscribe(callback) {
+    return this.subscribeOnce((err, message) => {
+      if (err) {
+        callback(err);
+        return this.subscribe(callback);
+      }
+
+      // override .ack() to trigger another subscribe
+      const originalAck = message.ack;
+      message.ack = () => {
+        originalAck();
+        this.subscribe(callback);
+      };
+    });
+  }
 }
 
 class Message {
   constructor(rawMessage, rawAck) {
-    this.data = rawMessage;
+    this.body = rawMessage;
     this.rawAck = rawAck;
   }
 
