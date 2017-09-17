@@ -30,9 +30,7 @@ He holds standups in the morning to touch base and see if anything is ahead or b
 
 He could save his engineers the time and context shift by not going to their desks so frequently. Usually he does this to see the work. Using Conjure he could instead view a list of what is actively being worked on, and open any branch to view it.
 
-#### Actions
-
-When using Conjure, he may:
+#### Use Case
 
 - Give feedback to his engineers
 - Pull in a more senior engineer to check something in the branch
