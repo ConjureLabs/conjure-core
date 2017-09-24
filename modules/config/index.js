@@ -26,7 +26,8 @@ const config = {
 
     // not filling in worker with domain, host, etc, since it should be considered elastic/dynamic
     worker: {
-      port: process.env.CONJURE_WORKER_PORT
+      port: process.env.CONJURE_WORKER_PORT,
+      protocol: process.env.CONJURE_WORKER_PROTOCOL
     }
   },
 
