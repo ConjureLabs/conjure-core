@@ -14,7 +14,7 @@ const corsOptions = {
     config.app.web.url
   ],
   preflightContinue: true
-}
+};
 
 class Route extends Array {
   constructor(options) {
