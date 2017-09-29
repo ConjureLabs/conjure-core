@@ -29,7 +29,7 @@ class MachineConfig {
     return this[internalDefinition].environment || {};
   }
 
-  // todo: possibly check for files like podfile or package.json and determine language, dynamically, for ux
+  // todo: possibly check for files like podfile or package.json and determine language, dynamically, for better ux
   get languages() {
     return this[internalDefinition].languages || {};
   }
@@ -58,6 +58,9 @@ class MachineConfig {
         return 'npm install';
         break;
 
+      case 'java':
+        break;
+
       default:
         return null;
     }
@@ -78,6 +81,10 @@ class MachineConfig {
       default:
         return null;
     }
+  }
+
+  get version() {
+    return this[internalDefinition].version;
   }
 
   [singleLanguageKey]() {
