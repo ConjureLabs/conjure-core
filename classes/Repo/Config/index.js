@@ -83,10 +83,6 @@ class MachineConfig {
     }
   }
 
-  get version() {
-    return this[internalDefinition].version;
-  }
-
   [singleLanguageKey]() {
     const languagesUsing = Object.keys(this.languages);
 
