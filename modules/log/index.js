@@ -17,7 +17,7 @@ module.exports = label => {
     return methods;
   }
 
-  moethods.dev = Object.keys(moethods).reduce((noOps, key) => {
+  methods.dev = Object.keys(methods).reduce((noOps, key) => {
     noOps[key] = () => {};
     return noOps;
   }, {});
