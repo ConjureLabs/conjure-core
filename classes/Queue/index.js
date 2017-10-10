@@ -27,7 +27,7 @@ function getConnection(callback) {
     getConnection = callback => callback(null, connection);
 
     // process all pending callbacks
-    for (let i = 0; i < pendingConnectionCallbacks.length; i++) {
+    for (let i = 0, l = pendingConnectionCallbacks.length; i < l; i++) {
       const pending = pendingConnectionCallbacks.shift();
       pending(null, connection);
     }
