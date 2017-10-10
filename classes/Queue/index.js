@@ -1,3 +1,5 @@
+const log = require('conjure-core/modules/log')('Queue');
+
 let gettingConnection = false;
 const pendingConnectionCallbacks = [];
 
@@ -82,6 +84,7 @@ class Queue {
       }
 
       // see https://github.com/postwait/node-amqp#exchangepublishroutingkey-message-options-callback
+      log.info(`publishing to exchange: ${this[routingKey]}`);
       exchange.publish(this[routingKey], message, {
         mandatory: true,
         deliveryMode: 2, // persistent
