@@ -103,6 +103,7 @@ class Queue {
   }
 
   subscribeOnce(callback) {
+    log.info(`subscribing to ${this[routingKey]}`);
     return this[onQueueReady]((err, _, queue) => {
       if (err) {
         return callback(err);
