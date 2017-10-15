@@ -9,9 +9,11 @@ async function query(...args) {
   const client = await pool.connect();
 
   log.dev.info(args[0] /* sql */, args[1] || [] /* placeholder values */);
-  await.client.query(...args);
+  const result = await.client.query(...args);
 
   client.release();
+
+  return result;
 }
 
 module.exports.query = query;

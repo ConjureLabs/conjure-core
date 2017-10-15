@@ -1,4 +1,4 @@
-const UnexpectedError = require('conjure-core/modules/err').UnexpectedError;
+const { UnexpectedError } = require('conjure-core/modules/err');
 
 const rowTableName = Symbol('instance row\'s table name');
 const rowDeleted = Symbol('indicator that row was deleted');
