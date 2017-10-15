@@ -1,11 +1,8 @@
 // todo: tests!
 
-const UnexpectedError = require('conjure-core/modules/err').UnexpectedError;
-const ContentError = require('conjure-core/modules/err').ContentError;
+const { UnexpectedError, ContentError } = require('conjure-core/modules/err');
 
-const slice = Array.prototype.slice;
-
-const queryCallback = Symbol('database.query callback');
+const mapRowInstances = Symbol('maps query result rows to DatabaseRow instances');
 const staticProxy = Symbol('static method, proxy to instance method');
 
 // used to mark a string, to not be wrapped in an escaped string
@@ -27,131 +24,103 @@ module.exports = class DatabaseTable {
     this.tableName = tableName;
   }
 
-  select(/* [constraints, ...,] callback */) {
-    const database = require('conjure-core/modules/database');
-
-    const args = slice.call(arguments);
-    const callback = args.pop(); // callback is assumed to always be last arg
-    const constraints = args; // anything left in arguments will be considered constraints
-    const queryValues = [];
-
-    const whereClause = generateWhereClause(constraints, queryValues);
-
-    database.query(`SELECT * FROM ${this.tableName}${whereClause}`, queryValues, this[queryCallback](callback));
-    return this;
+  [mapRowInstances](queryResult) {
+    const DatabaseRow = require('conjure-core/classes/DatabaseRow');
+    return (queryResult.rows || []).map(row => {
+      return new DatabaseRow(this.tableName, row);
+    });
   }
 
-  static select() {
-    return this[staticProxy]('select', arguments);
-  }
-
-  update(/* updates, [constraints, ...,] callback */) {
+  async select(...constraints) {
     const database = require('conjure-core/modules/database');
 
-    const args = slice.call(arguments);
-    const updates = args.shift(); // updates is assumed to always be the first arg
-    const callback = args.pop(); // callback is assumed to always be last arg
-    const constraints = args; // anything left in arguments will be considered constraints
-    const queryValues = [];
+    const { queryValues, whereClause } = generateWhereClause(constraints);
 
+    const result = database.query(`SELECT * FROM ${this.tableName}${whereClause}`, queryValues);
+    return this[mapRowInstances](await result);
+  }
+
+  static async select() {
+    return await this[staticProxy]('select', arguments);
+  }
+
+  async update(updates, ...constraints) {
+    const database = require('conjure-core/modules/database');
+
+    const queryValues = [];
     const updatesSql = generateSqlKeyVals(', ', updates, queryValues);
-    const whereClause = generateWhereClause(constraints, queryValues);
+    const { whereClause } = generateWhereClause(constraints, queryValues);
 
-    database.query(`UPDATE ${this.tableName} SET ${updatesSql}${whereClause}`, queryValues, this[queryCallback](callback));
-    return this;
+    const result = database.query(`UPDATE ${this.tableName} SET ${updatesSql}${whereClause}`, queryValues);
+    return this[mapRowInstances](await result);
   }
 
-  static update() {
-    return this[staticProxy]('update', arguments);
+  static async update() {
+    return await this[staticProxy]('update', arguments);
   }
 
-  delete(/* [constraints, ...,] callback */) {
+  async delete(...constraints) {
     const database = require('conjure-core/modules/database');
 
-    const args = slice.call(arguments);
-    const callback = args.pop(); // callback is assumed to always be last arg
-    const constraints = args; // anything left in arguments will be considered constraints
-    const queryValues = [];
+    const { queryValues, whereClause } = generateWhereClause(constraints);
 
-    const whereClause = generateWhereClause(constraints, queryValues);
-
-    database.query(`DELETE FROM ${this.tableName}${whereClause}`, queryValues, this[queryCallback](callback));
-    return this;
+    const result = database.query(`DELETE FROM ${this.tableName}${whereClause}`, queryValues);
+    return this[mapRowInstances](await result);
   }
 
-  static delete() {
-    return this[staticProxy]('delete', arguments);
+  static async delete() {
+    return await this[staticProxy]('delete', arguments);
   }
 
-  insert(/* newRowContent[, newRowContent, ...,], callback */) {
+  async insert(...newRows) {
     const database = require('conjure-core/modules/database');
-
-    const args = slice.call(arguments);
-    const callback = args.pop(); // callback is assumed to always be last arg
-    const newRows = args; // anything left in arguments will be considered new row objects
 
     if (!newRows.length) {
-      callback(new UnexpectedError('There were no rows to insert'));
-      return this;
+      throw new UnexpectedError('There were no rows to insert');
     }
 
     const columnNames = findAllColumnNames(newRows);
 
     if (columnNames.includes('id')) {
-      callback(new ContentError('Cannot insert a row that has .id'));
+      throw new ContentError('Cannot insert a row that has .id');
       return this;
     }
 
-    const queryValues = [];
-    const insertAssignmentsFormatted = generateInsertValues(newRows, columnNames, queryValues);
+    const { queryValues, valuesFormatted } = generateInsertValues(newRows, columnNames);
 
-    database.query(`INSERT INTO ${this.tableName}(${columnNames.join(', ')}) VALUES ${insertAssignmentsFormatted} RETURNING *`, queryValues, this[queryCallback](callback));
-    return this;
+    const result = database.query(`INSERT INTO ${this.tableName}(${columnNames.join(', ')}) VALUES ${insertAssignmentsFormatted} RETURNING *`, queryValues);
+    return this[mapRowInstances](await result);
   }
 
-  static insert() {
-    return this[staticProxy]('insert', arguments);
+  static async insert() {
+    return await this[staticProxy]('insert', arguments);
   }
 
-  upsert(insertContent, updateContent, updateConstraints, callback) {
-    this.insert(insertContent, function(err) {
-      if (!err) {
-        const args = slice.call(arguments);
-        return callback(...args);
+  async upsert(insertContent, updateContent, updateConstraints) {
+    let result;
+
+    try {
+      result = await this.insert(insertContent);
+    } catch(err) {
+      if (!err.message || !err.message.substr(0, 13) === 'duplicate key') {
+        throw err;
       }
 
-      if (err && typeof err.message === 'string' && err.message.substr(0, 13) === 'duplicate key') {
-        return this.update(updateContent, updateConstraints, callback);
-      }
+      result = await this.update(updateContent, updateConstraints);
+    }
 
-      return callback(err);
-    }.bind(this));
-
-    return this;
+    return this[mapRowInstances](result);
   }
 
-  static upsert() {
-    return this[staticProxy]('upsert', arguments);
+  static async upsert() {
+    return await this[staticProxy]('upsert', arguments);
   }
 
-  [queryCallback](callback) {
-    return (err, result) => {
-      if (err) {
-        return callback(err)
-      }
-
-      const DatabaseRow = require('conjure-core/classes/DatabaseRow');
-      return callback(null, (result.rows || []).map(row => {
-        return new DatabaseRow(this.tableName, row);
-      }));
-    };
-  }
-
-  static [staticProxy](methodName, originalArgs /* [ tableName, [constraints, ...,] callback ] */) {
-    const args = slice.call(originalArgs);
+  static async [staticProxy](methodName, originalArgs /* = [ tableName, [constraints, ...,]] */) {
+    const args = Array.prototype.slice.call(originalArgs);
     const tableName = args.shift();
     const instance = new DatabaseTable(tableName);
-    instance[methodName].apply(instance, args);
+    await instance[methodName].apply(instance, args);
     return this;
   }
 
@@ -164,7 +133,7 @@ module.exports = class DatabaseTable {
   }
 }
 
-function generateInsertValues(rows, columnNames, valuesArray) {
+function generateInsertValues(rows, columnNames, queryValues = []) {
   const insertAssignments = [];
 
   for (let i = 0; i < rows.length; i++) {
@@ -183,8 +152,8 @@ function generateInsertValues(rows, columnNames, valuesArray) {
         continue;
       }
 
-      valuesArray.push(val);
-      newRowAssignment.push(`$${valuesArray.length}`);
+      queryValues.push(val);
+      newRowAssignment.push(`$${queryValues.length}`);
     }
 
     insertAssignments.push(newRowAssignment);
@@ -196,7 +165,10 @@ function generateInsertValues(rows, columnNames, valuesArray) {
     })
     .join(', ');
 
-  return valuesFormatted;
+  return {
+    queryValues,
+    valuesFormatted
+  };
 }
 
 function generateSqlKeyVals(separator, dict, valuesArray) {
@@ -218,20 +190,31 @@ function generateSqlKeyVals(separator, dict, valuesArray) {
   constraints should be an array of constraint {} objects
   e.g. [{ id: 1 }, { id: 2 }]
  */
-function generateWhereClause(constraints, queryValues) {
+function generateWhereClause(constraints, queryValues = []) {
   if (!constraints.length) {
-    return '';
+    return {
+      queryValues,
+      whereClause: ''
+    };
   }
 
   if (constraints.length === 1) {
-    return ' WHERE ' + generateSqlKeyVals(' AND ', constraints[0], queryValues);
+    return {
+      queryValues,
+      whereClause: ' WHERE ' + generateSqlKeyVals(' AND ', constraints[0], queryValues)
+    };
   }
 
-  return ' WHERE ' + constraints
+  const whereClause = ' WHERE ' + constraints
     .map(constr => {
       return `(${generateSqlKeyVals(' AND ', constr, queryValues)})`;
     })
     .join(' OR ');
+
+  return {
+    queryValues,
+    whereClause
+  };
 }
 
 /*
