@@ -13,7 +13,7 @@ function getConnection(callback) {
 
   const amqp = require('amqp');
   const log = require('conjure-core/modules/log')('MQ');
-  const config = require('conjure-core/modules/config').mq;
+  const { mq:config } = require('conjure-core/modules/config');
 
   const connection = amqp.createConnection(config);
 
@@ -93,7 +93,7 @@ class Queue {
         if (err instanceof Error) {
           return callback(err);
         } else if (err === true) {
-          const UnexpectedError = require('conjure-core/modules/err').UnexpectedError;
+          const { UnexpectedError } = require('conjure-core/modules/err');
           return callback(new UnexpectedError('An error occurred while publishing message to queue'));
         }
 
