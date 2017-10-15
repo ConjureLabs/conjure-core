@@ -19,34 +19,34 @@ const row = new DatabaseRow('account', {
 
 ```js
 // no .id in row content
-new DatabaseRow('account', {
+const row = new DatabaseRow('account', {
   name: 'Tim Marshall'
-}).save((err, row) => {
-  // ...
 });
+
+await row.save();
 ```
 
 #### Updating an existing row
 
 ```js
 // has .id
-new DatabaseRow('account', {
+const row = new DatabaseRow('account', {
   id: 1,
   email: 'tim@marshall.iio'
-}).save(err => {
-  // if no error, then row 1 now has email of 'tim@marshall.io'
 });
+
+await row.save();
 ```
 
 #### Deleting a row
 
 ```js
 // has .id
-new DatabaseRow('account', {
+const row = new DatabaseRow('account', {
   id: 1
-}).delete(err => {
-  // if no error, then row 1 was successfully deleted
 });
+
+await row.delete();
 ```
 
 After a deletion you cannot make any more modifying calls to the row (like .save).
@@ -90,11 +90,9 @@ const accountRow = new DatabaseRow('account', {
 });
 
 // want to modify email and save
-accountRow
+await accountRow
   .set({
     email: 'tim@conjure.sh'
   })
-  .save(err => {
-    // ...
-  });
+  .save();
 ```
