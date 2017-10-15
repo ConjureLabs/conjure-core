@@ -19,60 +19,48 @@ class Customer extends Stripe {
     }
   }
 
-  save(callback) {
+  async save() {
     if (this.id) {
-      return this[updateCustomer](callback);
+      return await this[updateCustomer]();
     }
-    return this[createCustomer](callback);
+    return await this[createCustomer]();
   }
 
-  static retrieve(conjureId, stripeId, callback) {
-    Customer.api.customers.retrieve(stripeId, (err, customerData) => {
-      if (err) {
-        return callback(err);
-      }
+  static async retrieve(conjureId, stripeId) {
+    const customerData = await Customer.api.customers.retrieve(stripeId);
 
-      callback(null, new Customer(conjureId, {
-        id: customerData.id,
-        email: customerData.email,
-        name: customerData.metadata.name
-      }, customerData));
-    });
-
-    return this;
+    return new Customer(conjureId, {
+      id: customerData.id,
+      email: customerData.email,
+      name: customerData.metadata.name
+    }, customerData));
   }
 
-  [createCustomer](callback) {
-    Customer.api.customers.create({
+  async [createCustomer]() {
+    const customerData = await Customer.api.customers.create({
       email: this.email,
       metadata: {
         conjureId: this.conjureId,
         name: this.name
       }
-    }, (err, customerData) => {
-      if (err) {
-        return callback(err);
-      }
-
-      this.id = customerData.id;
-      this.rawData = customerData;
-      callback(null, this);
     });
 
+    this.id = customerData.id;
+    this.rawData = customerData;
     return this;
   }
 
-  [updateCustomer](callback) {
-    Customer.api.customers.update(this.id, {
+  async [updateCustomer]() {
+    const customerData = await Customer.api.customers.update(this.id, {
       email: this.email,
       metadata: {
         conjureId: this.conjureId,
         name: this.name
       }
-    }, (err, customerData) => {
-      this.rawData = customerData;
-      return callback(err, this);
     });
+
+    this.rawData = customerData;
+    return this;
   }
 }
 
