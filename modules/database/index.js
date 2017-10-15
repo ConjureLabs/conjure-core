@@ -3,35 +3,15 @@ const config = require('conjure-core/modules/config');
 const ContentError = require('conjure-core/modules/err').ContentError;
 const log = require('conjure-core/modules/log')('database');
 
-const pool = new pgPool(config.database.pg);
+const pool = await new pgPool(config.database.pg);
 
-// todo: deal with client (err, client) that caused the err?
-pool.on('error', err => {
-  log.error(err);
-});
+async function query(...args) {
+  const client = await pool.connect();
 
-function query(/* query, [queryArgs], callback */) {
-  const args = Array.prototype.slice.call(arguments);
-  let callback = args.pop();
+  log.dev.info(args[0] /* sql */, args[1] || [] /* placeholder values */);
+  await.client.query(...args);
 
-  if (typeof callback !== 'function') {
-    throw new ContentError('Expected last argument to query() to be a callback');
-  }
-
-  pool.connect((err, client, done) => {
-    if (err) {
-      return callback(err);
-    }
-
-    // forcing `done()` to be called whenever a query returns
-    args.push(function queryCallback() {
-      done();
-      callback.apply(callback, arguments);
-    });
-
-    log.dev.info(args[0] /* sql */, args[1] /* placeholder values */);
-    client.query.apply(client, args);
-  });
+  client.release();
 }
 
 module.exports.query = query;
