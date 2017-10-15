@@ -1,4 +1,4 @@
-const UnexpectedError = require('conjure-core/modules/err').UnexpectedError;
+const { UnexpectedError } = require('conjure-core/modules/err');
 
 const TYPE_BRANCH = Symbol('is related to a branch');
 const TYPE_COMMIT = Symbol('is related to a commit');
@@ -137,7 +137,7 @@ class WebhookPayload {
 
   get prevSha() {
     const { payload } = this;
-    
+
     return payload.before;
   }
 
@@ -146,74 +146,60 @@ class WebhookPayload {
     this may be the author that triggered the webhook payload,
     or may be another user on the repo (if the author is not on Conjure)
    */
-  getGitHubAccount(callback) {
+  async getGitHubAccount() {
     if (this[cached].gitHubAccount) {
-      return callback(null, this[cached].gitHubAccount);
+      return this[cached].gitHubAccount;
     }
 
     const gitHubId = this.payload.sender.id;
 
     const DatabaseTable = require('conjure-core/classes/DatabaseTable');
     // attempting to pull conjure account record for the payload author
-    DatabaseTable.select('account_github', {
+    const githubAccountRows = await DatabaseTable.select('account_github', {
       github_id: gitHubId
-    }, (err, rows) => {
-      if (err) {
-        return callback(err);
-      }
+    };
 
-      // assuming paylaod author has RW access (since triggered a PR)
+    // assuming paylaod author has RW access (since triggered a PR)
 
-      // if we have an associated record for the payload author...
-      if (Array.isArray(rows) && rows.length) {
-        this[cached].gitHubAccount = rows[0];
+    // if we have an associated record for the payload author...
+    if (Array.isArray(githubAccountRows) && githubAccountRows.length) {
+      this[cached].gitHubAccount = githubAccountRows[0];
 
-        // callback handler should deal with undefined row
-        return callback(null, rows[0]);
-      }
+      // callback handler should deal with undefined row
+      return githubAccountRows[0];
+    }
 
-      // no associated record to payload author - will try to look up a different user in our system
-      DatabaseTable.select('account_repo', {
-        service: 'github',
-        service_repo_id: this.repoId,
-        access_rights: 'rw'
-      }, (err, rows) => {
-        if (err) {
-          return callback(err);
-        }
-
-        // prune out a possible row for the previously queried github id
-        if (Array.isArray(rows) && rows.length && rows[0].account === gitHubId) {
-          rows.shift();
-        }
-
-        // if nothing, callback with nothing
-        if (!Array.isArray(rows) || !rows.length) {
-          return callback(null, null);
-        }
-
-        // have another record - pulling github account record
-        DatabaseTable.select('account_github', {
-          account: rows[0].account
-        }, (err, rows) => {
-          if (err) {
-            return callback(err);
-          }
-
-          // this should not happen
-          if (!Array.isArray(rows) || !rows.length) {
-            return callback(null, null);
-          }
-
-          this[cached].gitHubAccount = rows[0];
-
-          // callback handler should deal with undefined row
-          return callback(null, rows[0]);
-        });
-      });
+    // no associated record to payload author - will try to look up a different user in our system
+    const accountRepoRows = await DatabaseTable.select('account_repo', {
+      service: 'github',
+      service_repo_id: this.repoId,
+      access_rights: 'rw'
     });
 
-    return this;
+    // prune out a possible row for the previously queried github id
+    if (Array.isArray(accountRepoRows) && accountRepoRows.length && accountRepoRows[0].account === gitHubId) {
+      accountRepoRows.shift();
+    }
+
+    // if nothing, callback with nothing
+    if (!Array.isArray(accountRepoRows) || !accountRepoRows.length) {
+      return null;
+    }
+
+    // have another record - pulling github account record
+    const githubAccountRows = await DatabaseTable.select('account_github', {
+      account: accountRepoRows[0].account
+    });
+
+    // this should not happen
+    if (!Array.isArray(githubAccountRows) || !githubAccountRows.length) {
+      return null;
+    }
+
+    this[cached].gitHubAccount = githubAccountRows[0];
+
+    // callback handler should deal with undefined row
+    return githubAccountRows[0];
   }
 
   // will likely fail if not a pull request payload
@@ -241,28 +227,23 @@ class WebhookPayload {
   }
 
   // finds the watched repo record
-  getWatchedRepoRecord(callback) {
+  async getWatchedRepoRecord() {
     if (this[cached].watchedRepo) {
-      return callback(null, this[cached].watchedRepo);
+      return this[cached].watchedRepo;
     }
 
     const DatabaseTable = require('conjure-core/classes/DatabaseTable');
-    DatabaseTable.select('watched_repo', {
+    const rows = await DatabaseTable.select('watched_repo', {
       service_repo_id: this.repoId
-    }, (err, rows) => {
-      if (err) {
-        return callback(err);
-      }
-
-      if (!rows.length) {
-        // todo: this may be legit if a PR is changed post-enabling conjure - maybe just log a warning?
-        return callback(new UnexpectedError('this repo is not being watched by Conjure'));
-      }
-
-      this[cached].watchedRepo = rows[0];
-
-      callback(null, rows[0]);
     });
+
+    if (!rows.length) {
+      // todo: this may be legit if a PR is changed post-enabling conjure - maybe just log a warning?
+      throw new UnexpectedError('this repo is not being watched by Conjure');
+    }
+
+    this[cached].watchedRepo = rows[0];
+    return rows[0];
   }
 }
 
