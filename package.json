@@ -28,6 +28,7 @@
     "octonode": "^0.7.13",
     "pg": "^7.3.0",
     "request": "^2.81.0",
+    "request-promise-native": "1.0.5",
     "stripe": "^4.19.0"
   }
 }
