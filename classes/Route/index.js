@@ -55,6 +55,10 @@ class Route extends Array {
         return;
       }
 
+      if (!req.user) {
+        throw new UnexpectedError('No req.user available');
+      }
+
       return await handler.apply(this, arguments);
     };
   }
