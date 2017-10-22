@@ -17,12 +17,11 @@ const corsOptions = {
 };
 
 class Route extends Array {
-  constructor(options) {
+  constructor(options = {}) {
     super();
 
     this.suppressedRoutes = false;
 
-    options = options || {};
     options.blacklistedEnv = options.blacklistedEnv || {};
 
     this.requireAuthentication = options.requireAuthentication === true;
@@ -128,9 +127,7 @@ class Route extends Array {
     }
   }
 
-  async call(req, args) {
-    args = args == null ? {} : args;
-
+  async call(req, args = {}) {
     req = Object.assign({}, req, {
       body: args,
       query: args
