@@ -62,6 +62,34 @@ class Customer extends Stripe {
     this.rawData = customerData;
     return this;
   }
+
+  static async getRecordFromReq(req) {
+    const DatabaseTable = require('../../DatabaseTable');
+    const account = new DatabaseTable('account');
+
+    const accountRows = await account.select({
+      id: req.user.id
+    });
+
+    // should not be possible
+    if (!accountRows.length) {
+      throw new UnexpectedError('Could not find account record');
+    }
+
+    // should not be possible
+    if (accountRows.length > 1) {
+      throw new UnexpectedError('Expected a single row for account record, received multiple');
+    }
+
+    const account = accountRows[0];
+
+    // if no account stripe_id, then error, since we expect it
+    if (typeof account.stripe_id !== 'string' || !account.stripe_id) {
+      throw new ContentError('Account is not associated to any Stripe records');
+    }
+
+    return await this.retrieve(req.user.id, account.stripe_id);
+  }
 }
 
 module.exports = Customer;
