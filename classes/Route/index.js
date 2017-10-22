@@ -3,7 +3,7 @@ const config = require('../../modules/config');
 const log = require('../../modules/log')('Route');
 
 const requireAuthenticationWrapper = Symbol('Require Auth Wrapper');
-const vanillaWrapper = Symbol('Vanilla (non-additive) Wrapper');
+const wrapWithExpressNext = Symbol('Wrap async handlers with express next()');
 
 const corsOptions = {
   credentials: true,
@@ -44,23 +44,44 @@ class Route extends Array {
     }
   }
 
-  [requireAuthenticationWrapper](handler) {
+  async [requireAuthenticationWrapper](handler) {
     const skippedHandler = this.skippedHandler;
 
-    return function(req, res, next) {
+    return async function(req, res) {
       if (!req.isAuthenticated()) {
         if (typeof skippedHandler === 'function') {
-          return skippedHandler.apply(this, arguments);
+          return await skippedHandler.apply(this, arguments);
         }
-        return next();
+        return;
       }
 
-      handler.apply(this, arguments);
+      return await handler.apply(this, arguments);
     };
   }
 
-  [vanillaWrapper](handler) {
-    return handler;
+  [wrapWithExpressNext](handler) {
+    return async (req, res, next) => {
+      const originalSend = res.send;
+      let sent = false;
+
+      res.send = function(...args) {
+        sent = true;
+        originalSend.apply(this, args);
+      };
+
+      try {
+        await handler(req, res);
+      } catch(err) {
+        return next(err);
+      }
+
+      // if res.send was called, kill the express flow
+      if (sent === true) {
+        return;
+      }
+
+      next();
+    };
   }
 
   expressRouterPrep() {
@@ -80,12 +101,10 @@ class Route extends Array {
     const expressPathUsed = this.wildcardRoute ? expressPath.replace(/\/$/, '') + '*' : expressPath;
     const expressVerb = verb.toLowerCase();
 
-    // log.info(verb.toUpperCase(), expressPathUsed);
-
     for (let i = 0; i < this.length; i++) {
       // see https://github.com/expressjs/cors#enabling-cors-pre-flight
       router.options(expressPathUsed, cors(corsOptions));
-      router[expressVerb](expressPathUsed, cors(corsOptions), (
+      router[expressVerb](expressPathUsed, cors(corsOptions), this[wrapWithExpressNext](
         this.requireAuthentication ? this[requireAuthenticationWrapper](this[i]) : this[i]
       ));
     }
@@ -93,32 +112,19 @@ class Route extends Array {
     return router;
   }
 
-  process(req, res, next) {
-    const stack = [];
+  async process(req, res) {
+    const tasks = [];
 
     for (let i = 0; i < this.length; i++) {
-      stack.push(this.requireAuthentication ? this[requireAuthenticationWrapper](this[i]) : this[i]);
+      tasks.push(this.requireAuthentication ? this[requireAuthenticationWrapper](this[i]) : this[i]);
     }
 
-    // build up a cache on task workers
-    const tasks = stack.map(handler => {
-      return cb => {
-        handler(req, res, err => {
-          if (err) {
-            return cb(err);
-          }
-
-          cb();
-        });
-      };
-    });
-
-    const waterfall = require('../../modules/async/waterfall');
-    waterfall(tasks, next);
-    return this;
+    for (let i = 0; i < tasks.length; i++) {
+      await tasks[i](req, res);
+    }
   }
 
-  call(req, args, callback) {
+  async call(req, args) {
     args = args == null ? {} : args;
 
     req = Object.assign({}, req, {
@@ -126,30 +132,25 @@ class Route extends Array {
       query: args
     });
 
-    // build up a cache on task workers
-    const tasks = [].concat(this).map(handler => {
-      return (cb, breakFlow) => {
-        const resProxy = {
-          send: data => {
-            breakFlow(data);
-          }
-        };
+    const tasks = [].concat(this);
 
-        handler(req, resProxy, err => {
-          if (err) {
-            return cb(err);
-          }
-
-          cb();
-        });
+    for (let i = 0, i < tasks.length; i++) {
+      const resProxy = {
+        send: data => new directCallResponse(data)
       };
-    });
+      
+      const taskResult = await tasks[i](req, resProxy);
 
-    const waterfall = require('../../modules/async/waterfall');
-    waterfall(tasks, (err, data) => {
-      callback(err, data);
-    });
-    return this;
+      if (taskResult && taskResult instanceof directCallResponse) {
+        return directCallResponse.data;
+      }
+    }
+  }
+}
+
+class directCallResponse {
+  constructor(data) {
+    this.data = data;
   }
 }
 
