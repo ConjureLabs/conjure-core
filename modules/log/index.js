@@ -12,10 +12,10 @@ module.exports = label => {
     timeEnd: console.time.bind(console.time, labelUsing)
   };
 
-  //if (process.env.NODE_ENV === 'development' || (typeof process.env.CONJURE_FORCE_ALL_LOGS === 'string' && process.env.CONJURE_FORCE_ALL_LOGS.length)) {
+  if (process.env.NODE_ENV === 'development') {
     methods.dev = Object.assign({}, methods);
     return methods;
-  //}
+  }
 
   methods.dev = Object.keys(methods).reduce((noOps, key) => {
     noOps[key] = () => {};
