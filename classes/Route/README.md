@@ -11,8 +11,8 @@ const Route = require('classes/Route');
 
 const route = new Route();
 
-route.push((req, res, next) => {
-  next();
+route.push(async (req, res) => {
+  // either res.send or return
 });
 
 module.exports = route;
@@ -41,7 +41,7 @@ const route = new Route({
   }
 });
 
-route.push((req, res, next) => {
+route.push(async (req, res) => {
   // this will not be accessible if process.env.NODE_ENV is 'test' or 'production'
 });
 
@@ -57,7 +57,7 @@ const route = new Route({
   wildcard: true
 });
 
-route.push((req, res, next) => {
+route.push(async (req, res) => {
   // ...
 });
 
@@ -66,18 +66,18 @@ module.exports = route;
 
 ##### Skipped Handler
 
-If a route is skipped, because of invalid criteria like not passing `requireAuthentication`, then it will, by default, call `next()` in the Express routes. To override that, you can supply `skippedHandler`.
+If a route is skipped, because of invalid criteria like not passing the `requireAuthentication` check, then it will, by default, continue through the Express routes matching the path. To override that, you can supply `skippedHandler`.
 
 ```js
 const route = new Route({
   requireAuthentication: true,
-  skippedHandler: (req, res, next) => {
+  skippedHandler: async (req, res) => {
     // ...
   }
 });
 
-route.push((req, res, next) => {
-  // if this route is not executed, because the user is not authed, then `skippedHandler` will be called instead of `next`
+route.push(async (req, res) => {
+  // if this route is not executed, because the user is not authed, then `skippedHandler` will be called instead of this or any later handlers
 });
 ```
 
@@ -89,15 +89,15 @@ You can alter anything within the `this` namespace (including the handlers, sinc
 
 `expressRouterPrep` is called at the start of `expressRouter`.
 
-#### Directly passing (req, res, next)
+#### Directly passing req & res
 
-If you have a route that you want to kick the `req`, `res` and `next` objects into a `Route` instance, you can do so by using `.process`.
+If you have a route that you want to kick the `req` and `res` params into a `Route` instance, you can do so by using `.process`.
 
 ```js
-route.push((req, res, next) => {
+route.push(async (req, res) => {
   const getOrgsApi = require('conjure-api/server/routes/api/orgs/get.js');
 
-  getOrgsApi.process(req, res, next); // this will now have the identical outcome a
+  await getOrgsApi.process(req, res);
 });
 ```
 
@@ -107,13 +107,13 @@ If have a repo like API, and want to install the module within another repo (say
 
 ```js
 // this is assumed to be within a parent repo
-route.push((req, res, next) => {
+route.push(async (req, res) => {
   const getOrgsApi = require('conjure-api/server/routes/api/orgs/get.js');
 
-  getOrgsApi.call(req, { arg: 'val' }, (err, result) => {
-    // ...
-  });
+  const result = await getOrgsApi.call(req, { arg: 'val' });
+
+  // ...
 });
 ```
 
-It is possible that the `.call` callback will not receive any data, if (within the route) `next` is called, and `res.send` is never fired.
+It is possible that the `.call` callback will not receive any data, if the route itself returns null, and `res.send` is never fired.
