@@ -64,41 +64,53 @@ class Route extends Array {
 
   // wraps async handlers with next()
   [wrapWithExpressNext](handler) {
-    if (handler.constructor.name !== 'AsyncFunction') {
+    console.log(handler, typeof handler, handler.constructor.name);
+    if (!(handler instanceof Promise)) {
       return handler;
     }
 
-    return async (req, res, next) => {
-      let sent = false;
+    return (req, res, next) => {
+      // express can't take in a promise (async func), so have to proxy it
+      const handlerProxy = async(callback) => {
+        let sent = false;
 
-      // methods of res that should not prevent next() call
-      const terminalMethods = [
-        'send', 'sendFile', 'sendStatus',
-        'format', 'json', 'jsonp',
-        'redirect', 'render', 'end'
-      ];
+        // methods of res that should not prevent next() call
+        const terminalMethods = [
+          'send', 'sendFile', 'sendStatus',
+          'format', 'json', 'jsonp',
+          'redirect', 'render', 'end'
+        ];
 
-      for (let i = 0; i < terminalMethods; i++) {
-        const name = terminalMethods[i];
-        const originalMethod = res[name];
-        res[name] = function(...args) {
-          sent = true;
-          originalMethod.apply(this, args);
-        };
-      }
+        for (let i = 0; i < terminalMethods; i++) {
+          const name = terminalMethods[i];
+          const originalMethod = res[name];
+          res[name] = function(...args) {
+            sent = true;
+            originalMethod.apply(this, args);
+          };
+        }
 
-      try {
-        await handler(req, res);
-      } catch(err) {
-        return next(err);
-      }
+        try {
+          await handler(req, res);
+        } catch(err) {
+          return callback(err);
+        }
 
-      // if res.send was called, kill the express flow
-      if (sent === true) {
-        return;
-      }
+        callback(null, sent);
+      };
 
-      next();
+      handlerProxy((err, sent) => {
+        if (err) {
+          return next(err);
+        }
+
+        // if res.send was called, kill the express flow
+        if (sent === true) {
+          return;
+        }
+
+        next();
+      });
     };
   }
 
@@ -150,7 +162,7 @@ class Route extends Array {
 
     const tasks = [].concat(this);
 
-    for (let i = 0, i < tasks.length; i++) {
+    for (let i = 0; i < tasks.length; i++) {
       const resProxy = {
         send: data => new directCallResponse(data)
       };
