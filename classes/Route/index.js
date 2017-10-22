@@ -69,13 +69,23 @@ class Route extends Array {
     }
 
     return async (req, res, next) => {
-      const originalSend = res.send;
       let sent = false;
 
-      res.send = function(...args) {
-        sent = true;
-        originalSend.apply(this, args);
-      };
+      // methods of res that should not prevent next() call
+      const terminalMethods = [
+        'send', 'sendFile', 'sendStatus',
+        'format', 'json', 'jsonp',
+        'redirect', 'render', 'end'
+      ];
+
+      for (let i = 0; i < terminalMethods; i++) {
+        const name = terminalMethods[i];
+        const originalMethod = res[name];
+        res[name] = function(...args) {
+          sent = true;
+          originalMethod.apply(this, args);
+        };
+      }
 
       try {
         await handler(req, res);
