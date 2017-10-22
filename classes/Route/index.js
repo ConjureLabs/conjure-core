@@ -62,7 +62,12 @@ class Route extends Array {
     };
   }
 
+  // wraps async handlers with next()
   [wrapWithExpressNext](handler) {
+    if (handler.constructor.name !== 'AsyncFunction') {
+      return handler;
+    }
+
     return async (req, res, next) => {
       const originalSend = res.send;
       let sent = false;
