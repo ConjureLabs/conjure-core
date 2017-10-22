@@ -1,6 +1,6 @@
 // todo: tests!
 
-const { UnexpectedError, ContentError } = require('conjure-core/modules/err');
+const { UnexpectedError, ContentError } = require('../../modules/err');
 
 const mapRowInstances = Symbol('maps query result rows to DatabaseRow instances');
 const staticProxy = Symbol('static method, proxy to instance method');
@@ -25,14 +25,14 @@ module.exports = class DatabaseTable {
   }
 
   [mapRowInstances](queryResult) {
-    const DatabaseRow = require('conjure-core/classes/DatabaseRow');
+    const DatabaseRow = require('../DatabaseRow');
     return (queryResult.rows || []).map(row => {
       return new DatabaseRow(this.tableName, row);
     });
   }
 
   async select(...constraints) {
-    const database = require('conjure-core/modules/database');
+    const database = require('../../modules/database');
 
     const { queryValues, whereClause } = generateWhereClause(constraints);
 
@@ -45,7 +45,7 @@ module.exports = class DatabaseTable {
   }
 
   async update(updates, ...constraints) {
-    const database = require('conjure-core/modules/database');
+    const database = require('../../modules/database');
 
     const queryValues = [];
     const updatesSql = generateSqlKeyVals(', ', updates, queryValues);
@@ -60,7 +60,7 @@ module.exports = class DatabaseTable {
   }
 
   async delete(...constraints) {
-    const database = require('conjure-core/modules/database');
+    const database = require('../../modules/database');
 
     const { queryValues, whereClause } = generateWhereClause(constraints);
 
@@ -73,7 +73,7 @@ module.exports = class DatabaseTable {
   }
 
   async insert(...newRows) {
-    const database = require('conjure-core/modules/database');
+    const database = require('../../modules/database');
 
     if (!newRows.length) {
       throw new UnexpectedError('There were no rows to insert');

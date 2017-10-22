@@ -1,7 +1,7 @@
 const async = require('async');
-const NotFoundError = require('conjure-core/modules/err').NotFoundError;
-const UnexpectedError = require('conjure-core/modules/err').UnexpectedError;
-const log = require('conjure-core/modules/log')('github issue comment');
+const NotFoundError = require('../../../../../modules/err').NotFoundError;
+const UnexpectedError = require('../../../../../modules/err').UnexpectedError;
+const log = require('../../../../../modules/log')('github issue comment');
 
 const getGitHubClient = Symbol('get GitHub api client instance');
 const createComment = Symbol('create new comment');
@@ -76,7 +76,7 @@ class GitHubIssueComment {
 
     // creating new comment record on our end
     waterfall.push((commentCreationBody, watchedRepo, cb) => {
-      const DatabaseTable = require('conjure-core/classes/DatabaseTable');
+      const DatabaseTable = require('../../../../DatabaseTable');
       DatabaseTable.insert('github_issue_comment', {
         watched_repo: watchedRepo.id,
         issue_id: this.issue.payload.number,

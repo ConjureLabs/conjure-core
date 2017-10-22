@@ -1,4 +1,4 @@
-const { UnexpectedError } = require('conjure-core/modules/err');
+const { UnexpectedError } = require('../../modules/err');
 
 const rowTableName = Symbol('instance row\'s table name');
 const rowDeleted = Symbol('indicator that row was deleted');
@@ -24,7 +24,7 @@ module.exports = class DatabaseRow {
       throw new UnexpectedError('This row was previously deleted'));
     }
 
-    const DatabaseTable = require('conjure-core/classes/DatabaseTable');
+    const DatabaseTable = require('../DatabaseTable');
 
     // no .id, assuming it's a new row to insert
     if (this.id === undefined) {
@@ -65,7 +65,7 @@ module.exports = class DatabaseRow {
       throw new UnexpectedError('Exepected row .id to exist, for deletion');
     }
 
-    const DatabaseTable = require('conjure-core/classes/DatabaseTable');
+    const DatabaseTable = require('../DatabaseTable');
     await DatabaseTable.delete(this[rowTableName], {
       id: this.id
     });
