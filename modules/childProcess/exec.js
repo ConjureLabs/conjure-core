@@ -1,6 +1,6 @@
-const { ConjureError } = require('conjure-core/modules/err');
+const { ConjureError } = require('../err');
 
-const log = require('conjure-core/modules/log')('child process execution');
+const log = require('../log')('child process execution');
 
 module.exports = (command, options) => {
   return new Promise((resolve, reject) => {

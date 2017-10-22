@@ -1,5 +1,5 @@
 const async = require('async');
-const log = require('conjure-core/modules/log')('github issue');
+const log = require('../../../../modules/log')('github issue');
 
 const getExistingComment = Symbol('get existing GitHub issue comment');
 
@@ -85,7 +85,7 @@ class GitHubIssue {
     });
 
     waterfall.push((watchedRepo, cb) => {
-      const DatabaseTable = require('conjure-core/classes/DatabaseTable');
+      const DatabaseTable = require('../../../DatabaseTable');
       DatabaseTable.select('github_issue_comment', {
         watched_repo: watchedRepo.id,
         issue_id: this.payload.number,
@@ -100,7 +100,7 @@ class GitHubIssue {
     });
 
     async.waterfall(waterfall, (err, watchedRepo, commentRecord) => {
-      const DatabaseRow = require('conjure-core/classes/DatabaseRow');
+      const DatabaseRow = require('../../../DatabaseRow');
       const GitHubIssueComment = require('./Comment');
       return callback(err, watchedRepo, commentRecord instanceof DatabaseRow ? new GitHubIssueComment(this, commentRecord) : null);
     });

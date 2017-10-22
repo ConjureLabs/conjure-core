@@ -1,7 +1,7 @@
 const { Pool } = require('pg');
-const config = require('conjure-core/modules/config');
-const { ContentError } = require('conjure-core/modules/err');
-const log = require('conjure-core/modules/log')('database');
+const config = require('../config');
+const { ContentError } = require('../err');
+const log = require('../log')('database');
 
 const pool = await new pgPool(config.database.pg);
 

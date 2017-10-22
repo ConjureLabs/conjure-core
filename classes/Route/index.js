@@ -1,6 +1,6 @@
 const cors = require('cors');
-const config = require('conjure-core/modules/config');
-const log = require('conjure-core/modules/log')('Route');
+const config = require('../../modules/config');
+const log = require('../../modules/log')('Route');
 
 const requireAuthenticationWrapper = Symbol('Require Auth Wrapper');
 const vanillaWrapper = Symbol('Vanilla (non-additive) Wrapper');
@@ -113,7 +113,7 @@ class Route extends Array {
       };
     });
 
-    const waterfall = require('conjure-core/modules/async/waterfall');
+    const waterfall = require('../../modules/async/waterfall');
     waterfall(tasks, next);
     return this;
   }
@@ -145,7 +145,7 @@ class Route extends Array {
       };
     });
 
-    const waterfall = require('conjure-core/modules/async/waterfall');
+    const waterfall = require('../../modules/async/waterfall');
     waterfall(tasks, (err, data) => {
       callback(err, data);
     });

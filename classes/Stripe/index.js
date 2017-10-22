@@ -1,4 +1,4 @@
-const config = require('conjure-core/modules/config');
+const config = require('../../modules/config');
 const stripeApi = require('stripe')(config.stripe.secret);
 
 class Stripe {
