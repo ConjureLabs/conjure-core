@@ -11,11 +11,15 @@ const { ContentError } = require('../../err');
 
   `generatePromise` must be a function that return promises (not the promises directly)
   this helps avoid promises firing immediately all in parallel (since that is what they do)
+
+  this function returns the result of each promise resolve, in same order as inbound `baseData`
 */
 module.exports = async (batchLimit, baseData, generatePromise) => {
   if (isNaN(batchLimit) || batchLimit < 1) {
     throw new ContentError('Invalid batch limit set');
   }
+
+  const result = [];
 
   // iterate based on batchLimit
   for (let i = 0; i < baseData.length; i += batchLimit) {
@@ -29,7 +33,9 @@ module.exports = async (batchLimit, baseData, generatePromise) => {
 
     // wait all promises in this batch to clear
     for (let j = 0; j < pendingCount; j++) {
-      await pending[j];
+      result[i + j] = await pending[j];
     }
   }
+
+  return result;
 };
