@@ -64,7 +64,6 @@ class Route extends Array {
 
   // wraps async handlers with next()
   [wrapWithExpressNext](handler) {
-    console.log(handler, typeof handler, handler.constructor.name);
     if (!(handler instanceof Promise)) {
       return handler;
     }
