@@ -56,7 +56,7 @@ const config = {
 
   services: {
     github: {
-      id: 'a2f05da23445befbe47a',
+      id: process.env.CONJURE_GITHUB_CLIENT_ID,
       secret: process.env.CONJURE_GITHUB_CLIENT_SECRET,
       inboundWebhookScret: 'super secret secret'
     }
