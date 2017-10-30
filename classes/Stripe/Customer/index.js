@@ -19,60 +19,76 @@ class Customer extends Stripe {
     }
   }
 
-  save(callback) {
+  async save() {
     if (this.id) {
-      return this[updateCustomer](callback);
+      return await this[updateCustomer]();
     }
-    return this[createCustomer](callback);
+    return await this[createCustomer]();
   }
 
-  static retrieve(conjureId, stripeId, callback) {
-    Customer.api.customers.retrieve(stripeId, (err, customerData) => {
-      if (err) {
-        return callback(err);
-      }
+  static async retrieve(conjureId, stripeId) {
+    const customerData = await Customer.api.customers.retrieve(stripeId);
 
-      callback(null, new Customer(conjureId, {
-        id: customerData.id,
-        email: customerData.email,
-        name: customerData.metadata.name
-      }, customerData));
-    });
-
-    return this;
+    return new Customer(conjureId, {
+      id: customerData.id,
+      email: customerData.email,
+      name: customerData.metadata.name
+    }, customerData));
   }
 
-  [createCustomer](callback) {
-    Customer.api.customers.create({
+  async [createCustomer]() {
+    const customerData = await Customer.api.customers.create({
       email: this.email,
       metadata: {
         conjureId: this.conjureId,
         name: this.name
       }
-    }, (err, customerData) => {
-      if (err) {
-        return callback(err);
-      }
-
-      this.id = customerData.id;
-      this.rawData = customerData;
-      callback(null, this);
     });
 
+    this.id = customerData.id;
+    this.rawData = customerData;
     return this;
   }
 
-  [updateCustomer](callback) {
-    Customer.api.customers.update(this.id, {
+  async [updateCustomer]() {
+    const customerData = await Customer.api.customers.update(this.id, {
       email: this.email,
       metadata: {
         conjureId: this.conjureId,
         name: this.name
       }
-    }, (err, customerData) => {
-      this.rawData = customerData;
-      return callback(err, this);
     });
+
+    this.rawData = customerData;
+    return this;
+  }
+
+  static async getRecordFromReq(req) {
+    const DatabaseTable = require('../../DatabaseTable');
+    const account = new DatabaseTable('account');
+
+    const accountRows = await account.select({
+      id: req.user.id
+    });
+
+    // should not be possible
+    if (!accountRows.length) {
+      throw new UnexpectedError('Could not find account record');
+    }
+
+    // should not be possible
+    if (accountRows.length > 1) {
+      throw new UnexpectedError('Expected a single row for account record, received multiple');
+    }
+
+    const account = accountRows[0];
+
+    // if no account stripe_id, then error, since we expect it
+    if (typeof account.stripe_id !== 'string' || !account.stripe_id) {
+      throw new ContentError('Account is not associated to any Stripe records');
+    }
+
+    return await this.retrieve(req.user.id, account.stripe_id);
   }
 }
 

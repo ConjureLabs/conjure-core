@@ -1,3 +1,5 @@
+**DEPRECATED**
+
 # Waterfall Async Worker
 
 Similar to [the async module's waterfall](https://caolan.github.io/async/docs.html#waterfall), but with one additional quirk: an extra function is passed to each task worker, that allows the flow to break, without returning an error.

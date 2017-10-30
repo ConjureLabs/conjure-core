@@ -1,26 +1,28 @@
-const ConjureError = require('conjure-core/modules/err').ConjureError;
+const { ConjureError } = require('../err');
 
-const log = require('conjure-core/modules/log')('child process execution');
+const log = require('../log')('child process execution');
 
-module.exports = (command, options, callback) => {
-  const exec = require('child_process').exec;
+module.exports = (command, options) => {
+  return new Promise((resolve, reject) => {
+    const exec = require('child_process').exec;
 
-  log.dev.info(command);
+    log.dev.info(command);
 
-  exec(command, options, (err, stdout, stderr) => {
-    if (err) {
-      return callback(err);
-    }
+    exec(command, options, (err, stdout, stderr) => {
+      if (err) {
+        return reject(err);
+      }
 
-    if (stderr) {
-      return callback(new ConjureError(stderr));
-    }
+      if (stderr) {
+        return reject(new ConjureError(stderr));
+      }
 
-    // // keeping these commented lines to help debug, when needed
-    // if (stdout) {
-    //   console.log(stdout);
-    // }
+      // // keeping these commented lines to help debug, when needed
+      // if (stdout) {
+      //   console.log(stdout);
+      // }
 
-    callback(null, typeof stdout === 'string' ? stdout.trim() : '');
+      resolve(typeof stdout === 'string' ? stdout.trim() : '');
+    });
   });
 };

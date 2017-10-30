@@ -1,5 +1,5 @@
-const ContentError = require('conjure-core/modules/err').ContentError;
-const UserError = require('conjure-core/modules/err').UserError;
+const ContentError = require('../../modules/err').ContentError;
+const UserError = require('../../modules/err').UserError;
 
 const slice = Array.prototype.slice;
 

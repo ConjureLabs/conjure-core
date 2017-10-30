@@ -1,9 +1,9 @@
 const cors = require('cors');
-const config = require('conjure-core/modules/config');
-const log = require('conjure-core/modules/log')('Route');
+const config = require('../../modules/config');
+const log = require('../../modules/log')('Route');
 
 const requireAuthenticationWrapper = Symbol('Require Auth Wrapper');
-const vanillaWrapper = Symbol('Vanilla (non-additive) Wrapper');
+const wrapWithExpressNext = Symbol('Wrap async handlers with express next()');
 
 const corsOptions = {
   credentials: true,
@@ -17,12 +17,11 @@ const corsOptions = {
 };
 
 class Route extends Array {
-  constructor(options) {
+  constructor(options = {}) {
     super();
 
     this.suppressedRoutes = false;
 
-    options = options || {};
     options.blacklistedEnv = options.blacklistedEnv || {};
 
     this.requireAuthentication = options.requireAuthentication === true;
@@ -44,23 +43,73 @@ class Route extends Array {
     }
   }
 
-  [requireAuthenticationWrapper](handler) {
+  async [requireAuthenticationWrapper](handler) {
     const skippedHandler = this.skippedHandler;
 
-    return function(req, res, next) {
+    return async function(req, res) {
       if (!req.isAuthenticated()) {
         if (typeof skippedHandler === 'function') {
-          return skippedHandler.apply(this, arguments);
+          return await skippedHandler.apply(this, arguments);
         }
-        return next();
+        return;
       }
 
-      handler.apply(this, arguments);
+      if (!req.user) {
+        throw new UnexpectedError('No req.user available');
+      }
+
+      return await handler.apply(this, arguments);
     };
   }
 
-  [vanillaWrapper](handler) {
-    return handler;
+  // wraps async handlers with next()
+  [wrapWithExpressNext](handler) {
+    if (!(handler instanceof Promise) && handler.constructor.name !== 'AsyncFunction') {
+      return handler;
+    }
+
+    return (req, res, next) => {
+      // express can't take in a promise (async func), so have to proxy it
+      const handlerProxy = async callback => {
+        let sent = false;
+
+        // methods of res that should not prevent next() call
+        const terminalMethods = [
+          'send', 'sendFile', 'sendStatus',
+          'format', 'json', 'jsonp',
+          'redirect', 'render', 'end'
+        ];
+
+        const hijackedRes = Object.assign({}, res, terminalMethods.reduce((methods, key) => {
+          methods[key] = (...args) => {
+            sent = true;
+            res[key](...args);
+          };
+          return methods;
+        }, {}));
+
+        try {
+          await handler(req, hijackedRes, next);
+        } catch(err) {
+          return callback(err);
+        }
+
+        callback(null, sent);
+      };
+
+      handlerProxy((err, sent) => {
+        if (err) {
+          return next(err);
+        }
+
+        // if res.send was called, kill the express flow
+        if (sent === true) {
+          return;
+        }
+
+        next();
+      });
+    };
   }
 
   expressRouterPrep() {
@@ -80,12 +129,10 @@ class Route extends Array {
     const expressPathUsed = this.wildcardRoute ? expressPath.replace(/\/$/, '') + '*' : expressPath;
     const expressVerb = verb.toLowerCase();
 
-    // log.info(verb.toUpperCase(), expressPathUsed);
-
     for (let i = 0; i < this.length; i++) {
       // see https://github.com/expressjs/cors#enabling-cors-pre-flight
       router.options(expressPathUsed, cors(corsOptions));
-      router[expressVerb](expressPathUsed, cors(corsOptions), (
+      router[expressVerb](expressPathUsed, cors(corsOptions), this[wrapWithExpressNext](
         this.requireAuthentication ? this[requireAuthenticationWrapper](this[i]) : this[i]
       ));
     }
@@ -93,63 +140,43 @@ class Route extends Array {
     return router;
   }
 
-  process(req, res, next) {
-    const stack = [];
+  async process(req, res) {
+    const tasks = [];
 
     for (let i = 0; i < this.length; i++) {
-      stack.push(this.requireAuthentication ? this[requireAuthenticationWrapper](this[i]) : this[i]);
+      tasks.push(this.requireAuthentication ? this[requireAuthenticationWrapper](this[i]) : this[i]);
     }
 
-    // build up a cache on task workers
-    const tasks = stack.map(handler => {
-      return cb => {
-        handler(req, res, err => {
-          if (err) {
-            return cb(err);
-          }
-
-          cb();
-        });
-      };
-    });
-
-    const waterfall = require('conjure-core/modules/async/waterfall');
-    waterfall(tasks, next);
-    return this;
+    for (let i = 0; i < tasks.length; i++) {
+      await tasks[i](req, res);
+    }
   }
 
-  call(req, args, callback) {
-    args = args == null ? {} : args;
-
+  async call(req, args = {}) {
     req = Object.assign({}, req, {
       body: args,
       query: args
     });
 
-    // build up a cache on task workers
-    const tasks = [].concat(this).map(handler => {
-      return (cb, breakFlow) => {
-        const resProxy = {
-          send: data => {
-            breakFlow(data);
-          }
-        };
+    const tasks = [].concat(this);
 
-        handler(req, resProxy, err => {
-          if (err) {
-            return cb(err);
-          }
-
-          cb();
-        });
+    for (let i = 0; i < tasks.length; i++) {
+      const resProxy = {
+        send: data => new directCallResponse(data)
       };
-    });
+      
+      const taskResult = await tasks[i](req, resProxy);
 
-    const waterfall = require('conjure-core/modules/async/waterfall');
-    waterfall(tasks, (err, data) => {
-      callback(err, data);
-    });
-    return this;
+      if (taskResult && taskResult instanceof directCallResponse) {
+        return directCallResponse.data;
+      }
+    }
+  }
+}
+
+class directCallResponse {
+  constructor(data) {
+    this.data = data;
   }
 }
 

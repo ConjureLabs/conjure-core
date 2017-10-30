@@ -12,43 +12,33 @@ This classes serves as a proxy to database tables, making it easier to select, i
 const account = new DatabaseTable('account');
 
 // SELECT * FROM account;
-account.select((err, rows) => {
-  // ...
-});
+const rows1 = await account.select();
 
 // SELECT * FROM account WHERE id = 1 AND name = 'Tim Marshall';
-account.select({
+const rows2 = await account.select({
   id: 1,
   name: 'Tim Marshall'
-}, (err, rows) => {
-  // ...
 });
 
 // SELECT * FROM account WHERE (id = 1 AND name = 'Tim Marshall') OR (id = 2);
-accont.select({
+const rows3 = await account.select({
   id: 1,
   name: 'Tim Marshall'
 }, {
   id: 2
-}, (err, rows) => {
-  // ...
-})
+});
 ```
 
 ##### Direct (static) call
 
 ```js
 // SELECT * FROM account;
-DatabaseTable.select('account', (err, rows) => {
-  // ...
-});
+const rows1 = await DatabaseTable.select('account');
 
 // SELECT * FROM account WHERE id = 1 AND name = 'Tim Marshall';
-DatabaseTable.select('account', {
+const rows2 = await DatabaseTable.select('account', {
   id: 1,
   name: 'Tim Marshall'
-}, (err, rows) => {
-  // ...
 });
 ```
 </details>
@@ -63,53 +53,43 @@ DatabaseTable.select('account', {
 const account = new DatabaseTable('account');
 
 // UPDATE account SET activated = false;
-account.update({
+const rows1 = await account.update({
   activated: false
-}, (err, rows) => {
-  // ...
 });
 
 // UPDATE account SET email = 'tim@marshall.io' WHERE id = 1 AND name = 'Tim Marshall';
-account.update({
+const rows2 = await account.update({
   email: 'tim@marshall.io'
 }, {
   id: 1,
   name: 'Tim Marshall'
-}, (err, rows) => {
-  // ...
 });
 
 // UPDATE account SET email = 'tim@marshall.io' WHERE (id = 1 AND name = 'Tim Marshall') OR (id = 2);
-account.update({
+const rows3 = await account.update({
   email: 'tim@marshall.io'
 }, {
   id: 1,
   name: 'Tim Marshall'
 }, {
   id: 2
-}, (err, rows) => {
-  // ...
-})
+});
 ```
 
 ##### Direct (static) call
 
 ```js
 // UPDATE account SET activated = false;
-DatabaseTable.update('account', {
+const rows1 = await DatabaseTable.update('account', {
   activated: false
-}, (err, rows) => {
-  // ...
 });
 
 // UPDATE account SET activated = false WHERE id = 1 AND name = 'Tim Marshall';
-DatabaseTable.update('account', {
+const rows2 = await DatabaseTable.update('account', {
   activated: false
 }, {
   id: 1,
   name: 'Tim Marshall'
-}, (err, rows) => {
-  // ...
 });
 ```
 </details>
@@ -124,21 +104,17 @@ DatabaseTable.update('account', {
 const account = new DatabaseTable('account');
 
 // INSERT INTO account (name, email) VALUES ('Tim Marshall', 'tim@marshall.io');
-account.insert({
+const rows1 = await account.insert({
   name: 'Tim Marshall',
   email: 'tim@marshall.io'
-}, (err, rows) => {
-  // ...
 });
 
 // INSERT INTO account (name, email) VALUES ('Tim Marshall', 'tim@marshall.io'), ('John Newton', NULL);
-account.insert({
+const rows2 = await account.insert({
   name: 'Tim Marshall',
   email: 'tim@marshall.io'
 }, {
   name: 'John Newton'
-}, (err, rows) => {
-  // ...
 });
 ```
 
@@ -146,21 +122,17 @@ account.insert({
 
 ```js
 // INSERT INTO account (name, email) VALUES ('Tim Marshall', 'tim@marshall.io');
-DatabaseTable.insert('account', {
+const rows1 = await DatabaseTable.insert('account', {
   name: 'Tim Marshall',
   email: 'tim@marshall.io'
-}, (err, rows) => {
-  // ...
 });
 
 // INSERT INTO account (name, email) VALUES ('Tim Marshall', 'tim@marshall.io'), ('John Newton', NULL);
-DatabaseTable.insert('account', {
+const rows2 = await DatabaseTable.insert('account', {
   name: 'Tim Marshall',
   email: 'tim@marshall.io'
 }, {
   name: 'John Newton'
-}, (err, rows) => {
-  // ...
 });
 ```
 </details>
@@ -175,43 +147,33 @@ DatabaseTable.insert('account', {
 const account = new DatabaseTable('account');
 
 // DELETE FROM account;
-account.delete((err, rows) => {
-  // ...
-});
+const rows1 = await account.delete();
 
 // DELETE FROM account WHERE id = 1 AND name = 'Tim Marshall';
-account.delete({
+const rows2 = await account.delete({
   id: 1,
   name: 'Tim Marshall'
-}, (err, rows) => {
-  // ...
 });
 
 // DELETE FROM account WHERE (id = 1 AND name = 'Tim Marshall') OR (id = 2);
-accont.delete({
+const rows3 = await account.delete({
   id: 1,
   name: 'Tim Marshall'
 }, {
   id: 2
-}, (err, rows) => {
-  // ...
-})
+});
 ```
 
 ##### Direct (static) call
 
 ```js
 // DELETE FROM account;
-DatabaseTable.delete('account', (err, rows) => {
-  // ...
-});
+const rows1 = await DatabaseTable.delete('account');
 
 // DELETE FROM account WHERE id = 1 AND name = 'Tim Marshall';
-DatabaseTable.delete('account', {
+const rows2 = await DatabaseTable.delete('account', {
   id: 1,
   name: 'Tim Marshall'
-}, (err, rows) => {
-  // ...
 });
 ```
 </details>
@@ -230,7 +192,7 @@ const account = new DatabaseTable('account');
 //
 // falls back to:
 // UPDATE account SET name = 'Tim Marshall', updated = NOW() WHERE email = 'tim@marshall.io';
-account.upsert({
+const rows = await account.upsert({
   // insert
   name: 'Tim Marshall',
   email: 'tim@marshall.io',
@@ -242,9 +204,8 @@ account.upsert({
 }, {
   // update conditions
   email: 'tim@marshall.io'
-}, (err, rows) => {
-  // ...
 });
+```
 
 ##### Direct (static) call
 
@@ -254,7 +215,7 @@ account.upsert({
 //
 // falls back to:
 // UPDATE account SET name = 'Tim Marshall', updated = NOW() WHERE email = 'tim@marshall.io';
-DatabaseTable.upsert('account', {
+const rows = await DatabaseTable.upsert('account', {
   // insert
   name: 'Tim Marshall',
   email: 'tim@marshall.io',
@@ -266,8 +227,6 @@ DatabaseTable.upsert('account', {
 }, {
   // update conditions
   email: 'tim@marshall.io'
-}, (err, rows) => {
-  // ...
 });
 ```
 </details>
@@ -279,10 +238,8 @@ Use only when needed, and never with user-inputted values.
 
 ```js
 // INSERT INTO accoutn (name, added) VALUES ('Tim Marshall', NOW());
-DatabaseTable.insert('account', {
+const rows = await DatabaseTable.insert('account', {
   name: 'Tim Marshall',
   added: DatabaseTable.literal('NOW()')
-}, (err, rows) => {
-  // ...
 });
 ```

@@ -1,4 +1,4 @@
-const UnexpectedError = require('conjure-core/modules/err').UnexpectedError;
+const { UnexpectedError } = require('../../modules/err');
 
 const rowTableName = Symbol('instance row\'s table name');
 const rowDeleted = Symbol('indicator that row was deleted');
@@ -19,72 +19,58 @@ module.exports = class DatabaseRow {
       A) update an existing record based on it's .id (assumes all tables have .id pk)
       B) inserts a new record if no .id is present
    */
-  save(callback) {
+  async save() {
     if (this[rowDeleted] === true) {
-      callback(new UnexpectedError('This row was previously deleted'));
-      return this;
+      throw new UnexpectedError('This row was previously deleted'));
     }
 
-    const DatabaseTable = require('conjure-core/classes/DatabaseTable');
+    const DatabaseTable = require('../DatabaseTable');
 
     // no .id, assuming it's a new row to insert
     if (this.id === undefined) {
-      DatabaseTable.insert(this[rowTableName], this, (err, rows) => {
-        if (err) {
-          return callback(err);
-        }
+      const rows = await DatabaseTable.insert(this[rowTableName], this);
 
-        if (!rows.length) {
-          return callback(new UnexpectedError('Expected DatabaseTable.insert to return new table row'));
-        }
+      if (!rows.length) {
+        throw new UnexpectedError('Expected DatabaseTable.insert to return new table row');
+      }
 
-        if (rows.length > 1) {
-          return callback(new UnexpectedError('Expected DatabaseTable.insert to return a single new table row'));
-        }
+      if (rows.length > 1) {
+        throw new UnexpectedError('Expected DatabaseTable.insert to return a single new table row');
+      }
 
-        for (let key in rows[0]) {
-          this[key] = rows[0][key];
-        }
+      for (let key in rows[0]) {
+        this[key] = rows[0][key];
+      }
 
-        callback(null, this);
-      });
       return this;
     }
 
     // have a .id, must do an update
     const rowContentWithoutId = Object.assign({}, this);
     delete rowContentWithoutId.id;
-    DatabaseTable.update(this[rowTableName], rowContentWithoutId, {
+
+    await DatabaseTable.update(this[rowTableName], rowContentWithoutId, {
       id: this.id
-    }, err => {
-      callback(err, this);
     });
 
     return this;
   }
 
-  delete(callback) {
+  async delete() {
     if (this[rowDeleted] === true) {
-      callback(new UnexpectedError('This row was previously deleted'));
-      return this;
+      throw new UnexpectedError('This row was previously deleted');
     }
 
     if (this.id === undefined) {
-      callback(new UnexpectedError('Exepected row .id to exist, for deletion'));
-      return this;
+      throw new UnexpectedError('Exepected row .id to exist, for deletion');
     }
 
-    const DatabaseTable = require('conjure-core/classes/DatabaseTable');
-    DatabaseTable.delete(this[rowTableName], {
+    const DatabaseTable = require('../DatabaseTable');
+    await DatabaseTable.delete(this[rowTableName], {
       id: this.id
-    }, err => {
-      if (!err) {
-        this[rowDeleted] = true;
-      }
-
-      callback(err);
     });
 
+    this[rowDeleted] = true;
     return this;
   }
 
