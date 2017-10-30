@@ -12,6 +12,7 @@ export CONJURE_WORKER_PROTOCOL='http';
 
 export CONJURE_SESSION_SECRET='';
 export CONJURE_GITHUB_CLIENT_SECRET='';
+export export CONJURE_GITHUB_CLIENT_SECRET='';
 export CONJURE_STRIPE_API_SECRET='';
 
 export CONJURE_PG_USER='conjure_admin';
