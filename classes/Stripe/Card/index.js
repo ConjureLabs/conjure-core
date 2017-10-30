@@ -1,6 +1,5 @@
 const Stripe = require('../');
-const UnexpectedError = require('conjure-core/modules/err').UnexpectedError;
-const ContentError = require('conjure-core/modules/err').ContentError;
+const { UnexpectedError, ContentError} = require('../../../modules/err');
 
 const createCard = Symbol('create card');
 const updateCard = Symbol('update existing card');
@@ -46,19 +45,19 @@ class Card extends Stripe {
     }
   }
 
-  save(callback) {
+  async save() {
     if (this.id) {
-      return this[updateCard](callback);
+      return await this[updateCard]();
     }
-    return this[createCard](callback);
+    return await this[createCard]();
   }
 
-  [createCard](callback) {
+  async [createCard]() {
     if (!this.customer || !this.customer.id) {
-      return callback(new UnexpectedError('No stripe customer id present'));
+      throw new UnexpectedError('No stripe customer id present');
     }
 
-    Card.api.customers.createSource(this.customer.id, {
+    const cardData = await Card.api.customers.createSource(this.customer.id, {
       source: {
         object: 'card',
         exp_month: this.expiration.month,
@@ -73,25 +72,19 @@ class Card extends Stripe {
         cvc: this.cvc,
         name: this.name
       }
-    }, (err, cardData) => {
-      if (err) {
-        return callback(err);
-      }
-
-      this.id = cardData.id;
-      this.rawData = cardData;
-      callback(null, this);
     });
 
+    this.id = cardData.id;
+    this.rawData = cardData;
     return this;
   }
 
-  [updateCard](callback) {
+  async [updateCard]() {
     if (!this.customer || !this.customer.id) {
-      return callback(new UnexpectedError('No stripe customer id present'));
+      throw new UnexpectedError('No stripe customer id present');
     }
 
-    Card.api.customers.updateCard(this.customer.id, this.id, {
+    const cardData = await Card.api.customers.updateCard(this.customer.id, this.id, {
       source: {
         object: 'card',
         exp_month: this.expiration.month,
@@ -106,48 +99,41 @@ class Card extends Stripe {
         cvc: this.cvc,
         name: this.name
       }
-    }, (err, cardData) => {
-      this.rawData = cardData;
-      return callback(err, this);
     });
+
+    this.rawData = cardData;
+    return this;
   }
 
-  static retrieve(customerInstance, stripeCardId, callback) {
+  static async retrieve(customerInstance, stripeCardId) {
     if (typeof stripeCardId !== 'string' || !stripeCardId) {
-      return callback(new ContentError('No stripe card id provided'));
+      throw new ContentError('No stripe card id provided');
     }
 
-    Card.api.customers.retrieveCard(customerInstance.id, stripeCardId, (err, cardData) => {
-      if (err) {
-        return callback(err);
-      }
+    const cardData = await Card.api.customers.retrieveCard(customerInstance.id, stripeCardId);
 
-      const retrieved = new Card(customerInstance, {
-        id: stripeCardId,
-        address: {
-          country: cardData.country
-        },
-        expiration: {
-          month: cardData.exp_month,
-          year: cardData.exp_year
-        },
-        last4: cardData.last4,
-        brand: cardData.brand,
-        name: cardData.name
-      }, cardData);
-
-      callback(null, retrieved);
-    });
+    return new Card(customerInstance, {
+      id: stripeCardId,
+      address: {
+        country: cardData.country
+      },
+      expiration: {
+        month: cardData.exp_month,
+        year: cardData.exp_year
+      },
+      last4: cardData.last4,
+      brand: cardData.brand,
+      name: cardData.name
+    }, cardData);
   }
 
-  static delete(customerInstance, stripeCardId, callback) {
+  static async delete(customerInstance, stripeCardId) {
     if (typeof stripeCardId !== 'string' || !stripeCardId) {
-      return callback(new ContentError('No stripe card id provided'));
+      throw new ContentError('No stripe card id provided');
     }
 
-    Card.api.customers.deleteCard(customerInstance.id, stripeCardId, (err, confirmation) => {
-      callback(err, confirmation);
-    });
+    // returns a confirmation
+    return await Card.api.customers.deleteCard(customerInstance.id, stripeCardId);
   }
 }
 

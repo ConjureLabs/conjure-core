@@ -2,7 +2,7 @@ class ReqProxy {
   constructor(options) {
     options = options || {};
 
-    const config = require('conjure-core/modules/config');
+    const config = require('../../../modules/config');
 
     this.domain = options.domain !== undefined ? options.domain : config.app.api.publicDomain;
     this.protocol = options.protocol !== undefined ? options.protocol : config.app.api.protocol;

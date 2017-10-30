@@ -22,44 +22,39 @@ class Charge extends Stripe {
     }
   }
 
-  save(callback) {
+  async save() {
     if (this.id) {
-      return this[updateCharge](callback);
+      return await this[updateCharge]();
     }
-    return this[createCharge](callback);
+    return await this[createCharge]();
   }
 
-  [createCharge](callback) {
-    Customer.api.charges.create({
+  async [createCharge]() {
+    const chargeData = await Customer.api.charges.create({
       amount: this.amount,
       currency: this.currency,
       receipt_email: this.email,
       customer: this.customer,
       source: this.source
-    }, (err, chargeData) => {
-      if (err) {
-        return callback(err);
-      }
-
-      this.id = chargeData.id;
-      this.rawData = chargeData;
-      callback(null, this);
     });
+
+    this.id = chargeData.id;
+    this.rawData = chargeData;
 
     return this;
   }
 
-  [updateCharge](callback) {
-    Customer.api.charges.update(this.id, {
+  async [updateCharge]() {
+    const chargeData = await Customer.api.charges.update(this.id, {
       amount: this.amount,
       currency: this.currency,
       receipt_email: this.email,
       customer: this.customer,
       source: this.source
-    }, (err, chargeData) => {
-      this.rawData = chargeData;
-      return callback(err, this);
     });
+
+    this.rawData = chargeData;
+    return this;
   }
 }
 
