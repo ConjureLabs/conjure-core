@@ -70,7 +70,9 @@ class Route extends Array {
 
     return (req, res, next) => {
       // express can't take in a promise (async func), so have to proxy it
-      const handlerProxy = async(callback) => {
+      const handlerProxy = async callback => {
+        conosle.log('handler is' , handler);
+
         let sent = false;
 
         // methods of res that should not prevent next() call
@@ -90,11 +92,14 @@ class Route extends Array {
         }
 
         try {
+          console.log('awaiting');
           await handler(req, res);
         } catch(err) {
+          console.log('ERR', err);
           return callback(err);
         }
 
+        console.log('SENT?', sent);
         callback(null, sent);
       };
 
