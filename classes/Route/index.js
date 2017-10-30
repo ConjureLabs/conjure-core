@@ -64,15 +64,13 @@ class Route extends Array {
 
   // wraps async handlers with next()
   [wrapWithExpressNext](handler) {
-    if (!(handler instanceof Promise)) {
+    if (!(handler instanceof Promise) && handler.constructor.name !== 'AsyncFunction') {
       return handler;
     }
 
     return (req, res, next) => {
       // express can't take in a promise (async func), so have to proxy it
       const handlerProxy = async callback => {
-        conosle.log('handler is' , handler);
-
         let sent = false;
 
         // methods of res that should not prevent next() call
@@ -82,24 +80,20 @@ class Route extends Array {
           'redirect', 'render', 'end'
         ];
 
-        for (let i = 0; i < terminalMethods; i++) {
-          const name = terminalMethods[i];
-          const originalMethod = res[name];
-          res[name] = function(...args) {
+        const hijackedRes = Object.assign({}, res, terminalMethods.reduce((methods, key) => {
+          methods[key] = (...args) => {
             sent = true;
-            originalMethod.apply(this, args);
+            res[key](...args);
           };
-        }
+          return methods;
+        }, {}));
 
         try {
-          console.log('awaiting');
-          await handler(req, res);
+          await handler(req, hijackedRes, next);
         } catch(err) {
-          console.log('ERR', err);
           return callback(err);
         }
 
-        console.log('SENT?', sent);
         callback(null, sent);
       };
 
