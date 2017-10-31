@@ -21,7 +21,7 @@ module.exports = class DatabaseRow {
    */
   async save() {
     if (this[rowDeleted] === true) {
-      throw new UnexpectedError('This row was previously deleted'));
+      throw new UnexpectedError('This row was previously deleted');
     }
 
     const DatabaseTable = require('../DatabaseTable');
