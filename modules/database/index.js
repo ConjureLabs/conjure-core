@@ -3,7 +3,7 @@ const config = require('../config');
 const { ContentError } = require('../err');
 const log = require('../log')('database');
 
-const pool = await new pgPool(config.database.pg);
+const pool = new pgPool(config.database.pg);
 
 async function query(...args) {
   const client = await pool.connect();
