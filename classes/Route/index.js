@@ -16,6 +16,13 @@ const corsOptions = {
   preflightContinue: true
 };
 
+// methods of res that should not prevent next() call
+const resTerminalMethods = [
+  'send', 'sendFile', 'sendStatus',
+  'format', 'json', 'jsonp',
+  'redirect', 'render', 'end'
+];
+
 class Route extends Array {
   constructor(options = {}) {
     super();
@@ -73,23 +80,18 @@ class Route extends Array {
       const handlerProxy = async callback => {
         let sent = false;
 
-        // methods of res that should not prevent next() call
-        const terminalMethods = [
-          'send', 'sendFile', 'sendStatus',
-          'format', 'json', 'jsonp',
-          'redirect', 'render', 'end'
-        ];
-
-        const hijackedRes = Object.assign({}, res, terminalMethods.reduce((methods, key) => {
-          methods[key] = (...args) => {
+        for (let i = 0; i < resTerminalMethods.length; i++) {
+          const key = resTerminalMethods[i];
+          const original = res[key];
+          res[key] = function(...args) {
             sent = true;
-            res[key](...args);
+            res[key] = original; // set back
+            original.call(this, ...args);
           };
-          return methods;
-        }, {}));
+        }
 
         try {
-          await handler(req, hijackedRes, next);
+          await handler(req, res, next);
         } catch(err) {
           return callback(err);
         }
