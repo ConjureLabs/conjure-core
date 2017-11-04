@@ -31,5 +31,10 @@
     "request": "^2.81.0",
     "request-promise-native": "1.0.5",
     "stripe": "^4.19.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "8.0.1",
+    "eslint": "4.10.0",
+    "jscs": "3.0.7"
   }
 }
