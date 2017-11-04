@@ -1,4 +1,5 @@
 node_modules
 github-payloads
+personas
 ignore/**
 *.log
