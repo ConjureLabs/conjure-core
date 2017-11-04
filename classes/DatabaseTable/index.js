@@ -120,8 +120,7 @@ module.exports = class DatabaseTable {
     const args = Array.prototype.slice.call(originalArgs);
     const tableName = args.shift();
     const instance = new DatabaseTable(tableName);
-    await instance[methodName].apply(instance, args);
-    return this;
+    return await instance[methodName].apply(instance, args);
   }
 
   static literal(str) {
