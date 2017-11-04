@@ -6,16 +6,15 @@
 
 // log fatal exceptions
 process.on('uncaughtException', err => {
-  if (err.message) {
-    console.error('Caught exception (message): ', err.message);
-  }
   if (err.stack) {
     console.error('Caught exception (stack): ', err.stack);
-  }
-  if (!err.message && !err.stack) {
+  } else if (err.message) {
+    console.error('Caught exception (message): ', err.message);
+  } else {
     console.error('Caught exception:', err);
   }
 
+  // die
   process.nextTick(() => {
     process.exit();
   });
