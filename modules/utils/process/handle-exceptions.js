@@ -19,9 +19,9 @@ process.on('uncaughtException', err => {
 // log uncaught rejections
 // todo: possibly alter this - read https://nodejs.org/api/process.html#process_event_rejectionhandled
 process.on('unhandledRejection', (reason, p /* promise */) => {
-  console.error(`Unhandled Rejection at: ${p}
+  console.error('Unhandled Rejection at:', p, `
 
-reason: ${reason}`);
+reason: `, reason);
 });
 
 process.on('warning', warning => {
