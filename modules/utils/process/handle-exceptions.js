@@ -6,13 +6,9 @@
 
 // log fatal exceptions
 process.on('uncaughtException', err => {
-  if (err.stack) {
-    console.error('Caught exception (stack): ', err.stack);
-  } else if (err.message) {
-    console.error('Caught exception (message): ', err.message);
-  } else {
-    console.error('Caught exception:', err);
-  }
+  const errType = err.constructor.name;
+
+  console.error(`Uncaught ${errType}:`, err);
 
   // die
   process.nextTick(() => {
