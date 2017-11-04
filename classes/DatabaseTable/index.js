@@ -88,7 +88,7 @@ module.exports = class DatabaseTable {
 
     const { queryValues, valuesFormatted } = generateInsertValues(newRows, columnNames);
 
-    const result = database.query(`INSERT INTO ${this.tableName}(${columnNames.join(', ')}) VALUES ${insertAssignmentsFormatted} RETURNING *`, queryValues);
+    const result = database.query(`INSERT INTO ${this.tableName}(${columnNames.join(', ')}) VALUES ${valuesFormatted} RETURNING *`, queryValues);
     return this[mapRowInstances](await result);
   }
 
