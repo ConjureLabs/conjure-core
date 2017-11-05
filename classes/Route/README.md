@@ -89,18 +89,6 @@ You can alter anything within the `this` namespace (including the handlers, sinc
 
 `expressRouterPrep` is called at the start of `expressRouter`.
 
-#### Directly passing req & res
-
-If you have a route that you want to kick the `req` and `res` params into a `Route` instance, you can do so by using `.process`.
-
-```js
-route.push(async (req, res) => {
-  const getOrgsApi = require('conjure-api/server/routes/api/orgs/get.js');
-
-  await getOrgsApi.process(req, res);
-});
-```
-
 #### Server-side Calls
 
 If have a repo like API, and want to install the module within another repo (say, web) and call it, you can do so by passing the parent repo's route request object, and a callback.
