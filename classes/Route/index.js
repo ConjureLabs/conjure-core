@@ -1,6 +1,7 @@
 const cors = require('cors');
 const config = require('../../modules/config');
 const log = require('../../modules/log')('Route');
+const { PermissionsError, ContentError } = require('../../modules/err');
 
 const requireAuthenticationWrapper = Symbol('Require Auth Wrapper');
 const wrapWithExpressNext = Symbol('Wrap async handlers with express next()');
@@ -36,7 +37,6 @@ class Route extends Array {
 
     this.skippedHandler = options.skippedHandler || null;
 
-    this.process = this.process.bind(this);
     this.call = this.call.bind(this);
 
     for (let key in options.blacklistedEnv) {
@@ -50,28 +50,32 @@ class Route extends Array {
     }
   }
 
-  async [requireAuthenticationWrapper](handler) {
+  [requireAuthenticationWrapper](handler) {
     const skippedHandler = this.skippedHandler;
 
-    return async function(req, res) {
+    return (req, res, next) => {
       if (!req.isAuthenticated()) {
         if (typeof skippedHandler === 'function') {
-          return await skippedHandler.apply(this, arguments);
+          return this[wrapWithExpressNext](skippedHandler)(req, res, next);
         }
-        return;
+        return next();
       }
 
       if (!req.user) {
-        throw new UnexpectedError('No req.user available');
+        return next(new PermissionsError('No req.user available'));
       }
 
-      return await handler.apply(this, arguments);
+      return this[wrapWithExpressNext](handler)(req, res, next);
     };
   }
 
   // wraps async handlers with next()
   [wrapWithExpressNext](handler) {
-    if (!(handler instanceof Promise) && handler.constructor.name !== 'AsyncFunction') {
+    if (handler instanceof Promise) {
+      throw new ContentError('Express handlers need to be (req, res, next) or aysnc (req, res, next)');
+    }
+
+    if (handler.constructor.name !== 'AsyncFunction') {
       return handler;
     }
 
@@ -134,24 +138,11 @@ class Route extends Array {
     for (let i = 0; i < this.length; i++) {
       // see https://github.com/expressjs/cors#enabling-cors-pre-flight
       router.options(expressPathUsed, cors(corsOptions));
-      router[expressVerb](expressPathUsed, cors(corsOptions), this[wrapWithExpressNext](
-        this.requireAuthentication ? this[requireAuthenticationWrapper](this[i]) : this[i]
-      ));
+      const methodUsed = this.requireAuthentication ? this[requireAuthenticationWrapper].bind(this) : this[wrapWithExpressNext].bind(this);
+      router[expressVerb](expressPathUsed, cors(corsOptions), methodUsed(this[i]));
     }
 
     return router;
-  }
-
-  async process(req, res) {
-    const tasks = [];
-
-    for (let i = 0; i < this.length; i++) {
-      tasks.push(this.requireAuthentication ? this[requireAuthenticationWrapper](this[i]) : this[i]);
-    }
-
-    for (let i = 0; i < tasks.length; i++) {
-      await tasks[i](req, res);
-    }
   }
 
   async call(req, args = {}) {
@@ -166,11 +157,20 @@ class Route extends Array {
       const resProxy = {
         send: data => new directCallResponse(data)
       };
-      
-      const taskResult = await tasks[i](req, resProxy);
 
-      if (taskResult && taskResult instanceof directCallResponse) {
-        return directCallResponse.data;
+      let taskResult;
+
+      if (tasks[i].constructor.name === 'AsyncFunction') {
+        taskResult = await tasks[i](req, resProxy);
+      } else {
+        taskResult = await promisifiedHandler(tasks[i], req);
+      }
+
+      if (taskResult) {
+        if (taskResult instanceof directCallResponse) {
+          return taskResult.data;
+        }
+        return;
       }
     }
   }
@@ -180,6 +180,22 @@ class directCallResponse {
   constructor(data) {
     this.data = data;
   }
+}
+
+function promisifiedHandler(handler, req) {
+  return new Promise((resolve, reject) => {
+    handler(req, {
+      send: data => {
+        return resolve(new directCallResponse(data));
+      }
+    }, err => {
+      if (err) {
+        return reject(err);
+      }
+
+      return resolve();
+    });
+  });
 }
 
 module.exports = Route;
