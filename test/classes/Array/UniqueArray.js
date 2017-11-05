@@ -222,7 +222,7 @@ test('.reverse() should reverse the array', t => {
   arr.push({
     number: 'three'
   });
-  
+
   arr.reverse();
   t.deepEqual(arr[0], { number: 'three' });
   t.deepEqual(arr[1], { number: 'two' });
@@ -316,7 +316,7 @@ test('.slice() should honor index args', t => {
   t.deepEqual(arr2.native, initial);
 
   const arr3 = arr.slice(0, 0);
-  t.deepEqual(arr3.native, initial);
+  t.deepEqual(arr3.native, []);
 
   const arr4 = arr.slice(2);
   t.deepEqual(arr4.native, initial.slice(2));
@@ -371,7 +371,6 @@ test('.splice() should strip index range given from origin array', t => {
   const spliced = arr.splice(1, 3);
 
   t.deepEqual(spliced.native, [ { number: 'two' }, { number: 'three' }, { number: 'four' } ]);
-  console.log(arr.native);
   t.deepEqual(arr.native, [ { number: 'one' }, { number: 'five' }, { number: 'six' } ]);
 });
 
@@ -384,6 +383,7 @@ test('.splice() should inject values if given', t => {
     { number: 'five' },
     { number: 'six' }
   ];
+
   const arr = new UniqueArray('number', initial);
   arr.splice(1, 2, { number: 'zero' });
   t.deepEqual(arr.native, [
@@ -396,7 +396,7 @@ test('.splice() should inject values if given', t => {
 
   const arr2 = new UniqueArray('number', initial);
   arr2.splice(2, 99, { number: 'million' }, { number: 'billion' });
-  t.deepEqual(arr.native, [
+  t.deepEqual(arr2.native, [
     { number: 'one' },
     { number: 'two' },
     { number: 'million' },
@@ -437,7 +437,7 @@ test('.unshift() should return array length', t => {
   t.is(arr.unshift(), 6);
 });
 
-test('.unshift() should shift in values, to original array', t => {
+test('.unshift() should add in values, to original array', t => {
   const initial = [
     { number: 'one' },
     { number: 'two' },
@@ -447,7 +447,7 @@ test('.unshift() should shift in values, to original array', t => {
     { number: 'six' }
   ];
   const arr = new UniqueArray('number', initial);
-  arr.unshift({ number: 'zero '}, { number: 'infinity' });
+  arr.unshift({ number: 'zero' }, { number: 'infinity' });
   t.is(arr.length, 8);
   t.deepEqual(arr[ arr.length - 1], { number: 'six' });
   t.deepEqual(arr[0], { number: 'zero' });
@@ -465,6 +465,6 @@ test('.unshift() should not allow duplicate values', t => {
     { number: 'six' }
   ];
   const arr = new UniqueArray('number', initial);
-  arr.unshift({ number: 'zero '}, { number: 'five' });
+  arr.unshift({ number: 'zero' }, { number: 'five' });
   t.is(arr.length, 7);
 });
