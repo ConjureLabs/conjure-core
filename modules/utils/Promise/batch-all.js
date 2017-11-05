@@ -24,7 +24,7 @@ module.exports = async (batchLimit, baseData, generatePromise) => {
   // iterate based on batchLimit
   for (let i = 0; i < baseData.length; i += batchLimit) {
     const pending = [];
-    const pendingCount = Math.min(i + batchLimit, repos.length - 1);
+    const pendingCount = Math.min(i + batchLimit, baseData.length - 1);
 
     // push in all promises in this batch
     for (let j = i; j < pendingCount; j++) {
