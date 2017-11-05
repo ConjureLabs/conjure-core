@@ -32,8 +32,8 @@ test('should only allow unique values, based on key', t => {
     age: 101
   });
 
-  t.equal(arr.length, 3);
-  t.deepEqual(arr.map(obj => obj.name), ['Tim', 'Nathan', 'Adam']);
+  t.is(arr.length, 3);
+  t.deepEqual(arr.native.map(obj => obj.name), ['Tim', 'Nathan', 'Adam']);
 });
 
 test('should be an instance of Array', t => {
@@ -42,8 +42,13 @@ test('should be an instance of Array', t => {
 });
 
 test('should accept initial values', t => {
-  const arr = new UniqueArray('key', ['a', 'b', 'ccc']);
-  t.deepEqual(arr, ['a', 'b', 'ccc']);
+  const initial = [
+    { val: 'a' },
+    { val: 'b' },
+    { val: 'ccc' }
+  ];
+  const arr = new UniqueArray('val', initial);
+  t.deepEqual(arr.native, initial);
 });
 
 test('.native should return a native arary', t => {
@@ -56,25 +61,30 @@ test('.native should return a native arary', t => {
 });
 
 test('.native should have expected values', t => {
-  const arr = new UniqueArray('key', ['x', 'y', 'z']);
+  const initial = [
+    { val: 'x' },
+    { val: 'y' },
+    { val: 'z' }
+  ];
+  const arr = new UniqueArray('val', initial);
   const native = arr.native;
-  t.deepEqual(native, ['x', 'y', 'z']);
+  t.deepEqual(native, initial);
 });
 
 test('.concat() should return an instance of UniqueArray', t => {
-  const arr = new UniqueArray('key', ['a']);
-  const newArr = arr.concat('b');
+  const arr = new UniqueArray('val', [{ val: 'a' }]);
+  const newArr = arr.concat({ val: 'b' });
   t.true(newArr instanceof UniqueArray);
 });
 
 test('.concat() should concat from a native array', t => {
-  const arr = new UniqueArray('key', ['a', 's']);
-  const newArr = arr.concat(['d', 'f']);
-  t.deepEqual(newArr, ['a', 's', 'd', 'f']);
+  const arr = new UniqueArray('val', [{ val: 'a' }, { val: 's' }]);
+  const newArr = arr.concat([{ val: 'd' }, { val: 'f' }]);
+  t.deepEqual(newArr.native, [{ val: 'a' }, { val: 's' }, { val: 'd' }, { val: 'f' }]);
 
-  const arr2 = new UniqueArray('key', ['a', 's']);
-  const newArr2 = arr.concat('d', 'f');
-  t.deepEqual(newArr2, ['a', 's', 'd', 'f']);
+  const arr2 = new UniqueArray('val', [{ val: 'a' }, { val: 's' }]);
+  const newArr2 = arr.concat({ val: 'd' }, { val: 'f' });
+  t.deepEqual(newArr2.native, [{ val: 'a' }, { val: 's' }, { val: 'd' }, { val: 'f' }]);
 });
 
 test('.copyWithin() should throw', t => {
@@ -94,7 +104,7 @@ test('.fill() should throw', t => {
 });
 
 test('.filter() should return a UniqueArray', t => {
-  const arr = new UniqueArray('key', ['a', 'b', 'c', 'd']);
+  const arr = new UniqueArray('val', [{ val: 'a' }, { val: 'b' }, { val: 'c' }, { val: 'd' }]);
   const arr2 = arr.filter(val => {
     return true;
   });
@@ -102,41 +112,51 @@ test('.filter() should return a UniqueArray', t => {
 });
 
 test('.filter() should filter when truthy', t => {
-  const arr = new UniqueArray('key', ['a', 'b', 'c', 'd']);
+  const arr = new UniqueArray('val', [{ val: 'a' }, { val: 'b' }, { val: 'c' }, { val: 'd' }]);
   const want = ['b', 'd'];
-  const arr2 = arr.filter(val => {
-    return want.inclues(val);
+  const arr2 = arr.filter(cell => {
+    return want.includes(cell.val);
   });
-  t.deepEqual(arr2, ['b', 'd']);
+  t.deepEqual(arr2.native, [{ val: 'b' }, { val: 'd' }]);
 });
 
-test('.filter() should bind to array, if no bind given', t => {
-  const arr = new UniqueArray('ad', ['a', 'b', 'c', 'd']);
-  const arr2 = arr.filter(val => {
-    return this.UniqueKey.split('').includes(val);
+test('.filter() should bind to native array, if no bind given', t => {
+  const arr = new UniqueArray('val', [{ val: 'a' }, { val: 'b' }, { val: 'c' }, { val: 'd' }]);
+  const want = ['a', 'c'];
+  const arr2 = arr.filter(function(cell) {
+    t.deepEqual(this, arr.native);
+    return want.includes(cell.val);
   });
-  t.deepEqual(arr2, ['a', 'd']);
+  t.deepEqual(arr2.native, [{ val: 'a' }, { val: 'c' }]);
 });
 
 test('.filter() should bind if given a bind arg', t => {
-  const arr = new UniqueArray('key', ['a', 'b', 'c', 'd']);
+  const arr = new UniqueArray('val', [{ val: 'a' }, { val: 'b' }, { val: 'c' }, { val: 'd' }]);
   const want = ['a', 'c'];
-  const arr2 = arr.filter(val => {
-    return this.split('').includes(val);
+  const arr2 = arr.filter(function(cell) {
+    return this === want && this.includes(cell.val);
   }, want);
-  t.deepEqual(arr2, ['a', 'c']);
+  t.deepEqual(arr2.native, [{ val: 'a' }, { val: 'c' }]);
 });
 
 test('.pop() should pop off last value', t => {
-  const arr = new UniqueArray('key', ['one', 'two', 'three']);
+  const arr = new UniqueArray('number', [
+    { number: 'one' },
+    { number: 'two' },
+    { number: 'three' }
+  ]);
   const popped = arr.pop();
-  t.equal(popped, 'three');
+  t.deepEqual(popped, { number: 'three' });
 });
 
 test('.pop() should alter the array', t => {
-  const arr = new UniqueArray('key', ['one', 'two', 'three']);
+  const arr = new UniqueArray('number', [
+    { number: 'one' },
+    { number: 'two' },
+    { number: 'three' }
+  ]);
   const popped = arr.pop();
-  t.deepEqual(arr, ['one', 'two']);
+  t.deepEqual(arr.native, [{ number: 'one' }, { number: 'two' }]);
 });
 
 test('after .pop() should be able to re-add a unique value', t => {
@@ -152,15 +172,15 @@ test('after .pop() should be able to re-add a unique value', t => {
   });
 
   const popped = arr.pop();
-  t.equal(popped.number, 'three');
-  t.equal(arr.length, 2);
-  t.deepEqual(arr, [{ number: 'one' }, { number: 'two' }]);
+  t.is(popped.number, 'three');
+  t.is(arr.length, 2);
+  t.deepEqual(arr.native, [{ number: 'one' }, { number: 'two' }]);
 
   arr.push({
     number: 'three'
   });
-  t.equal(arr.length, 3);
-  t.deepEqual(arr, [{ number: 'one' }, { number: 'two' }, { number: 'three' }]);
+  t.is(arr.length, 3);
+  t.deepEqual(arr.native, [{ number: 'one' }, { number: 'two' }, { number: 'three' }]);
 });
 
 test('.reduce() should throw', t => {
