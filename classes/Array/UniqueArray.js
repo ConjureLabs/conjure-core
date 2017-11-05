@@ -1,8 +1,6 @@
 const ContentError = require('../../modules/err').ContentError;
 const UserError = require('../../modules/err').UserError;
 
-const slice = Array.prototype.slice;
-
 /*
 
 There is a common pattern where values need to be pushed into an array, skipping any duplicates.
@@ -107,9 +105,7 @@ class UniqueArray extends Array {
     return popped;
   }
 
-  push() {
-    const args = slice.call(arguments);
-
+  push(...args) {
     for (let i = 0; i < args.length; i++) {
       let argKey = args[i][ this.uniqueKey ];
 
@@ -147,22 +143,33 @@ class UniqueArray extends Array {
     return shifted;
   }
 
-  slice() {
+  slice(...args) {
     const native = this.native;
-    const sliced = native.slice.apply(native, arguments);
+    const sliced = native.slice(...args);
     return new UniqueArray(this.uniqueKey, sliced);
   }
 
-  splice() {
+  splice(start = 0, length = 0, ...injected) {
     const native = this.native;
-    const spliced = native.splice.apply(native, arguments);
+    const temporarilyRemoved = native.slice(0, start);
+    const spliced = native.slice(start, start + length);
+
+    // shifting off everything from the left, until the end point of the splice
+    for (let i = 0; i < temporarilyRemoved.length + spliced.length; i++) {
+      this.shift();
+    }
+
+    // add in injected values
+    this.unshift(...injected);
+
+    // adding back into the left-side that should not be spliced
+    this.unshift(...temporarilyRemoved);
+
     return new UniqueArray(this.uniqueKey, spliced);
   }
 
-  unshift() {
-    const args = slice.call(arguments);
-
-    for (let i = 0; i < args.length; i++) {
+  unshift(...args) {
+    for (let i = args.length - 1; i >= 0; i--) {
       let argKey = args[i][ this.uniqueKey ];
 
       if (this.have.includes(argKey)) {
