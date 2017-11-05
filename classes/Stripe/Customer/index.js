@@ -1,4 +1,5 @@
 const Stripe = require('../');
+const { UnexpectedError, ContentError } = require('../../../modules/err');
 
 const createCustomer = Symbol('create customer');
 const updateCustomer = Symbol('update existing customer');
@@ -33,7 +34,7 @@ class Customer extends Stripe {
       id: customerData.id,
       email: customerData.email,
       name: customerData.metadata.name
-    }, customerData));
+    }, customerData);
   }
 
   async [createCustomer]() {
@@ -65,9 +66,9 @@ class Customer extends Stripe {
 
   static async getRecordFromReq(req) {
     const DatabaseTable = require('../../DatabaseTable');
-    const account = new DatabaseTable('account');
+    const accountTable = new DatabaseTable('account');
 
-    const accountRows = await account.select({
+    const accountRows = await accountTable.select({
       id: req.user.id
     });
 

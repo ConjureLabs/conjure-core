@@ -69,7 +69,7 @@ test.cb('args should carry through', t => {
   ], (err, a, c, nada) => {
     const expected = !err && a === 'abc' && c === 'yup' && !nada;
     t.end(!expected); // passing inverse to signal no error
-  })
+  });
 });
 
 test.cb('initial args should be sent', t => {

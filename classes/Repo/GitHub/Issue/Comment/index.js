@@ -111,7 +111,7 @@ class GitHubIssueComment {
     waterfall.push(cb => {
       // this should not happen
       if (this.commentRow.is_active !== true) {
-        return cb(new ErUror('Can not update comment that is not longer active'));
+        return cb(new UnexpectedError('Can not update comment that is not longer active'));
       }
 
       cb();

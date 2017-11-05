@@ -23,7 +23,7 @@ test.cb('should return stderr if needed', t => {
   const path = require('path');
   exec('bash ./bash-error.sh', {
     cwd: path.resolve(__dirname)
-  }, (err, out) => {
+  }, err => {
     const expected = err;
     t.end(!expected); // passing inverse to signal no error
   });

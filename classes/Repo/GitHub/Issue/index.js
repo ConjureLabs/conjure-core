@@ -32,7 +32,7 @@ class GitHubIssue {
 
           // will also wipe record of old (broken) comment
           series.push(cb => {
-            const DatabaseTable = require(`${appRoot}/classes/DatabaseTable`);
+            const DatabaseTable = require('../../../DatabaseTable');
             DatabaseTable.update('github_issue_comment', {
               is_active: false,
               updated: new Date()

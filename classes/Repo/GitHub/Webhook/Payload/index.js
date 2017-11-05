@@ -151,11 +151,13 @@ class WebhookPayload {
       return this[cached].gitHubAccount;
     }
 
+    let githubAccountRows;
+
     const gitHubId = this.payload.sender.id;
 
     const DatabaseTable = require('../../../../DatabaseTable');
     // attempting to pull conjure account record for the payload author
-    const githubAccountRows = await DatabaseTable.select('account_github', {
+    githubAccountRows = await DatabaseTable.select('account_github', {
       github_id: gitHubId
     });
 
@@ -187,7 +189,7 @@ class WebhookPayload {
     }
 
     // have another record - pulling github account record
-    const githubAccountRows = await DatabaseTable.select('account_github', {
+    githubAccountRows = await DatabaseTable.select('account_github', {
       account: accountRepoRows[0].account
     });
 

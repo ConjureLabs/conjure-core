@@ -88,7 +88,7 @@ class Queue {
       exchange.publish(this[routingKey], message, {
         mandatory: true,
         deliveryMode: 2, // persistent
-        priority: 1, // todo: make priority adjustable?
+        priority: 1 // todo: make priority adjustable?
       }, err => {
         if (err instanceof Error) {
           return callback(err);

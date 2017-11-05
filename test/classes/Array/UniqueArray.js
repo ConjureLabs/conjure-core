@@ -4,7 +4,7 @@ const UniqueArray = require('../../../classes/Array/UniqueArray');
 
 test('should throw if no key given', t => {
   const err = t.throws(() => {
-    const arr = new UniqueArray();
+    new UniqueArray();
   });
   t.true(err instanceof Error);
 });
@@ -95,7 +95,7 @@ test('.concat() should concat from a native array', t => {
   t.deepEqual(newArr.native, [{ val: 'a' }, { val: 's' }, { val: 'd' }, { val: 'f' }]);
 
   const arr2 = new UniqueArray('val', [{ val: 'a' }, { val: 's' }]);
-  const newArr2 = arr.concat({ val: 'd' }, { val: 'f' });
+  const newArr2 = arr2.concat({ val: 'd' }, { val: 'f' });
   t.deepEqual(newArr2.native, [{ val: 'a' }, { val: 's' }, { val: 'd' }, { val: 'f' }]);
 });
 
@@ -117,7 +117,7 @@ test('.fill() should throw', t => {
 
 test('.filter() should return a UniqueArray', t => {
   const arr = new UniqueArray('val', [{ val: 'a' }, { val: 'b' }, { val: 'c' }, { val: 'd' }]);
-  const arr2 = arr.filter(val => {
+  const arr2 = arr.filter(() => {
     return true;
   });
   t.true(arr2 instanceof UniqueArray);
