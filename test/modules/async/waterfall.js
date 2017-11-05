@@ -1,8 +1,8 @@
-import test from 'ava';
+const { test } = require('ava');
 
-import waterfall from '../../../modules/async/waterfall';
+const waterfall = require('../../../modules/async/waterfall');
 
-test.cb('waterfall runs tasks', t => {
+test.cb('should runs tasks', t => {
   let a = 0;
   let b = 0;
   let c = 0;
