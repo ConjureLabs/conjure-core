@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "lint": "bash ./bash/yarn/lint.sh",
-    "test": "yarn run lint"
+    "test": "bash ./bash/yarn/test.sh"
   },
   "repository": {
     "type": "git",
@@ -33,6 +33,7 @@
     "stripe": "^4.19.0"
   },
   "devDependencies": {
+    "ava": "0.23.0",
     "babel-eslint": "8.0.1",
     "eslint": "4.10.0",
     "jscs": "3.0.7"
