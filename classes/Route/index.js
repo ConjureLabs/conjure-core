@@ -1,6 +1,5 @@
 const cors = require('cors');
 const config = require('../../modules/config');
-const log = require('../../modules/log')('Route');
 const { PermissionsError, ContentError } = require('../../modules/err');
 
 const requireAuthenticationWrapper = Symbol('Require Auth Wrapper');
@@ -155,7 +154,7 @@ class Route extends Array {
 
     for (let i = 0; i < tasks.length; i++) {
       const resProxy = {
-        send: data => new directCallResponse(data)
+        send: data => new DirectCallResponse(data)
       };
 
       let taskResult;
@@ -167,7 +166,7 @@ class Route extends Array {
       }
 
       if (taskResult) {
-        if (taskResult instanceof directCallResponse) {
+        if (taskResult instanceof DirectCallResponse) {
           return taskResult.data;
         }
         return;
@@ -176,7 +175,7 @@ class Route extends Array {
   }
 }
 
-class directCallResponse {
+class DirectCallResponse {
   constructor(data) {
     this.data = data;
   }
@@ -186,7 +185,7 @@ function promisifiedHandler(handler, req) {
   return new Promise((resolve, reject) => {
     handler(req, {
       send: data => {
-        return resolve(new directCallResponse(data));
+        return resolve(new DirectCallResponse(data));
       }
     }, err => {
       if (err) {

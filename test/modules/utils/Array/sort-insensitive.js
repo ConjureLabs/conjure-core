@@ -11,7 +11,7 @@ test('should modify the array', t => {
     return t.pass();
   }
   t.fail();
-})
+});
 
 test('should sort array of strings case insensitive', t => {
   const example = ['f', 'B', 'a', 'G', 'C', 'E', 'd', 'h'];

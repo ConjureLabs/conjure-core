@@ -30,7 +30,7 @@ class Charge extends Stripe {
   }
 
   async [createCharge]() {
-    const chargeData = await Customer.api.charges.create({
+    const chargeData = await Charge.api.charges.create({
       amount: this.amount,
       currency: this.currency,
       receipt_email: this.email,
@@ -45,7 +45,7 @@ class Charge extends Stripe {
   }
 
   async [updateCharge]() {
-    const chargeData = await Customer.api.charges.update(this.id, {
+    const chargeData = await Charge.api.charges.update(this.id, {
       amount: this.amount,
       currency: this.currency,
       receipt_email: this.email,

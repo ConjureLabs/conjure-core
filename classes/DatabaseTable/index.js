@@ -83,7 +83,6 @@ module.exports = class DatabaseTable {
 
     if (columnNames.includes('id')) {
       throw new ContentError('Cannot insert a row that has .id');
-      return this;
     }
 
     const { queryValues, valuesFormatted } = generateInsertValues(newRows, columnNames);
@@ -130,7 +129,7 @@ module.exports = class DatabaseTable {
   static cast(str, castTo) {
     return new DatabaseQueryCast(str, castTo);
   }
-}
+};
 
 function generateInsertValues(rows, columnNames, queryValues = []) {
   const insertAssignments = [];
@@ -172,7 +171,7 @@ function generateInsertValues(rows, columnNames, queryValues = []) {
 
 function generateSqlKeyVals(separator, dict, valuesArray) {
   return Object.keys(dict)
-    .map((key, i) => {
+    .map(key => {
       const val = dict[key];
 
       if (val instanceof DatabaseQueryLiteral) {

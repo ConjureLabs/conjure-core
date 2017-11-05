@@ -15,7 +15,7 @@ class Config {
       return;
     }
 
-    this.valid = true
+    this.valid = true;
     this.machine = new MachineConfig(this[internalDefinition]);
   }
 }
@@ -56,7 +56,6 @@ class MachineConfig {
     switch (lang) {
       case 'node':
         return 'npm install';
-        break;
 
       case 'java':
         break;
@@ -76,7 +75,6 @@ class MachineConfig {
     switch (lang) {
       case 'node':
         return 'npm start';
-        break;
 
       default:
         return null;
