@@ -6,4 +6,3 @@ BASE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 set -e;
 
 ava test;
-progress "Tests passed";
