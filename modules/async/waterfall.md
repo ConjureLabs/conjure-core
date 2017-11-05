@@ -75,7 +75,7 @@ const waterfall = require('conjure-core/modules/async/waterfall');
 const tasks = [];
 
 tasks.push((a, callback) => {
-  callback(null, a, b');
+  callback(null, a, 'b');
 });
 
 tasks.push((a, b, callback) => {
