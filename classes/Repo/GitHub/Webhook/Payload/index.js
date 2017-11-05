@@ -157,7 +157,7 @@ class WebhookPayload {
     // attempting to pull conjure account record for the payload author
     const githubAccountRows = await DatabaseTable.select('account_github', {
       github_id: gitHubId
-    };
+    });
 
     // assuming paylaod author has RW access (since triggered a PR)
 
