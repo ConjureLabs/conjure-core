@@ -81,10 +81,6 @@ class UniqueArray extends Array {
     return [].concat(this);
   }
 
-  of() {
-    return new UniqueArray(this.uniqueKey, slice.call(arguments));
-  }
-
   concat() {
     const nativeResult = Array.prototype.concat.apply(this.native, arguments);
     return new UniqueArray(this.uniqueKey, nativeResult);
