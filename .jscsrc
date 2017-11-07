@@ -1,7 +1,7 @@
 {
   "excludeFiles": [ "node_modules/**", "github-payloads/**", "personas/**" ],
   "disallowTrailingWhitespace": false,
-  "requireLineFeedAtFileEnd": true,
+  "requireLineFeedAtFileEnd": false,
   "disallowEmptyBlocks": false,
   "disallowKeywordsOnNewLine": [ "else", "catch", "finally" ],
   "disallowMixedSpacesAndTabs": true,
