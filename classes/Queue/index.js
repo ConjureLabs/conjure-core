@@ -2,63 +2,61 @@ const log = require('../../modules/log')('Queue');
 
 function promisifyConnection(connection) {
   // override connection methods to promisify them
-  const originalExchange = connection.exchange;
-  connection.exchange = (name, options) => {
-    return new Promise(resolve => {
-      originalExchange(name, options, exchange => {
-        resolve(promisifyExchange(exchange));
+  return {
+    on: connection.on,
+    exchange: (name, options) => {
+      return new Promise(resolve => {
+        connection.exchange(name, options, exchange => {
+          resolve(promisifyExchange(exchange));
+        });
       });
-    });
-  };
-
-  const originalQueue = connection.queue;
-  connection.queue = (name, options) => {
-    return new Promise(resolve => {
-      originalQueue(name, options, queue => {
-        resolve(promisifyQueue(queue));
+    },
+    queue: (name, options) => {
+      return new Promise(resolve => {
+        connection.queue(name, options, queue => {
+          resolve(promisifyQueue(queue));
+        });
       });
-    });
+    }
   };
-
-  return connection;
 }
 
 function promisifyExchange(exchange) {
   // override exchange methods as needed, to promisify
-  const originalPublish = exchange.publish;
-  exchange.publish = (key, message, options) => {
-    return new Promise((resolve, reject) => {
-      originalPublish(key, message, options, err => {
-        if (err instanceof Error) {
-          reject(err);
-        } else if (err === true) {
-          const { UnexpectedError } = require('../../modules/err');
-          reject(new UnexpectedError('An error occurred while publishing message to queue'));
-        } else {
-          resolve();
-        }
+  return {
+    publish: (key, message, options) => {
+      return new Promise((resolve, reject) => {
+        exchange.publish(key, message, options, err => {
+          if (err instanceof Error) {
+            reject(err);
+          } else if (err === true) {
+            const { UnexpectedError } = require('../../modules/err');
+            reject(new UnexpectedError('An error occurred while publishing message to queue'));
+          } else {
+            resolve();
+          }
+        });
       });
-    });
+    }
   };
-  return exchange;
 }
 
 function promisifyQueue(queue) {
   // override queue methods as needed, to promisfy
-  const originalSubscribe = queue.subscribe;
-  queue.subscribe = options => {
-    return new Promise((resolve) => {
-      originalSubscribe(options, (message, headers, deliveryInfo, ack) => {
-        resolve({
-          message,
-          headers,
-          deliveryInfo,
-          ack
+  return {
+    subscribe = options => {
+      return new Promise(resolve => {
+        queue.subscribe(options, (message, headers, deliveryInfo, ack) => {
+          resolve({
+            message,
+            headers,
+            deliveryInfo,
+            ack
+          });
         });
       });
-    });
+    }
   };
-  return queue;
 }
 
 let gettingConnection = false;
