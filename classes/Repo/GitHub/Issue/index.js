@@ -1,4 +1,3 @@
-const async = require('async');
 const log = require('../../../../modules/log')('github issue');
 
 const getExistingComment = Symbol('get existing GitHub issue comment');
@@ -21,7 +20,7 @@ class GitHubIssue {
       await comment.save(body);
     } catch(saveErr) {
       if (!(existingComment && saveErr.statusCode === 404)) {
-        throw err;
+        throw saveErr;
       }
 
       log.info('github comment save returned 404');
@@ -46,7 +45,6 @@ class GitHubIssue {
 
   async deleteComment() {
     const {
-      watchedRepo,
       existingComment
     } = await this[getExistingComment]();
 
@@ -65,6 +63,7 @@ class GitHubIssue {
     });
     const commentRecord = rows[0];
     const DatabaseRow = require('../../../DatabaseRow');
+    const GitHubIssueComment = require('./Comment/');
 
     return {
       watchedRepo,
