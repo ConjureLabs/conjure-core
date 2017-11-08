@@ -22,7 +22,6 @@
   "dependencies": {
     "amqp": "^0.2.6",
     "app-root-path": "^2.0.1",
-    "async": "^2.5.0",
     "cors": "^2.8.3",
     "express": "^4.15.4",
     "node-yaml": "^3.1.1",
