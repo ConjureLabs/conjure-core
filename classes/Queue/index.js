@@ -6,15 +6,15 @@ function promisifyConnection(connection) {
     on: connection.on,
     exchange: (name, options) => {
       return new Promise(resolve => {
-        connection.exchange(name, options, exchange => {
-          resolve(promisifyExchange(exchange));
+        connection.exchange(name, options, realExchange => {
+          resolve(promisifyExchange(realExchange));
         });
       });
     },
     queue: (name, options) => {
       return new Promise(resolve => {
-        connection.queue(name, options, queue => {
-          resolve(promisifyQueue(queue));
+        connection.queue(name, options, realQueue => {
+          resolve(promisifyQueue(realQueue));
         });
       });
     }
