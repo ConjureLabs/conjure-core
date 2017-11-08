@@ -1,4 +1,3 @@
-const async = require('async');
 const { NotFoundError, UnexpectedError } = require('../../../../../modules/err');
 const log = require('../../../../../modules/log')('github issue comment');
 
@@ -34,7 +33,7 @@ class GitHubIssueComment {
     return await this[createComment](gitHubClient, body);
   }
 
-  async createComment](gitHubClient, body) {
+  async [createComment](gitHubClient, body) {
     log.info('creating new issue comment, on github');
 
     const {
@@ -97,8 +96,6 @@ class GitHubIssueComment {
     }
 
     log.info('deleting existing issue comment, on github');
-
-    const commentId = this.commentRow.comment_id;
 
     // first deleting our own record of the comment
     await this.commentRow

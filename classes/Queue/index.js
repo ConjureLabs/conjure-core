@@ -65,7 +65,7 @@ let gettingConnection = false;
 const pendingConnections = []; // each cell is { resolve: [Function], reject: [Function] }
 function getConnection() {
   return new Promise((resolve, reject) => {
-    pendingConnectionResolves.push({
+    pendingConnections.push({
       resolve,
       reject
     });
@@ -76,7 +76,6 @@ function getConnection() {
     gettingConnection = true;
 
     const amqp = require('amqp');
-    const log = require('../../modules/log')('MQ');
     const { mq:config } = require('../../modules/config');
 
     const connection = amqp.createConnection(config);
