@@ -1,6 +1,5 @@
 const async = require('async');
-const NotFoundError = require('../../../../../modules/err').NotFoundError;
-const UnexpectedError = require('../../../../../modules/err').UnexpectedError;
+const { NotFoundError, UnexpectedError } = require('../../../../../modules/err');
 const log = require('../../../../../modules/log')('github issue comment');
 
 const getGitHubClient = Symbol('get GitHub api client instance');
@@ -13,197 +12,168 @@ class GitHubIssueComment {
     this.commentRow = commentRow;
   }
 
-  [getGitHubClient](callback) {
-    this.issue.payload.getGitHubAccount((err, gitHubAccount) => {
-      if (err) {
-        return callback(err);
-      }
+  async [getGitHubClient]() {
+    const gitHubAccount = await this.issue.payload.getGitHubAccount();
+    if (!gitHubAccount) {
+      throw new NotFoundError('No github account record found');
+    }
 
-      if (!gitHubAccount) {
-        return callback(new NotFoundError('No github account record found'));
-      }
+    const github = require('octonode');
+    const gitHubClient = github.client(gitHubAccount.access_token);
 
-      const github = require('octonode');
-      const gitHubClient = github.client(gitHubAccount.access_token);
-
-      callback(null, gitHubClient);
-    });
+    return gitHubClient;
   }
 
-  save(body, callback) {
-    this[getGitHubClient]((err, gitHubClient) => {
-      if (err) {
-        return callback(err);
-      }
+  async save(body) {
+    const gitHubClient = await this[getGitHubClient]();
 
-      if (this.commentRow && this.commentRow.is_active === true) {
-        return this[updateComment](gitHubClient, body, callback);
-      }
+    if (this.commentRow && this.commentRow.is_active === true) {
+      return await this[updateComment](gitHubClient, body);
+    }
 
-      this[createComment](gitHubClient, body, callback);
-    });
+    return await this[createComment](gitHubClient, body);
   }
 
-  [createComment](gitHubClient, body, callback) {
+  async createComment](gitHubClient, body) {
     log.info('creating new issue comment, on github');
 
-    const waterfall = [];
+    const {
+      orgName,
+      repoName,
+      number
+    } = this.issue.payload;
 
     // actual comment creation
-    waterfall.push(cb => {
-      const {
-        orgName,
-        repoName,
-        number
-      } = this.issue.payload;
-
-      // will need integration access from github, in order to post as ourselves, not the user
-      gitHubClient
-        .issue(`${orgName}/${repoName}`, number)
-        .createComment({
-          body: body
-        }, (err, response) => {
-          cb(err, response);
-        });
-    });
+    const issueCommentResponse = await createGitHubIssueComment(gitHubClient, orgName, repoName, number, body);
 
     // need to get watched repo record, so we can know its id (for next step)
-    waterfall.push((commentCreationBody, cb) => {
-      this.issue.payload.getWatchedRepoRecord((err, watchedRepo) => {
-        cb(err, commentCreationBody, watchedRepo);
-      });
-    });
+    const watchedRepo = await this.issue.payload.getWatchedRepoRecord();
 
     // creating new comment record on our end
-    waterfall.push((commentCreationBody, watchedRepo, cb) => {
-      const DatabaseTable = require('../../../../DatabaseTable');
-      DatabaseTable.insert('github_issue_comment', {
-        watched_repo: watchedRepo.id,
-        issue_id: this.issue.payload.number,
-        comment_id: commentCreationBody.id,
-        url: commentCreationBody.html_url,
-        is_active: true,
-        added: new Date()
-      }, (err, rows) => {
-        if (err) {
-          return cb(err);
-        }
-
-        cb(null, rows[0]);
-      });
+    const DatabaseTable = require('../../../../DatabaseTable');
+    const commentRows = await DatabaseTable.insert('github_issue_comment', {
+      watched_repo: watchedRepo.id,
+      issue_id: this.issue.payload.number,
+      comment_id: issueCommentResponse.id,
+      url: issueCommentResponse.html_url,
+      is_active: true,
+      added: new Date()
     });
-
-    // updating self with new comment record details
-    waterfall.push((issueCommentRow, cb) => {
-      this.commentRow = issueCommentRow;
-      cb(null, issueCommentRow);
-    });
-
-    async.waterfall(waterfall, callback); // returns issue comment row
+    this.commentRow = commentRows[0];
+    return this.commentRow;
   }
 
-  [updateComment](gitHubClient, body, callback) {
+  async [updateComment](gitHubClient, body) {
     log.info('updating existing issue comment, on github');
 
-    const waterfall = [];
-
     // making sure it's still active
-    waterfall.push(cb => {
-      // this should not happen
-      if (this.commentRow.is_active !== true) {
-        return cb(new UnexpectedError('Can not update comment that is not longer active'));
-      }
+    // this should not happen
+    if (this.commentRow.is_active !== true) {
+      throw new UnexpectedError('Can not update comment that is not longer active');
+    }
 
-      cb();
-    });
+    const {
+      orgName,
+      repoName,
+      number
+    } = this.issue.payload;
 
     // updating github comment
-    waterfall.push(cb => {
-      const {
-        orgName,
-        repoName,
-        number
-      } = this.issue.payload;
-
-      // will need integration access from github, in order to post as ourselves, not the user
-      gitHubClient
-        .issue(`${orgName}/${repoName}`, number)
-        .updateComment(this.commentRow.comment_id, {
-          body: body
-        }, err => {
-          cb(err);
-        });
-    });
+    await updateGitHubIssueComment(gitHubClient, orgName, repoName, number, this.commentRow.comment_id, body);
 
     // tracking updated time on our record
-    waterfall.push(cb => {
-      this.commentRow
-        .set({
-          updated: new Date()
-        })
-        .save(err => {
-          cb(err);
-        });
-    });
+    await this.commentRow
+      .set({
+        updated: new Date()
+      })
+      .save();
 
-    async.waterfall(waterfall, err => {
-      callback(err, this.commentRow); // returns updated comment row
-    });
+    return this.commentRow;
   }
 
-  delete(callback) {
+  async delete() {
     if (!this.commentRow) {
-      return callback(new UnexpectedError('Can not delete a comment without referencing existing row'));
+      throw new UnexpectedError('Can not delete a comment without referencing existing row');
     }
 
     log.info('deleting existing issue comment, on github');
 
-    const waterfall = [];
     const commentId = this.commentRow.comment_id;
 
     // first deleting our own record of the comment
-    waterfall.push(cb => {
-      this.commentRow
-        .set({
-          is_active: false,
-          updated: new Date()
-        })
-        .save(err => {
-          cb(err);
-        });
-    });
+    await this.commentRow
+      .set({
+        is_active: false,
+        updated: new Date()
+      })
+      .save();
 
     // getting github client
-    waterfall.push(cb => {
-      this[getGitHubClient](cb);
-    });
+    const gitHubClient = await this[getGitHubClient]();
 
     // now deleting the actual comment on github
-    waterfall.push((gitHubClient, cb) => {
-      const {
-        orgName,
-        repoName,
-        number
-      } = this.issue.payload;
+    const {
+      orgName,
+      repoName,
+      number
+    } = this.issue.payload;
 
-      // will need integration access from github, in order to post as ourselves, not the user
-      gitHubClient
-        .issue(`${orgName}/${repoName}`, number)
-        .deleteComment(commentId, err => {
-          cb(err);
-        });
-    });
+    await deleteGitHubIssueComment(gitHubClient, orgName, repoName, number, this.commentRow.comment_id);
 
     // removing local attributes, since comment is gone
-    waterfall.push(cb => {
-      this.commentRow = null;
-      return cb();
-    });
+    this.commentRow = null;
 
-    async.waterfall(waterfall, err => {
-      callback(err); // returning nothing
-    });
+    return null;
   }
+}
+
+function createGitHubIssueComment(gitHubClient, orgName, repoName, issueNumber, body) {
+  return new Promise((resolve, reject) => {
+    // will need integration access from github, in order to post as ourselves, not the user
+    gitHubClient
+      .issue(`${orgName}/${repoName}`, issueNumber)
+      .createComment({
+        body
+      }, (err, response) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve(response);
+      });
+  });
+}
+
+function updateGitHubIssueComment(gitHubClient, orgName, repoName, issueNumber, commentId, body) {
+  return new Promise((resolve, reject) => {
+    // will need integration access from github, in order to post as ourselves, not the user
+    gitHubClient
+      .issue(`${orgName}/${repoName}`, issueNumber)
+      .updateComment(commentId, {
+        body
+      }, (err, response) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve(response);
+      });
+  });
+}
+
+function deleteGitHubIssueComment(gitHubClient, orgName, repoName, issueNumber, commentId) {
+  return new Promise((resolve, reject) => {
+    // will need integration access from github, in order to post as ourselves, not the user
+    gitHubClient
+      .issue(`${orgName}/${repoName}`, issueNumber)
+      .deleteComment(commentId, (err, response) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve(response);
+      });
+  });
 }
 
 module.exports = GitHubIssueComment;
