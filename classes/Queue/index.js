@@ -44,7 +44,7 @@ function promisifyExchange(exchange) {
 function promisifyQueue(queue) {
   // override queue methods as needed, to promisfy
   return {
-    subscribe = options => {
+    subscribe: options => {
       return new Promise(resolve => {
         queue.subscribe(options, (message, headers, deliveryInfo, ack) => {
           resolve({
