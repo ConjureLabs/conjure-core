@@ -92,18 +92,18 @@ function getConnection() {
     });
 
     connection.on('ready', () => {
-      promisifyConnection(connection);
+      const promisifiedConnection = promisifyConnection(connection);
 
       // any future calls to .getConnection() will immediately resolve
       getConnection = () => {
         return new Promise(resolve => {
-          resolve(connection);
+          resolve(promisifiedConnection);
         });
       };
 
       // process all pending promises
       for (let i = 0; i < pendingConnections.length; i++) {
-        pendingConnections[i].resolve(connection);
+        pendingConnections[i].resolve(promisifiedConnection);
       }
     });
   });
