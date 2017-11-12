@@ -29,20 +29,12 @@ const Queue = require('conjure-core/classes/Queue');
 
 const queue = new Queue('exch', 'foodQueue', 'food.dinner.pizza');
 
-queue.publish({
+await queue.publish({
   id: 123
-}, err => {
-  if (err) {
-    throw err;
-  }
-
-  // ...
 });
 ```
 
 ### Subscribing
-
-#### Indefinite
 
 ```js
 const Queue = require('conjure-core/classes/Queue');
@@ -53,9 +45,10 @@ const queue = new Queue('exch', 'foodQueue', 'food.dinner.*');
 /*
   `.subscribe` will fire when a message is received
   This is not called once
-  After initial subscription or after any `message.ack()` it has potential to fire again
+  After initial subscription or after any `message.done()` another message can come in
+  Messages come in one at a time.
  */
-queue.subscribe((err, message) => {
+queue.subscribe(message => {
   if (err) {
     throw err;
   }
@@ -64,31 +57,6 @@ queue.subscribe((err, message) => {
 
   console.log(content);
 
-  message.ack(); // removes it from the queue
-});
-```
-
-#### Only Once
-
-```js
-const Queue = require('conjure-core/classes/Queue');
-
-// will subscribe to `food.dinner.pizza` and _all other_ `food.dinner`s
-const queue = new Queue('exch', 'foodQueue', 'food.dinner.*');
-
-/*
-  `.subscribe` will fire when a message is received
-  After `message.ack()` this _will not fire again_
- */
-queue.subscribeOnce((err, message) => {
-  if (err) {
-    throw err;
-  }
-
-  const content = message.body;
-
-  console.log(content);
-
-  message.ack(); // removes it from the queue
+  message.done(); // removes it from the queue, move to next task
 });
 ```

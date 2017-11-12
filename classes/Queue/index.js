@@ -14,7 +14,7 @@ function promisifyConnection(connection) {
     queue: (name, options) => {
       return new Promise(resolve => {
         connection.queue(name, options, realQueue => {
-          resolve(promisifyQueue(realQueue));
+          resolve(realQueue);
         });
       });
     }
@@ -35,24 +35,6 @@ function promisifyExchange(exchange) {
           } else {
             resolve();
           }
-        });
-      });
-    }
-  };
-}
-
-function promisifyQueue(queue) {
-  // override queue methods as needed, to promisfy
-  return {
-    subscribe: options => {
-      return new Promise(resolve => {
-        queue.subscribe(options, (message, headers, deliveryInfo, ack) => {
-          resolve({
-            message,
-            headers,
-            deliveryInfo,
-            ack
-          });
         });
       });
     }
@@ -156,38 +138,29 @@ class Queue {
     });
   }
 
-  async subscribeOnce() {
+  async subscribe(handler) {
     log.info(`subscribing to ${this[routingKey]}`);
     const { queue } = await this[onQueueReady]();
 
-    // see https://github.com/postwait/node-amqp#queuesubscribeoptions-listener
-    const { message, ack } = await queue.subscribe({
-      ack: true
+    queue.subscribe({
+      ack: true,
+      prefetchCount: 1
+    }, (message, headers, deliveryInfo, messageObject) => {
+      handler(new Message(queue, message, messageObject));
     });
-
-    return new Message(message, ack);
-  }
-
-  async subscribe() {
-    const message = await this.subscribeOnce();
-    // override .ack() to trigger another subscribe
-    const originalAck = message.ack.bind(message);
-    message.ack = () => {
-      originalAck();
-      this.subscribe();
-    };
-    return message;
   }
 }
 
 class Message {
-  constructor(rawMessage, rawAck) {
+  constructor(queue, rawMessage, messageObject) {
+    this.queue = queue;
     this.body = rawMessage;
-    this.rawAck = rawAck;
+    this.rawAck = messageObject.acknowledge.bind(messageObject);
   }
 
-  ack() {
-    this.rawAck.acknowledge();
+  done() {
+    this.rawAck(false);
+    this.queue.shift();
     return this;
   }
 }
