@@ -2,29 +2,28 @@ const { test } = require('ava');
 
 const exec = require('../../../modules/childProcess/exec');
 
-test.cb('should echo', t => {
-  exec('echo "This is Via a Test"', {}, (err, out) => {
-    const expected = !err && out === 'This is Via a Test';
-    t.end(!expected); // passing inverse to signal no error
-  });
+test('should echo', async t => {
+  const echo = await exec('echo "This is Via a Test"');
+  t.is(echo, 'This is Via a Test');
 });
 
-test.cb('should honor cwd', t => {
+test('should honor cwd', async t => {
   const path = require('path');
-  exec('cat ./contents.txt', {
+  const content = await exec('cat ./contents.txt', {
     cwd: path.resolve(__dirname, 'path', 'test')
-  }, (err, out) => {
-    const expected = !err && out === 'Dark Forest';
-    t.end(!expected); // passing inverse to signal no error
   });
+  t.is(content, 'Dark Forest');
 });
 
-test.cb('should return stderr if needed', t => {
+test('should return stderr if needed', async t => {
   const path = require('path');
-  exec('bash ./bash-error.sh', {
-    cwd: path.resolve(__dirname)
-  }, err => {
-    const expected = err;
-    t.end(!expected); // passing inverse to signal no error
-  });
+  let awaitErr;
+  try {
+    await exec('bash ./bash-error.sh', {
+      cwd: path.resolve(__dirname)
+    });
+  } catch(err) {
+    awaitErr = err;
+  }
+  t.true(awaitErr instanceof Error);
 });

@@ -19,21 +19,22 @@ module.exports = async (batchLimit, baseData, generatePromise) => {
     throw new ContentError('Invalid batch limit set');
   }
 
+  const data = baseData.slice();
   const result = [];
 
-  // iterate based on batchLimit
-  for (let i = 0; i < baseData.length; i += batchLimit) {
-    const pending = [];
-    const pendingMaxIndex = Math.min(i + batchLimit, baseData.length - 1);
+  while (data.length) {
+    const currentRun = [];
 
-    // push in all promises in this batch
-    for (let j = i; j <= pendingMaxIndex; j++) {
-      pending.push(generatePromise(baseData[j]));
+    for (let i = 0; i < Math.min(batchLimit, data.length); i++) {
+      currentRun.push(
+        generatePromise(
+          data.shift()
+        )
+      );
     }
 
-    // wait all promises in this batch to clear
-    for (let j = 0; j <= pendingMaxIndex; j++) {
-      result[i + j] = await pending[j];
+    for (let i = 0; i < currentRun.length; i++) {
+      result.push( await currentRun[i] );
     }
   }
 
