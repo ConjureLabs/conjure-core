@@ -101,7 +101,7 @@ module.exports = class DatabaseTable {
     try {
       result = await this.insert(insertContent);
     } catch(err) {
-      if (!err.message || !err.message.substr(0, 13) === 'duplicate key') {
+      if (!err.message || err.message.substr(0, 13) !== 'duplicate key') {
         throw err;
       }
 
