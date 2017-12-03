@@ -144,10 +144,12 @@ class Route extends Array {
     return router;
   }
 
-  async call(req, args = {}) {
+  async call(req, args = {}, params = {}) {
     req = Object.assign({}, req, {
       body: args,
       query: args
+    }, {
+      params
     });
 
     const tasks = [].concat(this);
