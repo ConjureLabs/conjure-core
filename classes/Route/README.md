@@ -109,7 +109,7 @@ If a route you are trying to call directly has req params, you can set them via 
 ```js
 // this is assumed to be within a parent repo
 route.push(async (req, res) => {
-  const getOrgInfoApi = require('conjure-api/server/routes/api/org/:orgName/info/get.js');
+  const getOrgInfoApi = require('conjure-api/server/routes/api/org/$orgName/info/get.js');
 
   const result = await getOrgInfoApi.call(req, {}, { orgName: 'myOrg' });
 
