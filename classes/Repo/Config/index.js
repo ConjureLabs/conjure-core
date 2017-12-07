@@ -22,7 +22,7 @@ class Config {
 
 class MachineConfig {
   constructor(config) {
-    this[internalDefinition] = config.machine;
+    this[internalDefinition] = config;
   }
 
   get environment() {
