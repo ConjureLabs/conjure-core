@@ -54,6 +54,10 @@ const config = {
     }
   },
 
+  postmark: {
+    key: process.env.CONJURE_POSTMARK_KEY
+  },
+
   services: {
     github: {
       id: process.env.CONJURE_GITHUB_CLIENT_ID,
