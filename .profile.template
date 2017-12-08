@@ -25,4 +25,6 @@ export CONJURE_MQ_LOGIN='guest';
 export CONJURE_MQ_PASS='guest';
 export CONJURE_MQ_SSL_ENABLED=false;
 
+export CONJURE_POSTMARK_KEY='';
+
 export CONJURE_CONTAINER_STARTING_PORT=3001;
