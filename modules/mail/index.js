@@ -11,7 +11,7 @@ module.exports.send = ({ to, subject, text, html }) => {
   if (!subject) {
     throw new ContentError(`mail.send requires 'subject'`);
   }
-  if (!(typeof html === 'string') || !(typeof text === 'string')) {
+  if (!(typeof html === 'string') && !(typeof text === 'string')) {
     throw new ContentError(`mail.send requires either 'html' or 'text' content`);
   }
 
