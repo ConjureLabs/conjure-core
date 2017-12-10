@@ -33,7 +33,11 @@ const config = {
 
   aws: {
     accessKey: process.env.CONJURE_AWS_ACCESS_KEY,
-    secretKey: process.env.CONJURE_AWS_SECRET_KEY
+    secretKey: process.env.CONJURE_AWS_SECRET_KEY,
+
+    default: {
+      region: 'us-east-1'
+    }
   },
 
   database: {
