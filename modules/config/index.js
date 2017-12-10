@@ -31,6 +31,11 @@ const config = {
     }
   },
 
+  aws: {
+    accessKey: process.env.CONJURE_AWS_ACCESS_KEY,
+    secretKey: process.env.CONJURE_AWS_SECRET_KEY
+  },
+
   database: {
     pg: {
       user: process.env.CONJURE_PG_USER,
