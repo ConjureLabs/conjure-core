@@ -1,7 +1,5 @@
 <p align="center">
-  <strong>c o n j u r e</strong>
-  <kbd>⎔</kbd>
-  <strong>c o r e</strong>
+  <kbd>c o r e</kbd>
 </p>
 
 # Conjure Core
