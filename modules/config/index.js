@@ -32,6 +32,10 @@ const config = {
   },
 
   aws: {
+    account: {
+      id: '6577-8121-5424'
+    },
+
     accessKey: process.env.CONJURE_AWS_ACCESS_KEY,
     secretKey: process.env.CONJURE_AWS_SECRET_KEY,
 
