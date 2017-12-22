@@ -1,8 +1,8 @@
-export CONJURE_WEB_DOMAIN='conjure.dev';
+export CONJURE_WEB_DOMAIN='conjure.local';
 export CONJURE_WEB_PROTOCOL='http';
 export CONJURE_WEB_PORT=3000;
 
-export CONJURE_API_DOMAIN='conjure.dev';
+export CONJURE_API_DOMAIN='conjure.local';
 export CONJURE_API_PROTOCOL='http';
 export CONJURE_API_PORT=2999;
 export CONJURE_API_PUBLIC_HOST='asdf.ngrok.io';
