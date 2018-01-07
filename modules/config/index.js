@@ -33,7 +33,7 @@ const config = {
 
   aws: {
     account: {
-      id: '6577-8121-5424'
+      id: '657781215424'
     },
 
     accessKey: process.env.CONJURE_AWS_ACCESS_KEY,
