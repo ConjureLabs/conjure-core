@@ -41,6 +41,13 @@ const config = {
 
     default: {
       region: 'us-east-1'
+    },
+
+    arn: {
+      ecs: {
+        executionRole: process.env.CONJURE_AWS_ARN_ECS_EXECUTION,
+        taskRole: process.env.CONJURE_AWS_ARN_ECS_TASK
+      }
     }
   },
 
