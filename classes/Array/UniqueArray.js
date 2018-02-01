@@ -1,5 +1,5 @@
-const ContentError = require('../../modules/err').ContentError;
-const UserError = require('../../modules/err').UserError;
+const ContentError = require('err').ContentError;
+const UserError = require('err').UserError;
 
 /*
 

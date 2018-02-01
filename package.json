@@ -23,6 +23,7 @@
     "amqp": "^0.2.6",
     "app-root-path": "^2.0.1",
     "cors": "^2.8.3",
+    "err": "ConjureLabs/err",
     "express": "^4.15.4",
     "node-yaml": "^3.1.1",
     "octonode": "^0.7.13",

@@ -1,6 +1,6 @@
 const { Pool } = require('pg');
 const config = require('../config');
-const { ContentError } = require('../err');
+const { ContentError } = require('err');
 const log = require('../log')('database');
 
 const pool = new Pool(config.database.pg);

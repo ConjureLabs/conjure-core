@@ -1,5 +1,5 @@
 const config = require('../config');
-const { ContentError } = require('../err');
+const { ContentError } = require('err');
 
 module.exports.send = ({ to, subject, text, html }) => {
   const postmark = require('postmark');

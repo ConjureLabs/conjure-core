@@ -1,4 +1,4 @@
-const { UnexpectedError } = require('../../../../../modules/err');
+const { UnexpectedError } = require('err');
 
 const TYPE_BRANCH = Symbol('is related to a branch');
 const TYPE_COMMIT = Symbol('is related to a commit');
