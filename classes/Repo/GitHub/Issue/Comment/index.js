@@ -1,4 +1,4 @@
-const { NotFoundError, UnexpectedError } = require('../../../../../modules/err');
+const { NotFoundError, UnexpectedError } = require('err');
 const log = require('../../../../../modules/log')('github issue comment');
 
 const getGitHubClient = Symbol('get GitHub api client instance');

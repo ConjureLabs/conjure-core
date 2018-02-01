@@ -1,6 +1,6 @@
 const cors = require('cors');
 const config = require('../../modules/config');
-const { PermissionsError, ContentError } = require('../../modules/err');
+const { PermissionsError, ContentError } = require('err');
 
 const requireAuthenticationWrapper = Symbol('Require Auth Wrapper');
 const wrapWithExpressNext = Symbol('Wrap async handlers with express next()');

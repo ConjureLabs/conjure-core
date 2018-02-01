@@ -30,7 +30,7 @@ function promisifyExchange(exchange) {
           if (err instanceof Error) {
             reject(err);
           } else if (err === true) {
-            const { UnexpectedError } = require('../../modules/err');
+            const { UnexpectedError } = require('err');
             reject(new UnexpectedError('An error occurred while publishing message to queue'));
           } else {
             resolve();

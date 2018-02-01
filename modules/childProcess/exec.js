@@ -1,4 +1,4 @@
-const { ConjureError } = require('../err');
+const { ConjureError } = require('err');
 
 const log = require('../log')('child process execution');
 

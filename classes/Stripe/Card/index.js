@@ -1,5 +1,5 @@
 const Stripe = require('../');
-const { UnexpectedError, ContentError} = require('../../../modules/err');
+const { UnexpectedError, ContentError} = require('err');
 
 const createCard = Symbol('create card');
 const updateCard = Symbol('update existing card');
