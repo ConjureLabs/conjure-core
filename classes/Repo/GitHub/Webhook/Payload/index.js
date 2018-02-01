@@ -155,7 +155,7 @@ class WebhookPayload {
 
     const gitHubId = this.payload.sender.id;
 
-    const DatabaseTable = require('../../../../DatabaseTable');
+    const DatabaseTable = require('db/table');
     // attempting to pull conjure account record for the payload author
     githubAccountRows = await DatabaseTable.select('account_github', {
       github_id: gitHubId
@@ -234,7 +234,7 @@ class WebhookPayload {
       return this[cached].watchedRepo;
     }
 
-    const DatabaseTable = require('../../../../DatabaseTable');
+    const DatabaseTable = require('db/table');
     const rows = await DatabaseTable.select('watched_repo', {
       service_repo_id: this.repoId
     });
