@@ -47,3 +47,15 @@ queue.subscribe(job => {
   job.success();
 }, 10); // 10 at a time
 ```
+
+### Clearing a queue
+
+You can remove all pending jobs, and cancel/remove all active, by doing the following:
+
+```js
+const Queue = require('conjure-core/classes/Queue');
+
+const queue = new Queue('email');
+
+await queue.removeAll();
+```
