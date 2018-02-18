@@ -1,36 +1,21 @@
 # Queue Class
 
-This class works with RabbitMQ. It could work with any AMQP, probably.
-
-## Setup
-
-The constructor takes three arguments; `exchangeNameArg`, `queueNameArg` and `routingKeyArg`.
-
-See [the RabbitMQ concepts docs](https://www.rabbitmq.com/tutorials/amqp-concepts.html) for more on each.
-
-var | purpose | library docs
---- | --- | ---
-`exchangeNameArg` | The name of the exchange to use | [link](https://github.com/postwait/node-amqp#exchange)
-`queueNameArg` | The name of the queue to use | [link](https://github.com/postwait/node-amqp#queue)
-`routingKeyArg` | The dot-notated topic path | [link](https://github.com/postwait/node-amqp#exchangepublishroutingkey-message-options-callback)
-
-The `routingKeyArg` is dot-notated, and can have wildcards.
-
-`food.dinner.pizza` can be published, then a listener could subscribe to `food.dinner.pizza`, `food.dinner.*`, `food.*`, or `*`.
-
-But, if you changed it to `food.italian.dinner.pizza` then only `food.*` and `*` would continue to subscribe correctly.
+This class works with [Bee-Queue](https://github.com/bee-queue/bee-queue).
 
 ## Usage
 
-### Publishing messages
+### Publishing jobs
 
 ```js
 const Queue = require('conjure-core/classes/Queue');
 
-const queue = new Queue('exch', 'foodQueue', 'food.dinner.pizza');
+const queue = new Queue('email');
 
-await queue.publish({
-  id: 123
+// attributes can be anything
+await queue.push({
+  email: 'tim@conjure.sh',
+  subject: 'howdy',
+  body: 'this is an example'
 });
 ```
 
@@ -39,24 +24,36 @@ await queue.publish({
 ```js
 const Queue = require('conjure-core/classes/Queue');
 
-// will subscribe to `food.dinner.pizza` and _all other_ `food.dinner`s
-const queue = new Queue('exch', 'foodQueue', 'food.dinner.*');
+const queue = new Queue('email');
 
-/*
-  `.subscribe` will fire when a message is received
-  This is not called once
-  After initial subscription or after any `message.done()` another message can come in
-  Messages come in one at a time.
- */
-queue.subscribe(message => {
-  if (err) {
-    throw err;
-  }
+queue.subscribe(job => {
+  // job.data contains the attributes sent in .push()
 
-  const content = message.body;
+  // job.failure(err) if any problems
 
-  console.log(content);
-
-  message.done(); // removes it from the queue, move to next task
+  job.success(); // acks and moves on
 });
+```
+
+You can subscribe to multiple in parallel. By default it will only process one at a time.
+
+```js
+const Queue = require('conjure-core/classes/Queue');
+
+const queue = new Queue('email');
+
+queue.subscribe(job => {
+  // ...
+  job.success();
+}, 10); // 10 at a time
+```
+
+### Workers
+
+Any workers need to pass `true` to the queue, which [adds extra connections](https://github.com/bee-queue/bee-queue#under-the-hood).
+
+```js
+const Queue = require('conjure-core/classes/Queue');
+
+const workerQueue = new Queue('email', true);
 ```

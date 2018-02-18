@@ -20,7 +20,7 @@
     "node": ">=8.7.0"
   },
   "dependencies": {
-    "amqp": "^0.2.6",
+    "bee-queue": "1.2.2",
     "db": "ConjureLabs/db",
     "err": "ConjureLabs/err",
     "node-yaml": "^3.1.1",
