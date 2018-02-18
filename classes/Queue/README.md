@@ -1,6 +1,6 @@
 # Queue Class
 
-This class works with [Kue](https://github.com/Automattic/kue).
+This class works with [Bee-Queue](https://github.com/bee-queue/bee-queue).
 
 ## Usage
 
@@ -48,14 +48,12 @@ queue.subscribe(job => {
 }, 10); // 10 at a time
 ```
 
-### Clearing a queue
+### Workers
 
-You can remove all pending jobs, and cancel/remove all active, by doing the following:
+Any workers need to pass `true` to the queue, which [adds extra connections](https://github.com/bee-queue/bee-queue#under-the-hood).
 
 ```js
 const Queue = require('conjure-core/classes/Queue');
 
-const queue = new Queue('email');
-
-await queue.removeAll();
+const workerQueue = new Queue('email', true);
 ```
