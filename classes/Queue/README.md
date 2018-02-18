@@ -26,7 +26,7 @@ const Queue = require('conjure-core/classes/Queue');
 
 const queue = new Queue('email');
 
-queue.subscribe(async job => {
+queue.subscribe(job => {
   // job.data contains the attributes sent in .push()
 
   // job.failure(err) if any problems
@@ -42,7 +42,7 @@ const Queue = require('conjure-core/classes/Queue');
 
 const queue = new Queue('email');
 
-queue.subscribe(async job => {
+queue.subscribe(job => {
   // ...
   job.success();
 }, 10); // 10 at a time
