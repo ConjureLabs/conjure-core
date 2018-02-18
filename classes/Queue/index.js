@@ -1,4 +1,53 @@
+const kue = require('kue');
+const config = require('../../modules/config');
 const log = require('../../modules/log')('Queue');
+
+// queue.create( ... ).removeOnComplete( true ).save()
+
+class Queue {
+  constructor() {
+    this.queue = kue.createQueue({
+      prefix: config.redis.queue.prefix,
+      redis: {
+        port: config.redis.port,
+        host: config.redis.host,
+        auth: config.redis.auth
+      }
+    });
+  }
+
+  queue(type, attributes = {}, priority = 'low') {
+    const unitsOfTime = require('../../modules/unitsOfTime');
+
+    this.queue
+      .create(type, attributes)
+      .priority(priority) // see https://github.com/Automattic/kue#job-priority
+      .attempts(3)
+      .backoff({
+        type: 'exponential'
+      })
+      .ttl(unitsOfTime.hour)
+      .save();
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function promisifyConnection(connection) {
   // override connection methods to promisify them
