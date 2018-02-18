@@ -14,7 +14,7 @@ class Queue {
   // to queue a job
   // `grouping` is a required string, that should be unique to the branch & PR combination
   // it is used to track pending jobs, so we can clear them as needed
-  push(grouping, attributes = {}, priority = 'normal') {
+  push(attributes) {
     return new Promise(resolve, reject) => {
       const unitsOfTime = require('../../modules/unitsOfTime');
 
