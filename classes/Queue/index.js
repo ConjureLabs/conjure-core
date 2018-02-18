@@ -43,20 +43,8 @@ class Queue {
     });
   }
 
-  subscribe(parallelCount = 1) {
-    return new Promise(resolve => {
-      this.queue.process(this.type, (data, done) => {
-        resolve({
-          data,
-          success: () => {
-            done();
-          },
-          failure: err => {
-            done(err);
-          }
-        });
-      });
-    });
+  subscribe(handler, parallelCount = 1) {
+    this.queue.process(this.type, parallelCount, handler);
   }
 }
 
