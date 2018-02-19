@@ -48,6 +48,12 @@ const config = {
         executionRole: process.env.CONJURE_AWS_ARN_ECS_EXECUTION,
         taskRole: process.env.CONJURE_AWS_ARN_ECS_TASK
       }
+    },
+
+    ecs: {
+      fargate: {
+        prefix: `${process.env.NODE_ENV}-watched-`
+      }
     }
   },
 
