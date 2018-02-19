@@ -10,7 +10,6 @@ const redisClient = redis.createClient(config.redis);
 const lpop = promisify(redisClient.lpop).bind(redisClient);
 const rpop = promisify(redisClient.rpop).bind(redisClient);
 const lrange = promisify(redisClient.lrange).bind(redisClient);
-const llen = promisify(redisClient.llen).bind(redisClient);
 
 redisClient.on('error', err => {
   log.error(err);
@@ -41,14 +40,9 @@ class RedisArray {
     return str;
   }
 
-  async slice(start, end = -1) {
+  async slice(start = 0, end = -1) {
     const slice = await lrange(this.name, start, end);
     return slice;
-  }
-
-  async get length() {
-    const length = await llen(this.name);
-    return length;
   }
 }
 
