@@ -6,7 +6,9 @@ class Queue {
   constructor(type, isWorker = false) {
     this.queue = new BeeQueue(type, {
       redis: config.redis,
-      isWorker
+      isWorker,
+      removeOnSuccess: true,
+      removeOnFailure: true
     });
     this.type = type;
   }
@@ -23,8 +25,6 @@ class Queue {
         .retries(3)
         .backoff('exponential', unitsOfTime.second * 2)
         .timeout(unitsOfTime.hour)
-        .removeOnSuccess(true)
-        .removeOnFailure(true)
         .save(err => {
           if (err) {
             return reject(err);
