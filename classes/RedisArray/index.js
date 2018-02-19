@@ -16,7 +16,7 @@ redisClient.on('error', err => {
   log.error(err);
 });
 
-class RedisQueue {
+class RedisArray {
   constructor(name) {
     this.name = name;
   }
@@ -52,4 +52,4 @@ class RedisQueue {
   }
 }
 
-module.exports = RedisQueue;
+module.exports = RedisArray;
