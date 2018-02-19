@@ -32,7 +32,7 @@ class Queue {
           resolve();
         });
 
-      this.queue.on('errror', err => {
+      this.queue.on('error', err => {
         log.error(err);
       });
 
