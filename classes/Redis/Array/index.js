@@ -1,19 +1,10 @@
-const redis = require('redis');
-const config = require('../../modules/config');
-const log = require('../../modules/log')('redis queue');
 const { promisify } = require('util');
 
-// const getAsync = promisify(client.get).bind(client);
-
-const redisClient = redis.createClient(config.redis);
+const redisClient = require('../../../modules/redis-client');
 
 const lpop = promisify(redisClient.lpop).bind(redisClient);
 const rpop = promisify(redisClient.rpop).bind(redisClient);
 const lrange = promisify(redisClient.lrange).bind(redisClient);
-
-redisClient.on('error', err => {
-  log.error(err);
-});
 
 class RedisArray {
   constructor(name) {
