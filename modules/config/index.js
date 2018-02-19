@@ -84,6 +84,12 @@ const config = {
     key: process.env.CONJURE_POSTMARK_KEY
   },
 
+  redis: {
+    port: process.env.CONJURE_REDIS_PORT,
+    host: process.env.CONJURE_REDIS_HOST,
+    password: process.env.CONJURE_REDIS_PASSWORD
+  },
+
   services: {
     github: {
       id: process.env.CONJURE_GITHUB_CLIENT_ID,
