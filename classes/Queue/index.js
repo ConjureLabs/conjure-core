@@ -43,7 +43,9 @@ class Queue {
   }
 
   subscribe(handler, parallelCount = 1) {
-    this.queue.process(parallelCount, handler);
+    this.queue.process(parallelCount, (job, done) => {
+      handler(job.data, done);
+    });
   }
 }
 
