@@ -1,10 +1,10 @@
-const config = require('../../modules/config');
-const stripeApi = require('stripe')(config.stripe.secret);
+const config = require('../../modules/config')
+const stripeApi = require('stripe')(config.stripe.secret)
 
 class Stripe {
   static get api() {
-    return stripeApi;
+    return stripeApi
   }
 }
 
-module.exports = Stripe;
+module.exports = Stripe

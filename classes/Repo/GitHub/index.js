@@ -1,4 +1,4 @@
-const Repo = require('../');
+const Repo = require('../')
 
 module.exports = class GitHubRepo extends Repo {
   constructor(apiRecord) {
@@ -14,8 +14,8 @@ module.exports = class GitHubRepo extends Repo {
       },
       private: apiRecord.private,
       url: apiRecord.html_url
-    });
+    })
 
-    this.service = 'GitHub';
+    this.service = 'GitHub'
   }
-};
+}
