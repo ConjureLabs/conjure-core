@@ -1,4 +1,4 @@
-const { UnexpectedError } = require('err');
+const { UnexpectedError } = require('@conjurelabs/err');
 
 const TYPE_BRANCH = Symbol('is related to a branch');
 const TYPE_COMMIT = Symbol('is related to a commit');
@@ -155,7 +155,7 @@ class WebhookPayload {
 
     const gitHubId = this.payload.sender.id;
 
-    const DatabaseTable = require('db/table');
+    const DatabaseTable = require('@conjurelabs/db/table');
     // attempting to pull conjure account record for the payload author
     githubAccountRows = await DatabaseTable.select('account_github', {
       github_id: gitHubId
@@ -234,7 +234,7 @@ class WebhookPayload {
       return this[cached].watchedRepo;
     }
 
-    const DatabaseTable = require('db/table');
+    const DatabaseTable = require('@conjurelabs/db/table');
     const rows = await DatabaseTable.select('watched_repo', {
       service_repo_id: this.repoId
     });

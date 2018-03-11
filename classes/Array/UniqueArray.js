@@ -1,5 +1,5 @@
-const ContentError = require('err').ContentError;
-const UserError = require('err').UserError;
+const ContentError = require('@conjurelabs/err').ContentError;
+const UserError = require('@conjurelabs/err').UserError;
 
 /*
 

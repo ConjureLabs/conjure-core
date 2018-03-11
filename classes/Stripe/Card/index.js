@@ -1,5 +1,5 @@
 const Stripe = require('../');
-const { UnexpectedError, ContentError} = require('err');
+const { UnexpectedError, ContentError} = require('@conjurelabs/err');
 
 const createCard = Symbol('create card');
 const updateCard = Symbol('update existing card');

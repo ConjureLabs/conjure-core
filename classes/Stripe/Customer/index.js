@@ -1,5 +1,5 @@
 const Stripe = require('../');
-const { UnexpectedError, ContentError } = require('err');
+const { UnexpectedError, ContentError } = require('@conjurelabs/err');
 
 const createCustomer = Symbol('create customer');
 const updateCustomer = Symbol('update existing customer');
@@ -65,7 +65,7 @@ class Customer extends Stripe {
   }
 
   static async getRecordFromReq(req) {
-    const DatabaseTable = require('db/table');
+    const DatabaseTable = require('@conjurelabs/db/table');
     const accountTable = new DatabaseTable('account');
 
     const accountRows = await accountTable.select({
