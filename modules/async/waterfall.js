@@ -1,28 +1,28 @@
 // using a proxy to waterfallWorker to avoid arg exposure
 module.exports = function waterfall(arr, callback, ...initialArgs) {
-  waterfallWorker(arr, initialArgs, callback);
-};
+  waterfallWorker(arr, initialArgs, callback)
+}
 
 function waterfallWorker(arr, args, callback) {
-  const step = arr.shift();
+  const step = arr.shift()
 
   if (step === undefined) {
-    return callback(null, ...args);
+    return callback(null, ...args)
   }
 
   // normal waterfall callback
   function stepCallback(err, ...newArgs) {
     if (err) {
-      return callback(err);
+      return callback(err)
     }
 
-    waterfallWorker(arr, newArgs, callback);
+    waterfallWorker(arr, newArgs, callback)
   }
 
   // break waterfall
   function breakWaterfall(...newArgs) {
-    return callback(null, ...newArgs);
+    return callback(null, ...newArgs)
   }
 
-  step(...args, stepCallback, breakWaterfall);
+  step(...args, stepCallback, breakWaterfall)
 }

@@ -1,6 +1,6 @@
-const BeeQueue = require('bee-queue');
-const config = require('../../modules/config');
-const log = require('../../modules/log')('Queue');
+const BeeQueue = require('bee-queue')
+const config = require('../../modules/config')
+const log = require('../../modules/log')('Queue')
 
 class Queue {
   constructor(type, isWorker = false) {
@@ -9,8 +9,8 @@ class Queue {
       isWorker,
       removeOnSuccess: true,
       removeOnFailure: true
-    });
-    this.type = type;
+    })
+    this.type = type
   }
 
   // to queue a job
@@ -18,7 +18,7 @@ class Queue {
   // it is used to track pending jobs, so we can clear them as needed
   push(attributes) {
     return new Promise((resolve, reject) => {
-      const unitsOfTime = require('../../modules/unitsOfTime');
+      const unitsOfTime = require('../../modules/unitsOfTime')
 
       this.queue
         .createJob(attributes)
@@ -27,26 +27,26 @@ class Queue {
         .timeout(unitsOfTime.hour)
         .save(err => {
           if (err) {
-            return reject(err);
+            return reject(err)
           }
-          resolve();
-        });
+          resolve()
+        })
 
       this.queue.on('error', err => {
-        log.error(err);
-      });
+        log.error(err)
+      })
 
       this.queue.on('retrying', (job, err) => {
-        log.info(`job ${job.id} is retrying - err message of "${err.message}"`);
-      });
-    });
+        log.info(`job ${job.id} is retrying - err message of "${err.message}"`)
+      })
+    })
   }
 
   subscribe(handler, parallelCount = 1) {
     this.queue.process(parallelCount, (job, done) => {
-      handler(job.data, done);
-    });
+      handler(job.data, done)
+    })
   }
 }
 
-module.exports = Queue;
+module.exports = Queue

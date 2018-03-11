@@ -1,40 +1,40 @@
-const Stripe = require('../');
-const { UnexpectedError, ContentError } = require('@conjurelabs/err');
+const Stripe = require('../')
+const { UnexpectedError, ContentError } = require('@conjurelabs/err')
 
-const createCustomer = Symbol('create customer');
-const updateCustomer = Symbol('update existing customer');
+const createCustomer = Symbol('create customer')
+const updateCustomer = Symbol('update existing customer')
 
 class Customer extends Stripe {
   constructor(conjureId, data, rawData) {
-    super(...arguments);
+    super(...arguments)
 
     if (data.id) {
-      this.id = data.id;
+      this.id = data.id
     }
-    this.conjureId = conjureId;
-    this.email = data.email;
-    this.name = data.name;
+    this.conjureId = conjureId
+    this.email = data.email
+    this.name = data.name
 
     if (rawData) {
-      this.rawData = rawData;
+      this.rawData = rawData
     }
   }
 
   async save() {
     if (this.id) {
-      return await this[updateCustomer]();
+      return await this[updateCustomer]()
     }
-    return await this[createCustomer]();
+    return await this[createCustomer]()
   }
 
   static async retrieve(conjureId, stripeId) {
-    const customerData = await Customer.api.customers.retrieve(stripeId);
+    const customerData = await Customer.api.customers.retrieve(stripeId)
 
     return new Customer(conjureId, {
       id: customerData.id,
       email: customerData.email,
       name: customerData.metadata.name
-    }, customerData);
+    }, customerData)
   }
 
   async [createCustomer]() {
@@ -44,11 +44,11 @@ class Customer extends Stripe {
         conjureId: this.conjureId,
         name: this.name
       }
-    });
+    })
 
-    this.id = customerData.id;
-    this.rawData = customerData;
-    return this;
+    this.id = customerData.id
+    this.rawData = customerData
+    return this
   }
 
   async [updateCustomer]() {
@@ -58,39 +58,39 @@ class Customer extends Stripe {
         conjureId: this.conjureId,
         name: this.name
       }
-    });
+    })
 
-    this.rawData = customerData;
-    return this;
+    this.rawData = customerData
+    return this
   }
 
   static async getRecordFromReq(req) {
-    const DatabaseTable = require('@conjurelabs/db/table');
-    const accountTable = new DatabaseTable('account');
+    const DatabaseTable = require('@conjurelabs/db/table')
+    const accountTable = new DatabaseTable('account')
 
     const accountRows = await accountTable.select({
       id: req.user.id
-    });
+    })
 
     // should not be possible
     if (!accountRows.length) {
-      throw new UnexpectedError('Could not find account record');
+      throw new UnexpectedError('Could not find account record')
     }
 
     // should not be possible
     if (accountRows.length > 1) {
-      throw new UnexpectedError('Expected a single row for account record, received multiple');
+      throw new UnexpectedError('Expected a single row for account record, received multiple')
     }
 
-    const account = accountRows[0];
+    const account = accountRows[0]
 
     // if no account stripe_id, then error, since we expect it
     if (typeof account.stripe_id !== 'string' || !account.stripe_id) {
-      throw new ContentError('Account is not associated to any Stripe records');
+      throw new ContentError('Account is not associated to any Stripe records')
     }
 
-    return await this.retrieve(req.user.id, account.stripe_id);
+    return await this.retrieve(req.user.id, account.stripe_id)
   }
 }
 
-module.exports = Customer;
+module.exports = Customer

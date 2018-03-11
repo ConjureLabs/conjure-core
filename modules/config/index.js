@@ -1,7 +1,7 @@
-const second = 1000;
-const minute = 60 * second;
-const hour = 60 * minute;
-const day = 24 * hour;
+const second = 1000
+const minute = 60 * second
+const hour = 60 * minute
+const day = 24 * hour
 
 const config = {
   app: {
@@ -106,17 +106,17 @@ const config = {
   stripe: {
     secret: process.env.CONJURE_STRIPE_API_SECRET
   }
-};
+}
 
 // fill in app.api
-config.app.api.host = process.env.NODE_ENV === 'development' ? `${config.app.api.domain}:${config.app.api.port}` : config.app.api.domain;
-config.app.api.publicDomain = process.env.CONJURE_API_PUBLIC_HOST || config.app.api.domain;
-config.app.api.publicHost = process.env.NODE_ENV === 'development' ? `${config.app.api.publicDomain}:${config.app.api.port}` : config.app.api.publicDomain;
-config.app.api.publicUrl = `${config.app.api.protocol}://${config.app.api.publicHost}`;
-config.app.api.url = `${config.app.api.protocol}://${config.app.api.host}`;
+config.app.api.host = process.env.NODE_ENV === 'development' ? `${config.app.api.domain}:${config.app.api.port}` : config.app.api.domain
+config.app.api.publicDomain = process.env.CONJURE_API_PUBLIC_HOST || config.app.api.domain
+config.app.api.publicHost = process.env.NODE_ENV === 'development' ? `${config.app.api.publicDomain}:${config.app.api.port}` : config.app.api.publicDomain
+config.app.api.publicUrl = `${config.app.api.protocol}://${config.app.api.publicHost}`
+config.app.api.url = `${config.app.api.protocol}://${config.app.api.host}`
 
 // fill in app.web
-config.app.web.host = process.env.NODE_ENV === 'development' ? `${config.app.web.domain}:${config.app.web.port}` : config.app.web.domain;
-config.app.web.url = `${config.app.web.protocol}://${config.app.web.host}`;
+config.app.web.host = process.env.NODE_ENV === 'development' ? `${config.app.web.domain}:${config.app.web.port}` : config.app.web.domain
+config.app.web.url = `${config.app.web.protocol}://${config.app.web.host}`
 
-module.exports = config;
+module.exports = config
