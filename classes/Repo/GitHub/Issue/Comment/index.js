@@ -1,4 +1,4 @@
-const { NotFoundError, UnexpectedError } = require('err');
+const { NotFoundError, UnexpectedError } = require('@conjurelabs/err');
 const log = require('../../../../../modules/log')('github issue comment');
 
 const getGitHubClient = Symbol('get GitHub api client instance');
@@ -49,7 +49,7 @@ class GitHubIssueComment {
     const watchedRepo = await this.issue.payload.getWatchedRepoRecord();
 
     // creating new comment record on our end
-    const DatabaseTable = require('db/table');
+    const DatabaseTable = require('@conjurelabs/db/table');
     const commentRows = await DatabaseTable.insert('github_issue_comment', {
       watched_repo: watchedRepo.id,
       issue_id: this.issue.payload.number,
