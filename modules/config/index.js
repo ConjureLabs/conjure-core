@@ -57,6 +57,15 @@ const config = {
     }
   },
 
+  cookies: {
+    secure: {
+      cipherAlgorithm: process.env.CONJURE_SECURE_COOKIES_CIPHER_ALGO,
+      cipherSecret: process.env.CONJURE_SECURE_COOKIES_CIPHER_SECRET,
+      hmacAlgorithm: process.env.CONJURE_SECURE_COOKIES_HMAC_ALGO,
+      hmacSecret: process.env.CONJURE_SECURE_COOKIES_HMAC_SECRET
+    }
+  },
+
   database: {
     pg: {
       user: process.env.CONJURE_PG_USER,
