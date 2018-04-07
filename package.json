@@ -22,6 +22,7 @@
   "dependencies": {
     "@conjurelabs/db": "0.0.2",
     "@conjurelabs/err": "0.0.2",
+    "aws-sdk": "2.222.1",
     "bee-queue": "1.2.2",
     "node-yaml": "^3.1.1",
     "octonode": "^0.7.13",
