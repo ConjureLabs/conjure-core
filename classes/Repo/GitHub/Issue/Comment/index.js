@@ -1,9 +1,16 @@
 const { NotFoundError, UnexpectedError } = require('@conjurelabs/err')
+const AWS = require('aws-sdk')
 const log = require('../../../../../modules/log')('github issue comment')
 
 const getGitHubClient = Symbol('get GitHub api client instance')
 const createComment = Symbol('create new comment')
 const updateComment = Symbol('update existing comment')
+
+AWS.config.update({
+  accessKeyId: config.aws.accessKey,
+  secretAccessKey: config.aws.secretKey,
+  region: config.aws.default.region
+})
 
 class GitHubIssueComment {
   constructor(issueInstance, commentRow) {
@@ -36,11 +43,16 @@ class GitHubIssueComment {
   async [createComment](gitHubClient, body) {
     log.info('creating new issue comment, on github')
 
+    const { payload } = this.issue
+
     const {
       orgName,
       repoName,
       number
-    } = this.issue.payload
+    } = payload
+
+    // saving payload to s3, for later access
+    const s3Data = uploadToS3(payload)
 
     // actual comment creation
     const issueCommentResponse = await createGitHubIssueComment(gitHubClient, orgName, repoName, number, body)
@@ -56,9 +68,11 @@ class GitHubIssueComment {
       comment_id: issueCommentResponse.id,
       url: issueCommentResponse.html_url,
       is_active: true,
+      s3_key: (await s3Data).Key,
       added: new Date()
     })
     this.commentRow = commentRows[0]
+
     return this.commentRow
   }
 
@@ -71,11 +85,16 @@ class GitHubIssueComment {
       throw new UnexpectedError('Can not update comment that is not longer active')
     }
 
+    const { payload } = this.issue
+
     const {
       orgName,
       repoName,
       number
-    } = this.issue.payload
+    } = payload
+
+    // saving payload to s3, for later access
+    const s3Data = uploadToS3(payload)
 
     // updating github comment
     await updateGitHubIssueComment(gitHubClient, orgName, repoName, number, this.commentRow.comment_id, body)
@@ -83,7 +102,8 @@ class GitHubIssueComment {
     // tracking updated time on our record
     await this.commentRow
       .set({
-        updated: new Date()
+        updated: new Date(),
+        s3_key: (await s3Data).Key,
       })
       .save()
 
@@ -170,6 +190,30 @@ function deleteGitHubIssueComment(gitHubClient, orgName, repoName, issueNumber, 
 
         resolve(response)
       })
+  })
+}
+
+function uploadToS3(payload) {
+  return new Promise((resolve, reject) => {
+    const { orgName, repoName, branch, sha } = payload
+
+    const s3 = new AWS.S3({
+      params: {
+        Bucket: config.aws.s3.buckets.gitHubPayloads
+      }
+    })
+
+    s3.upload({
+      Key: `${orgName}/${repoName}/${branch}/${sha}.json`,
+      Body: imagesBySize[size].buffer,
+      // https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
+      ACL: 'bucket-owner-full-control'
+    }, (err, data) => {
+      if (err) {
+        return reject(err)
+      }
+      resolve(data)
+    })
   })
 }
 

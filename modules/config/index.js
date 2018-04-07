@@ -54,6 +54,12 @@ const config = {
       fargate: {
         prefix: `${process.env.NODE_ENV}-watched-`
       }
+    },
+
+    s3: {
+      buckets: {
+        gitHubPayload: 'gh-payload'
+      }
     }
   },
 
