@@ -64,7 +64,7 @@ class GitHubIssueComment {
     const DatabaseTable = require('@conjurelabs/db/table')
     const commentRows = await DatabaseTable.insert('github_issue_comment', {
       watched_repo: watchedRepo.id,
-      issue_id: this.issue.payload.number,
+      issue_id: number,
       comment_id: issueCommentResponse.id,
       url: issueCommentResponse.html_url,
       is_active: true,
