@@ -1,4 +1,4 @@
-const { UnexpectedError } = require('@conjurelabs/err')
+const { UnexpectedError, ContentError } = require('@conjurelabs/err')
 
 const TYPE_BRANCH = Symbol('is related to a branch')
 const TYPE_COMMIT = Symbol('is related to a commit')
@@ -25,6 +25,40 @@ class WebhookPayload {
     // uncomment for debug
     // console.log(this.payload)
   }
+
+  // // used to mimic a github payload, when directly triggering queue workers
+  // // some methods may fail when mimicking
+  // static mimic(payload) {
+  //   if (!payload.ref) {
+  //     throw new ContentError('Mimicked payload must have .ref')
+  //   }
+  //   if (!(
+  //     payload.repository &&
+  //     payload.repository.id &&
+  //     payload.repository.name &&
+  //     payload.repository.full_name
+  //   )) {
+  //     throw new ConjureError('Mimicked payload must have .repository {id:, name:, full_name:}')
+  //   }
+  //   if (!(
+  //     payload.pull_request &&
+  //     payload.pull_request.head &&
+  //     payload.pull_request.head.ref
+  //   )) {
+  //     throw new ConjureError('Mimicked payload must have .pull_request {head: {ref:}}'
+  //   }
+  //   if (!['opened', 'reopened'].includes(payload.action)) {
+  //     throw new ConjureError(`Mimicked payload must have an .action of either 'opened' or 'reopened'`)
+  //   }
+  //   if (!(
+  //     payload.sender &&
+  //     payload.sender.id
+  //   )) {
+  //     throw new ConjureError('Mimicked payload must have .sender {id:}')
+  //   }
+    
+  //   return new WebhookPayload(payload)
+  // }
 
   static get types() {
     return {
