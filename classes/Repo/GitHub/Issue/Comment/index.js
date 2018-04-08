@@ -103,7 +103,7 @@ class GitHubIssueComment {
     await this.commentRow
       .set({
         updated: new Date(),
-        s3_key: (await s3Data).Key,
+        s3_key: (await s3Data).Key
       })
       .save()
 
