@@ -28,7 +28,7 @@ class GitHubIssue {
       // comment was deleted, likely by user (but possibly a system hiccup?)
       // so, will just add a new one, so that the flow does not break down
       
-      const DatabaseTable = require('@conjurelabs/db/table')
+      const { DatabaseTable } = require('@conjurelabs/db')
       await DatabaseTable.update('github_issue_comment', {
         is_active: false,
         updated: new Date()
@@ -54,16 +54,16 @@ class GitHubIssue {
   }
 
   async [getExistingComment]() {
+    const { DatabaseTable, DatabaseRow } = require('@conjurelabs/db')
+    const GitHubIssueComment = require('./Comment')
+
     const watchedRepo = await this.payload.getWatchedRepoRecord()
-    const DatabaseTable = require('@conjurelabs/db/table')
     const rows = await DatabaseTable.select('github_issue_comment', {
       watched_repo: watchedRepo.id,
       issue_id: this.payload.number,
       is_active: true
     })
     const commentRecord = rows[0]
-    const DatabaseRow = require('@conjurelabs/db/row')
-    const GitHubIssueComment = require('./Comment/')
 
     return {
       watchedRepo,
