@@ -164,7 +164,8 @@ class WebhookPayload {
     // pulling repo records first, since payload sender may not have logged into Conjure yet
     const accountRepoRows = await DatabaseTable.select('account_repo', {
       service: 'github',
-      service_repo_id: this.repoId
+      service_repo_id: this.repoId,
+      access_rights: 'rw' // need rw to write comment
     })
 
     // if nothing, callback with nothing
@@ -181,8 +182,7 @@ class WebhookPayload {
       try {
         const gitHubAccountRows = await DatabaseTable.select('account_github', {
           account: accountRepo.account,
-          service_repo_id: accountRepo.service_repo_id,
-          access_rights: 'rw' // need rw to write comment
+          access_token_assumed_valid: true
         })
         if (!gitHubAccountRows.length) {
           // should not happen
