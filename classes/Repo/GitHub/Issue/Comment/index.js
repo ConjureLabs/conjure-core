@@ -1,5 +1,6 @@
 const { NotFoundError, UnexpectedError } = require('@conjurelabs/err')
 const AWS = require('aws-sdk')
+const config = require('../../../../../modules/config')
 const log = require('../../../../../modules/log')('github issue comment')
 
 const getGitHubClient = Symbol('get GitHub api client instance')
