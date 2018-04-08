@@ -3,7 +3,6 @@ const AWS = require('aws-sdk')
 const config = require('../../../../../modules/config')
 const log = require('../../../../../modules/log')('github issue comment')
 
-const getGitHubClient = Symbol('get GitHub api client instance')
 const createComment = Symbol('create new comment')
 const updateComment = Symbol('update existing comment')
 
@@ -19,20 +18,11 @@ class GitHubIssueComment {
     this.commentRow = commentRow
   }
 
-  async [getGitHubClient]() {
-    const gitHubAccount = await this.issue.payload.getGitHubAccount()
-    if (!gitHubAccount) {
-      throw new NotFoundError('No github account record found')
-    }
-
-    const github = require('octonode')
-    const gitHubClient = github.client(gitHubAccount.access_token)
-
-    return gitHubClient
-  }
-
   async save(body) {
-    const gitHubClient = await this[getGitHubClient]()
+    const gitHubClient = await this.issue.payload.getGitHubClient()
+    if (!gitHubClient) {
+      throw new NotFoundError('No github account record, with valid token, found')
+    }
 
     if (this.commentRow && this.commentRow.is_active === true) {
       return await this[updateComment](gitHubClient, body)
@@ -127,7 +117,10 @@ class GitHubIssueComment {
       .save()
 
     // getting github client
-    const gitHubClient = await this[getGitHubClient]()
+    const gitHubClient = await this.issue.payload.getGitHubClient()
+    if (!gitHubClient) {
+      throw new NotFoundError('No github account record, with valid token, found')
+    }
 
     // now deleting the actual comment on github
     const {

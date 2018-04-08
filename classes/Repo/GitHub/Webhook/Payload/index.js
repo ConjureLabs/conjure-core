@@ -20,45 +20,14 @@ const cached = Symbol('cached data')
 class WebhookPayload {
   constructor(payload) {
     this.payload = payload
-    this[cached] = {}
+    this[cached] = {
+      gitHubAccount: null,
+      gitHubClient: null
+    }
 
     // uncomment for debug
     // console.log(this.payload)
   }
-
-  // // used to mimic a github payload, when directly triggering queue workers
-  // // some methods may fail when mimicking
-  // static mimic(payload) {
-  //   if (!payload.ref) {
-  //     throw new ContentError('Mimicked payload must have .ref')
-  //   }
-  //   if (!(
-  //     payload.repository &&
-  //     payload.repository.id &&
-  //     payload.repository.name &&
-  //     payload.repository.full_name
-  //   )) {
-  //     throw new ConjureError('Mimicked payload must have .repository {id:, name:, full_name:}')
-  //   }
-  //   if (!(
-  //     payload.pull_request &&
-  //     payload.pull_request.head &&
-  //     payload.pull_request.head.ref
-  //   )) {
-  //     throw new ConjureError('Mimicked payload must have .pull_request {head: {ref:}}'
-  //   }
-  //   if (!['opened', 'reopened'].includes(payload.action)) {
-  //     throw new ConjureError(`Mimicked payload must have an .action of either 'opened' or 'reopened'`)
-  //   }
-  //   if (!(
-  //     payload.sender &&
-  //     payload.sender.id
-  //   )) {
-  //     throw new ConjureError('Mimicked payload must have .sender {id:}')
-  //   }
-    
-  //   return new WebhookPayload(payload)
-  // }
 
   static get types() {
     return {
@@ -181,61 +150,52 @@ class WebhookPayload {
     or may be another user on the repo (if the author is not on Conjure)
    */
   async getGitHubAccount() {
-    if (this[cached].gitHubAccount) {
-      return this[cached].gitHubAccount
+    await this.getGitHubClient
+    return this[cached].gitHubAccount
+  }
+
+  async getGitHubClient() {
+    if (this[cached].gitHubClient) {
+      return this[cached].gitHubClient
     }
 
-    let githubAccountRows
+    const { DatabaseTable } = require('@conjurelabs/db')
 
-    const gitHubId = this.payload.sender.id
-
-    const DatabaseTable = require('@conjurelabs/db/table')
-    // attempting to pull conjure account record for the payload author
-    githubAccountRows = await DatabaseTable.select('account_github', {
-      github_id: gitHubId
-    })
-
-    // assuming paylaod author has RW access (since triggered a PR)
-
-    // if we have an associated record for the payload author...
-    if (Array.isArray(githubAccountRows) && githubAccountRows.length) {
-      this[cached].gitHubAccount = githubAccountRows[0]
-
-      // callback handler should deal with undefined row
-      return githubAccountRows[0]
-    }
-
-    // no associated record to payload author - will try to look up a different user in our system
+    // pulling repo records first, since payload sender may not have logged into Conjure yet
     const accountRepoRows = await DatabaseTable.select('account_repo', {
       service: 'github',
       service_repo_id: this.repoId,
-      access_rights: 'rw'
+      access_rights: 'rw', // need rw to write comment
+      access_token_assumed_valid: true
     })
-
-    // prune out a possible row for the previously queried github id
-    if (Array.isArray(accountRepoRows) && accountRepoRows.length && accountRepoRows[0].account === gitHubId) {
-      accountRepoRows.shift()
-    }
 
     // if nothing, callback with nothing
     if (!Array.isArray(accountRepoRows) || !accountRepoRows.length) {
       return null
     }
 
-    // have another record - pulling github account record
-    githubAccountRows = await DatabaseTable.select('account_github', {
-      account: accountRepoRows[0].account
-    })
+    // checking rate limit, in order to verify token still is valid
+    let gitHubClient
+    let gitHubAccount
+    for (let currentGitHubAccount of accountRepoRows) {
+      try {
+        gitHubClient = await getValidGitHubClient(currentGitHubAccount)
+        break
+      } catch(err) {
+        currentGitHubAccount.access_token_assumed_valid == false
+        currentGitHubAccount.save()
+      }
+    }
 
-    // this should not happen
-    if (!Array.isArray(githubAccountRows) || !githubAccountRows.length) {
+    // if no valid client found, then exit
+    if (!gitHubClient) {
       return null
     }
 
-    this[cached].gitHubAccount = githubAccountRows[0]
+    this[cached].gitHubAccount = currentGitHubAccount
+    this[cached].gitHubClient = gitHubClient
 
-    // callback handler should deal with undefined row
-    return githubAccountRows[0]
+    return gitHubClient
   }
 
   // will likely fail if not a pull request payload
@@ -268,7 +228,7 @@ class WebhookPayload {
       return this[cached].watchedRepo
     }
 
-    const DatabaseTable = require('@conjurelabs/db/table')
+    const { DatabaseTable } = require('@conjurelabs/db')
     const rows = await DatabaseTable.select('watched_repo', {
       service_repo_id: this.repoId
     })
@@ -295,6 +255,25 @@ function isAllZeros(str) {
   }
 
   return false
+}
+
+function getValidGitHubClient(githubAccount) {
+  return new Promise((resolve, reject) => {
+    const github = require('octonode')
+    const githubClient = github.client(githubAccount.accessToken)
+
+    // just for debub purposes
+    // todo: move or remove this
+    githubClient.limit((err/* , left, max, reset */) => {
+      if (err) {
+        return reject(err)
+      }
+
+      // todo: check `left out of max`?
+      // todo: reset?
+      resolve(githubClient)
+    })
+  })
 }
 
 module.exports = WebhookPayload
