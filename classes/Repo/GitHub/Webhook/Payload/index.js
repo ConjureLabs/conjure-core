@@ -164,9 +164,7 @@ class WebhookPayload {
     // pulling repo records first, since payload sender may not have logged into Conjure yet
     const accountRepoRows = await DatabaseTable.select('account_repo', {
       service: 'github',
-      service_repo_id: this.repoId,
-      access_rights: 'rw', // need rw to write comment
-      access_token_assumed_valid: true
+      service_repo_id: this.repoId
     })
 
     // if nothing, callback with nothing
@@ -177,22 +175,37 @@ class WebhookPayload {
     // checking rate limit, in order to verify token still is valid
     let gitHubClient
     let gitHubAccount
-    for (let currentGitHubAccount of accountRepoRows) {
+    for (let accountRepo of accountRepoRows) {
+      let currentGitHubAccount
+
       try {
+        const gitHubAccountRows = await DatabaseTable.select('account_github', {
+          account: accountRepo.account,
+          service_repo_id: accountRepo.service_repo_id,
+          access_rights: 'rw' // need rw to write comment
+        })
+        if (!gitHubAccountRows.length) {
+          // should not happen
+          continue
+        }
+        currentGitHubAccount = gitHubAccountRows[0]
         gitHubClient = await getValidGitHubClient(currentGitHubAccount)
+        gitHubAccount = currentGitHubAccount
         break
       } catch(err) {
-        currentGitHubAccount.access_token_assumed_valid == false
-        currentGitHubAccount.save()
+        if (currentGitHubAccount) {
+          currentGitHubAccount.access_token_assumed_valid == false
+          currentGitHubAccount.save()
+        }
       }
     }
 
     // if no valid client found, then exit
-    if (!gitHubClient) {
+    if (!gitHubAccount) {
       return null
     }
 
-    this[cached].gitHubAccount = currentGitHubAccount
+    this[cached].gitHubAccount = gitHubAccount
     this[cached].gitHubClient = gitHubClient
 
     return gitHubClient
