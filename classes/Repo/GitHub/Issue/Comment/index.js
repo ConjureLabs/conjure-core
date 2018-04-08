@@ -62,7 +62,7 @@ class GitHubIssueComment {
     const watchedRepo = await this.issue.payload.getWatchedRepoRecord()
 
     // creating new comment record on our end
-    const DatabaseTable = require('@conjurelabs/db/table')
+    const { DatabaseTable } = require('@conjurelabs/db')
     const commentRows = await DatabaseTable.insert('github_issue_comment', {
       watched_repo: watchedRepo.id,
       issue_id: number,
