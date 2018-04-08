@@ -58,7 +58,7 @@ const config = {
 
     s3: {
       buckets: {
-        gitHubPayloads: 'gh-payload'
+        gitHubPayloads: `${process.env.NODE_ENV}-gh-payload`
       }
     }
   },
