@@ -206,7 +206,7 @@ function uploadToS3(payload) {
 
     s3.upload({
       Key: `${orgName}/${repoName}/${branch}/${sha}.json`,
-      Body: imagesBySize[size].buffer,
+      Body: JSON.stringify(payload),
       // https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
       ACL: 'bucket-owner-full-control'
     }, (err, data) => {
