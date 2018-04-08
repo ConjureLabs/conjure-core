@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "lint": "bash ./bash/yarn/lint.sh",
-    "test": "bash ./bash/yarn/test.sh"
+    "test": "bash ./bash/yarn/test.sh",
+    "install-fresh": "(rm -rf ./node_modules || true) && (rm ./yarn.lock || true) && yarn install"
   },
   "repository": {
     "type": "git",
