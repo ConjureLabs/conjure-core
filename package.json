@@ -31,7 +31,7 @@
     "stripe": "^4.19.0"
   },
   "peerDependencies": {
-    "@conjurelabs/db": ">=0.1.0",
+    "@conjurelabs/db": ">=1.0.2",
     "@conjurelabs/err": ">=0.0.2"
   },
   "devDependencies": {
