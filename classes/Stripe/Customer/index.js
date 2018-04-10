@@ -65,7 +65,7 @@ class Customer extends Stripe {
   }
 
   static async getRecordFromReq(req) {
-    const DatabaseTable = require('@conjurelabs/db/table')
+    const { DatabaseTable } = require('@conjurelabs/db')
     const accountTable = new DatabaseTable('account')
 
     const accountRows = await accountTable.select({
