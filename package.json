@@ -8,15 +8,6 @@
     "test": "bash ./bash/yarn/test.sh",
     "install-fresh": "(rm -rf ./node_modules || true) && (rm ./yarn.lock || true) && yarn install"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ConjureLabs/conjure-core.git"
-  },
-  "author": "",
-  "bugs": {
-    "url": "https://github.com/ConjureLabs/conjure-core/issues"
-  },
-  "homepage": "https://github.com/ConjureLabs/conjure-core#readme",
   "engines": {
     "node": ">=8.7.0"
   },
