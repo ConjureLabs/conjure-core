@@ -78,7 +78,9 @@ class Card extends Stripe {
     } catch(err) {
       if (err.type === 'StripeCardError') {
         err.message = err.message.replace(/^error:\s*/i, '')
-        throw new ConjureError(err)
+        const newErr = new ConjureError(err)
+        newErr.friendlyError = err.message
+        throw newErr
       }
       throw err
     }
@@ -114,7 +116,9 @@ class Card extends Stripe {
     } catch(err) {
       if (err.type === 'StripeCardError') {
         err.message = err.message.replace(/^error:\s*/i, '')
-        throw new ConjureError(err)
+        const newErr = new ConjureError(err)
+        newErr.friendlyError = err.message
+        throw newErr
       }
       throw err
     }
