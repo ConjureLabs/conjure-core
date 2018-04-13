@@ -77,6 +77,7 @@ class Card extends Stripe {
       })
     } catch(err) {
       if (err.type === 'StripeCardError') {
+        err.message = err.message.replace(/^error:\s*/i, '')
         throw new ConjureError(err)
       }
       throw err
@@ -112,6 +113,7 @@ class Card extends Stripe {
       })
     } catch(err) {
       if (err.type === 'StripeCardError') {
+        err.message = err.message.replace(/^error:\s*/i, '')
         throw new ConjureError(err)
       }
       throw err
