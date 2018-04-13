@@ -1,5 +1,5 @@
 const Stripe = require('../')
-const { UnexpectedError, ContentError} = require('@conjurelabs/err')
+const { UnexpectedError, ContentError, ConjureError } = require('@conjurelabs/err')
 
 const createCard = Symbol('create card')
 const updateCard = Symbol('update existing card')
@@ -57,22 +57,30 @@ class Card extends Stripe {
       throw new UnexpectedError('No stripe customer id present')
     }
 
-    const cardData = await Card.api.customers.createSource(this.customer.id, {
-      source: {
-        object: 'card',
-        exp_month: this.expiration.month,
-        exp_year: this.expiration.year,
-        number: this.number,
-        address_city: this.address.city,
-        address_country: this.address.country,
-        address_line1: this.address.line1,
-        address_line2: this.address.line2,
-        address_state: this.address.state,
-        address_zip: this.address.zip,
-        cvc: this.cvc,
-        name: this.name
+    let cardData
+    try {
+      cardData = await Card.api.customers.createSource(this.customer.id, {
+        source: {
+          object: 'card',
+          exp_month: this.expiration.month,
+          exp_year: this.expiration.year,
+          number: this.number,
+          address_city: this.address.city,
+          address_country: this.address.country,
+          address_line1: this.address.line1,
+          address_line2: this.address.line2,
+          address_state: this.address.state,
+          address_zip: this.address.zip,
+          cvc: this.cvc,
+          name: this.name
+        }
+      })
+    } catch(err) {
+      if (err.type === 'StripeCardError') {
+        throw new ConjureError(err)
       }
-    })
+      throw err
+    }
 
     this.id = cardData.id
     this.rawData = cardData
@@ -84,22 +92,30 @@ class Card extends Stripe {
       throw new UnexpectedError('No stripe customer id present')
     }
 
-    const cardData = await Card.api.customers.updateCard(this.customer.id, this.id, {
-      source: {
-        object: 'card',
-        exp_month: this.expiration.month,
-        exp_year: this.expiration.year,
-        number: this.number,
-        address_city: this.address.city,
-        address_country: this.address.country,
-        address_line1: this.address.line1,
-        address_line2: this.address.line2,
-        address_state: this.address.state,
-        address_zip: this.address.zip,
-        cvc: this.cvc,
-        name: this.name
+    let cardData
+    try {
+      cardData = await Card.api.customers.updateCard(this.customer.id, this.id, {
+        source: {
+          object: 'card',
+          exp_month: this.expiration.month,
+          exp_year: this.expiration.year,
+          number: this.number,
+          address_city: this.address.city,
+          address_country: this.address.country,
+          address_line1: this.address.line1,
+          address_line2: this.address.line2,
+          address_state: this.address.state,
+          address_zip: this.address.zip,
+          cvc: this.cvc,
+          name: this.name
+        }
+      })
+    } catch(err) {
+      if (err.type === 'StripeCardError') {
+        throw new ConjureError(err)
       }
-    })
+      throw err
+    }
 
     this.rawData = cardData
     return this
