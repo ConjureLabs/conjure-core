@@ -13,8 +13,12 @@ module.exports = label => {
   }
 
   if (process.env.NODE_ENV === 'development') {
-    methods.dev = Object.assign({}, methods)
-    return methods
+    return {
+      ...methods,
+      dev: {
+        ...methods
+      }
+    }
   }
 
   methods.dev = Object.keys(methods).reduce((noOps, key) => {
