@@ -144,6 +144,19 @@ class WebhookPayload {
     return payload.before
   }
 
+  get title() {
+    const { payload } = this
+    const type = this.type
+
+    switch (type) {
+      case TYPE_PULL_REQUEST:
+        return payload.pull_request.title
+
+      default:
+        return this.sha
+    }
+  }
+
   /*
     gets the github account record for the given payload
     this may be the author that triggered the webhook payload,
