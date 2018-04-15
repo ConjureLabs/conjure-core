@@ -18,13 +18,10 @@ async function containerCreate() {
   const watchedRepo = await this.payload.getWatchedRepoRecord()
 
   // make sure the repo/branch is not already in progress
-  let containerRecord = await this.getActiveRecord()
-  if (containerRecord) {
+  let containerRecord = await this.getPendingOrActiveRecord()
+  if (containerRecord && containerRecord.isActive === true) {
     return containerRecord.urlUid
   }
-
-  // may be null, so later check will create if needed
-  containerRecord = await this.getPendingRecord()
 
   const { DatabaseTable } = require('@conjurelabs/db')
 
