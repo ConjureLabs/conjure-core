@@ -24,7 +24,7 @@ class GitHubContainer extends Container {
     await super.destroy()
 
     const issueComment = new IssueComment(this.payload)
-    await issue.delete()
+    await issueComment.delete()
   }
 }
 
