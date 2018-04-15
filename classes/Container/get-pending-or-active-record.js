@@ -31,4 +31,4 @@ async function getPendingOrActiveRecord() {
   return null
 }
 
-export default getPendingOrActiveRecord
+module.exports = getPendingOrActiveRecord
