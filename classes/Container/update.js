@@ -9,13 +9,10 @@ async function containerUpdate() {
   // get watched repo record
   const watchedRepo = await this.payload.getWatchedRepoRecord()
 
-  const { DatabaseTable } = require('@conjurelabs/db')
-  let containerRecord = await DatabaseTable.select('container', {
-    repo: watchedRepo.id,
-    branch,
-    isActive: true
-  })
+  let containerRecord = await this.getActiveRecord()
   let oldRecord
+
+  const { DatabaseTable } = require('@conjurelabs/db')
 
   if (containerRecord) {
     oldRecord = containerRecord.copy()

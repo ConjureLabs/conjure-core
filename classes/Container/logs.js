@@ -1,6 +1,8 @@
 const log = require('../../modules/log')('container logs')
 const { UnexpectedError } = require('@conjurelabs/err')
 
+// note that this uses urlUid to determine container record
+// so, not using .getActiveRecord()
 async function containerLogs(urlUid) {
   log.info('starting logs tail')
 

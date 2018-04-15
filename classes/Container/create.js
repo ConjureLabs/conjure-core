@@ -6,25 +6,27 @@ async function containerCreate() {
   log.info('starting create')
 
   const { branch } = this.payload
-  const { DatabaseTable } = require('@conjurelabs/db')
   
   // get watched repo record
   const watchedRepo = await this.payload.getWatchedRepoRecord()
 
   // make sure the repo/branch is not already in progress
   let containerRecord = await this.getActiveRecord()
-  if (containerRecord && containerRecord.ecsState !== 'pending') {
+  if (containerRecord) {
     return containerRecord.urlUid
   }
 
-  // get github client
-  const repoConfig = await this.getConfig()
+  // may be null, so later check will create if needed
+  containerRecord = await this.getPendingRecord()
+
+  const { DatabaseTable } = require('@conjurelabs/db')
 
   if (containerRecord) {
     // update existing pending record
     containerRecord
       .set({
         ecsState: 'spinning up',
+        isActive: true,
         updated: new Date()
       })
       .save()
@@ -47,6 +49,9 @@ async function containerCreate() {
   }
 
   const containerUid = await this.dockerBuild()
+
+  // get github client
+  const repoConfig = await this.getConfig()
 
   const fargateResponse = await spinUpProject(watchedRepo, repoConfig)
 
