@@ -12,6 +12,8 @@ async function getPendingRecord() {
   // get watched repo record
   const watchedRepo = await this.payload.getWatchedRepoRecord()
 
+  const { branch } = this.payload
+
   const containerRecords = await DatabaseTable.select('container', {
     repo: watchedRepo.id,
     branch,

@@ -12,6 +12,8 @@ async function getPendingOrActiveRecord() {
   // get watched repo record
   const watchedRepo = await this.payload.getWatchedRepoRecord()
 
+  const { branch } = this.payload
+
   const containerResult = await query(`
     SELECT * FROM container
     WHERE repo = $1
