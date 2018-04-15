@@ -17,7 +17,7 @@ async function getPendingOrActiveRecord() {
   const containerResult = await query(`
     SELECT * FROM container
     WHERE repo = $1
-    AND branch = $1
+    AND branch = $2
     AND (
       is_active = true
       OR ecs_state = 'pending'
