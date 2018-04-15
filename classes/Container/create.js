@@ -89,8 +89,18 @@ async function containerCreate() {
 function spinUpProject(watchedRepo, repoConfig) {
   return new Promise(async resolve => {
     // getting, and creating if needed, the ecr repo path in aws
-    log.info('getting ECR repo record')
+    log.info('checking if ECR repo exists')
+    const repoExists = require('../../modules/AWS/ECR/repo-exists')
+    // creating repo if it does not exist
+    if (!(await repoExists(watchedRepo))) {
+      log.info('creating new ECR repo')
+      const createRepo = require('../../modules/AWS/ECR/create-repo')
+      await createRepo(watchedRepo)
+    } else {
+      log.info('ECR repo already exists')
+    }
 
+    log.info('pushing docker build')
     const pushDockerBuild = require('../../modules/AWS/ECR/push-docker-build')
     await pushDockerBuild(watchedRepo, path.resolve(__dirname, '..', '..', 'modules', 'git-container'))
 
