@@ -5,7 +5,7 @@ This is the base class for dealing with containers
 ## States
 
 ecs state | active on AWS | description
---- | ---
+--- | --- | ---
 `pending` | `false` | requested to start - but not yet active (queue has not picked it up)
 `spinning up` | `true` | queue worker has started build process for a new container
 `updating` | `true` | queue worker has begun updating an existing container
