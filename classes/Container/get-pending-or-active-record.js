@@ -9,6 +9,9 @@ const log = require('../../modules/log')('container getPendingOrActiveRecord')
 async function getPendingOrActiveRecord() {
   const { query } = require('@conjurelabs/db')
 
+  // get watched repo record
+  const watchedRepo = await this.payload.getWatchedRepoRecord()
+
   const containerResult = await query(`
     SELECT * FROM container
     WHERE repo = $1
