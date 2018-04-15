@@ -1,6 +1,11 @@
 const log = require('../../modules/log')('container update')
 const { UnexpectedError } = require('@conjurelabs/err')
 
+/*
+  Updates an active container
+  If an active container does not exist, this will create one.
+  If a pending container exists, this will update it directly to spinning up state.
+ */
 async function containerUpdate() {
   log.info('starting update')
 
@@ -23,14 +28,29 @@ async function containerUpdate() {
       id: containerRecord.id
     })
   } else {
-    containerRecord = await DatabaseTable.insert('container', {
-      repo: watchedRepo.id,
-      branch,
-      isActive: true,
-      ecsState: 'spinning up', // this shouldn't really happen here
-      activeStart: new Date(),
-      added: new Date()
-    })
+    containerRecord = await this.getPendingRecord()
+
+    if (containerRecord) {
+      // update existing pending record
+      containerRecord
+        .set({
+          ecsState: 'spinning up',
+          isActive: true,
+          activeStart: new Date(),
+          updated: new Date()
+        })
+        .save()
+    } else {
+      // fallback - create a new container
+      containerRecord = await DatabaseTable.insert('container', {
+        repo: watchedRepo.id,
+        branch,
+        isActive: true,
+        ecsState: 'spinning up', // this shouldn't really happen here
+        activeStart: new Date(),
+        added: new Date()
+      })
+    }
   }
 
   // get github client

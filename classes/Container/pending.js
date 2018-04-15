@@ -1,7 +1,11 @@
 const { UnexpectedError } = require('@conjurelabs/err')
 const log = require('../../modules/log')('container pending')
 
-async function containerStart() {
+/*
+  Sets a container to pending state
+  This is not yet active (can't bill)
+ */
+async function containerPending() {
   log.info('creating pending container')
 
   const { branch } = this.payload
@@ -34,4 +38,4 @@ async function containerStart() {
   return insertedContainer
 }
 
-module.exports = containerStart
+module.exports = containerPending

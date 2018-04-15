@@ -1,5 +1,8 @@
 const log = require('../../modules/log')('container stop')
 
+/*
+  Stops an active container
+ */
 async function containerStop() {
   log.info('stopping container')
 

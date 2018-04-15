@@ -1,6 +1,10 @@
 const { UnexpectedError } = require('@conjurelabs/err')
 const log = require('../../modules/log')('container start')
 
+/*
+  Starts a stopped conatiner
+  This will fail if a container, in a stopped state, does not exist
+ */
 async function containerStart() {
   log.info('starting container')
 
