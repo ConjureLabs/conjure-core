@@ -6,11 +6,6 @@ const log = require('../../modules/log')('container stop')
 async function containerStop() {
   log.info('stopping container')
 
-  const { branch } = this.payload
-
-  // get watched repo record
-  const watchedRepo = await this.payload.getWatchedRepoRecord()
-
   const { DatabaseTable } = require('@conjurelabs/db')
   // make sure the repo/branch is in the correct state
   const containerRecord = await this.getActiveRecord()

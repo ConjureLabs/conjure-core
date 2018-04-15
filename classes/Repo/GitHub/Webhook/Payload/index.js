@@ -207,8 +207,11 @@ class WebhookPayload {
         break
       } catch(err) {
         if (currentGitHubAccount) {
-          currentGitHubAccount.access_token_assumed_valid == false
-          currentGitHubAccount.save()
+          currentGitHubAccount
+            .set({
+              access_token_assumed_valid: false
+            })
+            .save()
         }
       }
     }
