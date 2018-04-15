@@ -1,4 +1,4 @@
-const config = require('conjure-core/modules/config')
+const config = require('../config')
 const AWS = require('aws-sdk')
 
 AWS.config.update({

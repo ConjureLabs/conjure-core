@@ -1,4 +1,4 @@
-const config = require('conjure-core/modules/config')
+const config = require('../../config')
 
 module.exports = function registerTaskDefinition(watchedRepoRecord, repoConfig) {
   return new Promise((resolve, reject) => {
