@@ -1,4 +1,4 @@
-const config = require('conjure-core/modules/config')
+const config = require('../../../modules/config')
 
 const webUrl = config.app.web.url
 const gitHubCommentSignature = [
@@ -10,7 +10,7 @@ const gitHubCommentSignature = [
 
 class IssueComment {
   constructor(payload) {
-    const Issue = require('conjure-core/classes/Repo/GitHub/Issue')
+    const Issue = require('../../Repo/GitHub/Issue')
     this.issue = new Issue(payload)
   }
 
