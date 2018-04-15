@@ -13,7 +13,7 @@ async function containerStart() {
   // make sure the repo/branch is in the correct state
   const stoppedContainerRecords = await DatabaseTable.select('container', {
     repo: watchedRepo.id,
-    branch: branch,
+    branch,
     isActive: false,
     ecsState: 'stopped'
   })

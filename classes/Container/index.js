@@ -21,5 +21,6 @@ Container.prototype.update = require('./update')
 Container.prototype.start = require('./start')
 Container.prototype.stop = require('./stop')
 Container.prototype.logs = require('./logs')
+Container.prototype.getActiveRecord = require('./get-active-record')
 
 module.exports = Container
