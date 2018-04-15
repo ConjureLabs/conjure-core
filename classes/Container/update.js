@@ -14,12 +14,12 @@ async function containerUpdate() {
   // get watched repo record
   const watchedRepo = await this.payload.getWatchedRepoRecord()
 
-  let containerRecord = await this.getActiveRecord()
+  let containerRecord = await this.getPendingOrActiveRecord()
   let oldRecord
 
   const { DatabaseTable } = require('@conjurelabs/db')
 
-  if (containerRecord) {
+  if (containerRecord && containerRecord.isActive === true) {
     oldRecord = containerRecord.copy()
     DatabaseTable.update('container', {
       ecsState: 'updating',
@@ -28,8 +28,6 @@ async function containerUpdate() {
       id: containerRecord.id
     })
   } else {
-    containerRecord = await this.getPendingRecord()
-
     if (containerRecord) {
       // update existing pending record
       containerRecord
