@@ -2,6 +2,10 @@ const { UnexpectedError } = require('@conjurelabs/err')
 
 const log = require('../../modules/log')('container getPendingRecord')
 
+/*
+  Gets a pending container record
+  Assumes isActive can not be true
+ */
 async function getPendingRecord() {
   const { DatabaseTable } = require('@conjurelabs/db')
 

@@ -2,6 +2,13 @@ const { ContentError, UnexpectedError } = require('@conjurelabs/err')
 const path = require('path')
 const log = require('../../modules/log')('container create')
 
+/*
+  Creates an active (running) container.
+
+  If a pending container is set, it will start ECS container and update pending record to active
+  If there is no pending container, it will create a new container, skipping pending
+ */
+
 async function containerCreate() {
   log.info('starting create')
 
@@ -27,6 +34,7 @@ async function containerCreate() {
       .set({
         ecsState: 'spinning up',
         isActive: true,
+        activeStart: new Date(),
         updated: new Date()
       })
       .save()
