@@ -10,19 +10,11 @@ async function containerStop() {
 
   const { DatabaseTable } = require('@conjurelabs/db')
   // make sure the repo/branch is in the correct state
-  const runningContainerRecords = await DatabaseTable.select('container', {
-    repo: watchedRepo.id,
-    branch: branch,
-    isActive: true,
-    ecsState: 'running'
-  })
-
-  if (!runningContainerRecords.length) {
+  const containerRecord = await this.getActiveRecord()
+  if (!containerRecord) {
     // no container record to start back up
     return
   }
-
-  const containerRecord = runningContainerRecords[0]
 
   // update db record, since spinning down
   await DatabaseTable.update('container', {

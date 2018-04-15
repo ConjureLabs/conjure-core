@@ -6,39 +6,45 @@ async function containerCreate() {
   log.info('starting create')
 
   const { branch } = this.payload
+  const { DatabaseTable } = require('@conjurelabs/db')
   
   // get watched repo record
   const watchedRepo = await this.payload.getWatchedRepoRecord()
 
   // make sure the repo/branch is not already in progress
-  const { DatabaseTable } = require('@conjurelabs/db')
-  const duplicateActiveContainers = await DatabaseTable.select('container', {
-    repo: watchedRepo.id,
-    branch,
-    isActive: true
-  })
-  if (duplicateActiveContainers.length) {
-    return duplicateActiveContainers[0].urlUid
+  let containerRecord = await this.getActiveRecord()
+  if (containerRecord && containerRecord.ecsState !== 'pending') {
+    return containerRecord.urlUid
   }
 
   // get github client
   const repoConfig = await this.getConfig()
 
-  // create record for container
-  const insertedContainer = await DatabaseTable.insert('container', {
-    repo: watchedRepo.id,
-    branch,
-    isActive: true,
-    ecsState: 'spinning up',
-    activeStart: new Date(),
-    added: new Date()
-  })
+  if (containerRecord) {
+    // update existing pending record
+    containerRecord
+      .set({
+        ecsState: 'spinning up',
+        updated: new Date()
+      })
+      .save()
+  } else {
+    // create record for container
+    const insertedContainer = await DatabaseTable.insert('container', {
+      repo: watchedRepo.id,
+      branch,
+      isActive: true,
+      ecsState: 'spinning up',
+      activeStart: new Date(),
+      added: new Date()
+    })
 
-  if (!Array.isArray(insertedContainer) || !insertedContainer.length) {
-    throw UnexpectedError('Container record failed to insert')
+    if (!Array.isArray(insertedContainer) || !insertedContainer.length) {
+      throw UnexpectedError('Container record failed to insert')
+    }
+
+    containerRecord = insertedContainer[0]
   }
-
-  const containerRowId = insertedContainer[0].id
 
   const containerUid = await this.dockerBuild()
 
@@ -56,7 +62,7 @@ async function containerCreate() {
     ecsState: 'running',
     updated: new Date()
   }, {
-    id: containerRowId
+    id: containerRecord.id
   })
 
   return containerUid
