@@ -1,6 +1,6 @@
 module.exports = function createRepo(watchedRepoRecord) {
   return new Promise((resolve, reject) => {
-    const getRepoName = require('../../AWS/ECR/get-repo-name')
+    const getRepoName = require('./get-repo-name')
     const repoName = getRepoName(watchedRepoRecord)
 
     const AWS = require('../')

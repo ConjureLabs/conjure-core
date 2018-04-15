@@ -1,5 +1,5 @@
-const config = require('conjure-core/modules/config')
-const log = require('conjure-core/modules/log')('docker push to ecr')
+const config = require('../../config')
+const log = require('../../log')('docker push to ecr')
 
 module.exports = function pushDockerBuild(watchedRepoRecord /*, workingDir */) {
   return new Promise(async resolve => {
@@ -39,7 +39,7 @@ function defaultExecErrorHandler(err, resolve, reject) {
 
 function exec(command, workingDir, onErr = defaultExecErrorHandler) {
   return new Promise(async (resolve, reject) => {
-    const exec = require('conjure-core/modules/childProcess/exec')
+    const exec = require('../../childProcess/exec')
 
     if (process.env.NODE_ENV === 'development') {
       log.info(command)
