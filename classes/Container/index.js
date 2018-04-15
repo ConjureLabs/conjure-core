@@ -16,11 +16,13 @@ class Container {
   }
 }
 
+Container.prototype.pending = require('./pending')
 Container.prototype.create = require('./create')
 Container.prototype.update = require('./update')
 Container.prototype.start = require('./start')
 Container.prototype.stop = require('./stop')
 Container.prototype.logs = require('./logs')
 Container.prototype.getActiveRecord = require('./get-active-record')
+Container.prototype.getPendingRecord = require('./get-pending-record')
 
 module.exports = Container
