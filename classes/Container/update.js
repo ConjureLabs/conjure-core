@@ -101,7 +101,7 @@ function initalTasks(watchedRepo, repoConfig) {
 
     const pushDockerBuild = require('../../modules/AWS/ECR/push-docker-build')
     const path = require('path')
-    await pushDockerBuild(watchedRepo, path.resolve(__dirname, '..', '..', 'git-container'))
+    await pushDockerBuild(watchedRepo, path.resolve(__dirname, '..', '..', 'modules', 'git-container'))
 
     // checking if task definition is registered already
     log.info('checking for task definition')
