@@ -1,4 +1,4 @@
-const log = require('conjure-core/modules/log')('container stop')
+const log = require('../../modules/log')('container stop')
 
 async function containerStop() {
   log.info('stopping container')
@@ -33,7 +33,7 @@ async function containerStop() {
   })
 
   log.info('stopping task')
-  const stopTask = require('../../AWS/ECS/stop-task')
+  const stopTask = require('../../modules/AWS/ECS/stop-task')
   await stopTask(containerRecord.clusterArn, containerRecord.taskArn)
 
   // update db record

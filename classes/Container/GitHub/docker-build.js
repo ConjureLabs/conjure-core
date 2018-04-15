@@ -1,6 +1,6 @@
 const { UnexpectedError } = require('@conjurelabs/err')
-const config = require('conjure-core/modules/config')
-const log = require('conjure-core/modules/log')('container.github.docker-build')
+const config = require('../../../modules/config')
+const log = require('../../../modules/log')('container.github.docker-build')
 
 module.exports = function dockerBuild() {
   return new Promise(async resolve => {

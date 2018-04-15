@@ -1,6 +1,6 @@
 const { ContentError, UnexpectedError } = require('@conjurelabs/err')
 const path = require('path')
-const log = require('conjure-core/modules/log')('container create')
+const log = require('../../modules/log')('container create')
 
 async function containerCreate() {
   log.info('starting create')
@@ -75,17 +75,17 @@ function spinUpProject(watchedRepo, repoConfig) {
     // getting, and creating if needed, the ecr repo path in aws
     log.info('getting ECR repo record')
 
-    const pushDockerBuild = require('../../AWS/ECR/push-docker-build')
+    const pushDockerBuild = require('../../modules/AWS/ECR/push-docker-build')
     await pushDockerBuild(watchedRepo, path.resolve(__dirname, '..', '..', 'git-container'))
 
     // checking if task definition is registered already
     log.info('checking for task definition')
-    const getTaskDefinition = require('../../AWS/ECS/get-task-definition')
+    const getTaskDefinition = require('../../modules/AWS/ECS/get-task-definition')
     let taskDefinitionRevision = await getTaskDefinition(watchedRepo)
     // if no task definition registered, create one
     if (!taskDefinitionRevision) {
       log.info('no task definition - creating one')
-      const registerTaskDefinition = require('../../AWS/ECS/register-task-definition')
+      const registerTaskDefinition = require('../../modules/AWS/ECS/register-task-definition')
       taskDefinitionRevision = await registerTaskDefinition(watchedRepo, repoConfig)
     } else {
       log.info('task definition found')
@@ -93,12 +93,12 @@ function spinUpProject(watchedRepo, repoConfig) {
 
     // getting cluster info, in case it already exists
     log.info('checking for cluster')
-    const getClusterData = require('../../AWS/ECS/get-cluster-data')
+    const getClusterData = require('../../modules/AWS/ECS/get-cluster-data')
     let cluster = await getClusterData(watchedRepo)
     // if no cluster, then create one
     if (!cluster) {
       log.info('no cluster found - creating one')
-      const createCluster = require('../../AWS/ECS/create-cluster')
+      const createCluster = require('../../modules/AWS/ECS/create-cluster')
       cluster = await createCluster(watchedRepo)
     } else {
       log.info('cluster found')
@@ -106,16 +106,16 @@ function spinUpProject(watchedRepo, repoConfig) {
 
     // run the task, in the cluster
     log.info('running task')
-    const runTask = require('../../AWS/ECS/run-task')
+    const runTask = require('../../modules/AWS/ECS/run-task')
     const taskPending = await runTask(watchedRepo, taskDefinitionRevision)
 
     log.info('waiting for task to run')
-    const waitForTask = require('../../AWS/ECS/wait-for-task')
+    const waitForTask = require('../../modules/AWS/ECS/wait-for-task')
     const taskRunning = await waitForTask(taskPending)
     log.info('task running, via Fargate')
 
     log.info('getting public ip')
-    const getTaskIp = require('../../AWS/ECS/get-task-public-ip')
+    const getTaskIp = require('../../modules/AWS/ECS/get-task-public-ip')
     const publicIp = await getTaskIp(taskRunning)
 
     resolve({

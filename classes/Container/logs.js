@@ -1,4 +1,4 @@
-const log = require('conjure-core/modules/log')('container logs')
+const log = require('../../modules/log')('container logs')
 const { UnexpectedError } = require('@conjurelabs/err')
 
 async function containerLogs(urlUid) {
