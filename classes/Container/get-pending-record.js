@@ -9,6 +9,9 @@ const log = require('../../modules/log')('container getPendingRecord')
 async function getPendingRecord() {
   const { DatabaseTable } = require('@conjurelabs/db')
 
+  // get watched repo record
+  const watchedRepo = await this.payload.getWatchedRepoRecord()
+
   const containerRecords = await DatabaseTable.select('container', {
     repo: watchedRepo.id,
     branch,
@@ -27,3 +30,5 @@ async function getPendingRecord() {
   }
   return null
 }
+
+export default getPendingRecord

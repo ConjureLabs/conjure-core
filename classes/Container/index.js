@@ -24,5 +24,6 @@ Container.prototype.stop = require('./stop')
 Container.prototype.logs = require('./logs')
 Container.prototype.getActiveRecord = require('./get-active-record')
 Container.prototype.getPendingRecord = require('./get-pending-record')
+Container.prototype.getPendingOrActiveRecord = require('./get-pending-or-active-record')
 
 module.exports = Container
