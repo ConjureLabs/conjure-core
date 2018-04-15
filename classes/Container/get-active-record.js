@@ -30,4 +30,4 @@ async function getActiveRecord() {
   return null
 }
 
-export default getActiveRecord
+module.exports = getActiveRecord
