@@ -1,7 +1,7 @@
 const Container = require('../')
 const IssueComment = require('../../GitHub/IssueComment')
 
-const config = require('conjure-core/modules/config')
+const config = require('../../../modules/config')
 
 const webUrl = config.app.web.url
 

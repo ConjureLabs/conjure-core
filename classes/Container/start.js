@@ -1,5 +1,5 @@
 const { UnexpectedError } = require('@conjurelabs/err')
-const log = require('conjure-core/modules/log')('container start')
+const log = require('../../modules/log')('container start')
 
 async function containerStart() {
   log.info('starting container')
@@ -35,7 +35,7 @@ async function containerStart() {
   })
 
   log.info('retrieving task definition')
-  const getTaskDefinition = require('../../AWS/ECS/get-task-definition')
+  const getTaskDefinition = require('../../modules/AWS/ECS/get-task-definition')
   let taskDefinitionRevision = await getTaskDefinition(watchedRepo)
   // if no task definition registered, create one
   if (!taskDefinitionRevision) {
@@ -43,16 +43,16 @@ async function containerStart() {
   }
 
   log.info('running task')
-  const runTask = require('../../AWS/ECS/run-task')
+  const runTask = require('../../modules/AWS/ECS/run-task')
   const taskPending = await runTask(watchedRepo, taskDefinitionRevision)
 
   log.info('waiting for task to run')
-  const waitForTask = require('../../AWS/ECS/wait-for-task')
+  const waitForTask = require('../../modules/AWS/ECS/wait-for-task')
   const taskRunning = await waitForTask(taskPending)
   log.info('task running, via Fargate')
 
   log.info('getting public ip')
-  const getTaskIp = require('../../AWS/ECS/get-task-public-ip')
+  const getTaskIp = require('../../modules/AWS/ECS/get-task-public-ip')
   const publicIp = await getTaskIp(taskRunning)
 
   // update db record
