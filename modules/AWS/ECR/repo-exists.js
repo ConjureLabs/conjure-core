@@ -1,4 +1,5 @@
 const repoDoesNotExistExpr = /^The repository .* does not exist/
+const policyDoesNotExist = /^Repository policy does not exist for the repository/
 
 // checks if the ECR repo exists
 module.exports = function repoExists(watchedRepoRecord) {
@@ -16,10 +17,14 @@ module.exports = function repoExists(watchedRepoRecord) {
     }, err => {
       if (err) {
         // 'The repository with name \'conjure/development-watched-1\' does not exist in the registry with id \'657781215424\''
-        if (err.message && repoDoesNotExistExpr.test(err.message)) {
-          resolve(false)
-          return
-        }
+        if (err.message) {
+          if (repoDoesNotExistExpr.test(err.message)) {
+            resolve(false)
+            return
+          } else if (policyDoesNotExist.test(err.message)) {
+            resolve(true)
+            return
+          }
         reject(err)
       }
 
