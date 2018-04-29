@@ -25,6 +25,7 @@ module.exports = function repoExists(watchedRepoRecord) {
             resolve(true)
             return
           }
+        }
         reject(err)
       }
 
