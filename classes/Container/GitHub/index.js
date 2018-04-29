@@ -9,14 +9,12 @@ class GitHubContainer extends Container {
   // saving github comment, when creating a new container
   async create() {
     const issueComment = new IssueComment(this.payload)
-
     // commenting on issue thread to notify that an instance is spinning up
     await issueComment.upsert(`:hourglass_flowing_sand: [Conjure](${webUrl}) is spinning up this branch`)
 
     // create vm
     const containerUid = await super.create()
     const containerUrl = `${config.app.web.protocol}://${containerUid}.view.${config.app.web.host}`
-
     await issueComment.upsert(`:octocat: [You can view this branch on Conjure](${containerUrl})`)
   }
 

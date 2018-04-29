@@ -18,7 +18,8 @@ async function getPendingRecord() {
     repo: watchedRepo.id,
     branch,
     isActive: false,
-    ecsState: 'pending'
+    ecsState: 'pending',
+    creationFailed: false
   })
 
   // not throwing, so things can still work

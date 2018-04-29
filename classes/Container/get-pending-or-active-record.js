@@ -22,6 +22,7 @@ async function getPendingOrActiveRecord() {
       is_active = true
       OR ecs_state = 'pending'
     )
+    AND creation_failed = FALSE
   `, [watchedRepo.id, branch])
 
   // not throwing, so things can still work

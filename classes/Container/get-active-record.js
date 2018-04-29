@@ -17,7 +17,8 @@ async function getActiveRecord() {
   const containerRecords = await DatabaseTable.select('container', {
     repo: watchedRepo.id,
     branch,
-    isActive: true
+    isActive: true,
+    creationFailed: false
   })
 
   // not throwing, so things can still work

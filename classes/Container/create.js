@@ -19,9 +19,9 @@ async function containerCreate() {
 
   // make sure the repo/branch is not already in progress
   let containerRecord = await this.getPendingOrActiveRecord()
-  if (containerRecord && containerRecord.isActive === true) {
-    return containerRecord.urlUid
-  }
+  // if (containerRecord) {
+  //   return containerRecord.urlUid
+  // }
 
   const { DatabaseTable } = require('@conjurelabs/db')
 
@@ -32,7 +32,8 @@ async function containerCreate() {
         ecsState: 'spinning up',
         isActive: true,
         activeStart: new Date(),
-        updated: new Date()
+        updated: new Date(),
+        creationHeartbeat: new Date()
       })
       .save()
   } else {
@@ -41,9 +42,11 @@ async function containerCreate() {
       repo: watchedRepo.id,
       branch,
       isActive: true,
+      creationFailed: false,
       ecsState: 'spinning up',
       activeStart: new Date(),
-      added: new Date()
+      added: new Date(),
+      creationHeartbeat: new Date()
     })
 
     if (!Array.isArray(insertedContainer) || !insertedContainer.length) {
@@ -52,6 +55,16 @@ async function containerCreate() {
 
     containerRecord = insertedContainer[0]
   }
+
+  // update heartbeat every minute
+  const heartbeat = setInterval(function() {
+    containerRecord
+      .set({
+        creationHeartbeat: new Date(),
+        updated: new Date()
+      })
+      .save()
+  }, 60 * 1000) // every minute
 
   const containerUid = await this.dockerBuild()
 
@@ -74,6 +87,9 @@ async function containerCreate() {
   }, {
     id: containerRecord.id
   })
+
+  // end heartbeat
+  clearInterval(heartbeat)
 
   return containerUid
 }
