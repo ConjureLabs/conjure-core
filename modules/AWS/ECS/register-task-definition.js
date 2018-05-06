@@ -21,8 +21,8 @@ module.exports = function registerTaskDefinition(watchedRepoRecord, repoConfig) 
         image: `${ecrReposUrl}${builtDockerName}:latest`,
         name: resourceName
       }],
-      memory: '512',
-      cpu: '256',
+      cpu: '512',
+      memory: '1024',
       executionRoleArn: config.aws.arn.ecs.executionRole,
       taskRoleArn: config.aws.arn.ecs.taskRole,
       requiresCompatibilities: ['FARGATE'],
