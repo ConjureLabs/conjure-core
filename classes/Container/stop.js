@@ -26,16 +26,54 @@ async function containerStop() {
   const stopTask = require('../../modules/AWS/ECS/stop-task')
   await stopTask(containerRecord.clusterArn, containerRecord.taskArn)
 
+  const endDate = new Date()
+
   // update db record
   await DatabaseTable.update('container', {
     ecsState: 'stopped',
     isActive: false,
     taskArn: null,
     publicIp: null,
-    activeEnd: new Date(),
+    activeEnd: endDate,
     updated: new Date()
   }, {
     id: containerRecord.id
+  })
+
+  const { branch } = this.payload
+  
+  // get watched repo record
+  const watchedRepo = await this.payload.getWatchedRepoRecord()
+
+  tlogRecordRan(containerRecord, watchedRepo, endDate)
+}
+
+/*
+  Stores billable transaction record that a container had run
+ */
+async function tlogRecordRan(containerRecord, watchedRepo, endDate) {
+  const { DatabaseTable } = require('@conjurelabs/db')
+
+  const orgBillingPlanRecords = await DatabaseTable.select('githubOrgBillingPlan', {
+    org: watchedRepo.org,
+    deactivated: null
+  })
+
+  // todo: should kill build / run flow if no billing plan is found
+  // todo: check for billing plan before build/run maybe?
+  if (orgBillingPlanRecords.length === 0) {
+    throw new UnexpectedError(`No billing plan found for repo ${watchedRepo.org}/${watchedRepo.name}`)
+  }
+
+  const billingPlan = orgBillingPlanRecords[0]
+
+  DatabaseTable.insert('containerTransactionLog', {
+    containerId: containerRecord.id,
+    billingPlan: billingPlan.id,
+    action: 'ran',
+    actionStart: containerRecord.activeStart,
+    actionEnd: endDate,
+    added: new Date()
   })
 }
 
