@@ -59,7 +59,7 @@ async function containerUpdate() {
   const repoConfig = await this.getConfig()
 
   // first take the time to do anything we can before stopping any old
-  const containerUid = await initalTasks(watchedRepo, repoConfig)
+  const containerUid = await initialTasks(this.dockerBuild, watchedRepo, repoConfig)
 
   log.info('retrieving task definition')
   const getTaskDefinition = require('../../modules/AWS/ECS/get-task-definition')
@@ -141,10 +141,10 @@ async function tlogRecordBuild(containerRecord, watchedRepo, actionDate) {
   before stopping any running tasks
   (this will help avoid dead-time of container cutover)
  */
-function initalTasks(watchedRepo, repoConfig) {
+function initialTasks(dockerBuild, watchedRepo, repoConfig) {
   return new Promise(async resolve => {
     // build docker file
-    const containerUid = await this.dockerBuild()
+    const containerUid = dockerBuild()
 
     // getting, and creating if needed, the ecr repo path in aws
     log.info('getting ECR repo record')
