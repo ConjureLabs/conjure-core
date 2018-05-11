@@ -19,11 +19,13 @@ async function containerUpdate() {
 
   const { DatabaseTable } = require('@conjurelabs/db')
 
+  const actionDate = new Date()
+
   if (containerRecord && containerRecord.isActive === true) {
     oldRecord = containerRecord.copy()
     DatabaseTable.update('container', {
       ecsState: 'updating',
-      updated: new Date()
+      updated: actionDate
     }, {
       id: containerRecord.id
     })
@@ -34,8 +36,8 @@ async function containerUpdate() {
         .set({
           ecsState: 'spinning up',
           isActive: true,
-          activeStart: new Date(),
-          updated: new Date()
+          activeStart: actionDate,
+          updated: actionDate
         })
         .save()
     } else {
@@ -45,11 +47,13 @@ async function containerUpdate() {
         branch,
         isActive: true,
         ecsState: 'spinning up', // this shouldn't really happen here
-        activeStart: new Date(),
-        added: new Date()
+        activeStart: actionDate,
+        added: actionDate
       })
     }
   }
+
+  // todo: heartbeat?
 
   // get github client
   const repoConfig = await this.getConfig()
@@ -98,6 +102,37 @@ async function containerUpdate() {
     const stopTask = require('../../modules/AWS/ECS/stop-task')
     await stopTask(oldRecord.clusterArn, oldRecord.taskArn)
   }
+
+  tlogRecordBuild(containerRecord, watchedRepo, actionDate)
+}
+
+/*
+  Stores billable transaction record that a container was built
+ */
+async function tlogRecordBuild(containerRecord, watchedRepo, actionDate) {
+  const { DatabaseTable } = require('@conjurelabs/db')
+
+  const orgBillingPlanRecords = await DatabaseTable.select('githubOrgBillingPlan', {
+    org: watchedRepo.org,
+    deactivated: null
+  })
+
+  // todo: should kill build / run flow if no billing plan is found
+  // todo: check for billing plan before build/run maybe?
+  if (orgBillingPlanRecords.length === 0) {
+    throw new UnexpectedError(`No billing plan found for repo ${watchedRepo.org}/${watchedRepo.name}`)
+  }
+
+  const billingPlan = orgBillingPlanRecords[0]
+
+  DatabaseTable.insert('containerTransactionLog', {
+    containerId: containerRecord.id,
+    billingPlan: billingPlan.id,
+    action: 'build',
+    actionStart: actionDate,
+    actionEnd: new Date(),
+    added: new Date()
+  })
 }
 
 /*
