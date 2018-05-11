@@ -58,12 +58,9 @@ async function containerCreate() {
 
   // update heartbeat every minute
   const heartbeat = setInterval(function() {
-    containerRecord
-      .set({
-        creationHeartbeat: new Date(),
-        updated: new Date()
-      })
-      .save()
+    containerRecord.creationHeartbeat = new Date()
+    containerRecord.updated = new Date()
+    containerRecord.save()
   }, 60 * 1000) // every minute
 
   const containerUid = await this.dockerBuild()
@@ -121,7 +118,7 @@ async function tlogRecordBuild(containerRecord, watchedRepo) {
     containerId: containerRecord.id,
     billingPlan: billingPlan.id,
     action: 'build',
-    actionStart: watchedRepo.activeStart,
+    actionStart: containerRecord.activeStart,
     actionEnd: new Date(),
     added: new Date()
   })
