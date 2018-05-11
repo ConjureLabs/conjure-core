@@ -59,7 +59,7 @@ async function containerUpdate() {
   const repoConfig = await this.getConfig()
 
   // first take the time to do anything we can before stopping any old
-  const containerUid = await initialTasks(this.dockerBuild, watchedRepo, repoConfig)
+  const containerUid = await initialTasks(this.dockerBuild.bind(this), watchedRepo, repoConfig)
 
   log.info('retrieving task definition')
   const getTaskDefinition = require('../../modules/AWS/ECS/get-task-definition')
