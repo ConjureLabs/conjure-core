@@ -21,6 +21,8 @@ async function containerUpdate() {
 
   const actionDate = new Date()
 
+  let heartbeat
+
   if (containerRecord && containerRecord.isActive === true) {
     oldRecord = containerRecord.copy()
     DatabaseTable.update('container', {
@@ -51,6 +53,17 @@ async function containerUpdate() {
         added: actionDate
       })
     }
+
+    // only doing a heartbeat if on a non-active container
+    // update heartbeat every minute
+    heartbeat = setInterval(function() {
+      containerRecord
+        .set({
+          creationHeartbeat: new Date(),
+          updated: new Date()
+        })
+        .save()
+    }, 60 * 1000) // every minute
   }
 
   // todo: heartbeat?
@@ -95,6 +108,11 @@ async function containerUpdate() {
   }, {
     id: containerRecord.id
   })
+
+  // end heartbeat
+  if (heartbeat) {
+    clearInterval(heartbeat)
+  }
 
   // should _always_ have an old record, but safe > sorry
   if (oldRecord) {
