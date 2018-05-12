@@ -58,9 +58,12 @@ async function containerCreate() {
 
   // update heartbeat every minute
   const heartbeat = setInterval(function() {
-    containerRecord.creationHeartbeat = new Date()
-    containerRecord.updated = new Date()
-    containerRecord.save()
+    containerRecord
+      .set({
+        creationHeartbeat: new Date(),
+        updated: new Date()
+      })
+      .save()
   }, 60 * 1000) // every minute
 
   const containerUid = await this.dockerBuild()
