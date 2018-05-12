@@ -1,6 +1,6 @@
 const Stripe = require('../')
 
-const createCharge = Symbol('create charge for custmer + card')
+const createCharge = Symbol('create charge for customer + card')
 const updateCharge = Symbol('update existing charge')
 
 class Charge extends Stripe {
@@ -13,6 +13,7 @@ class Charge extends Stripe {
 
     this.amount = data.amount
     this.currency = data.currency
+    this.receiptNumber = data.receiptNumber
     this.email = customerInstance.email
     this.customer = customerInstance.id
     this.source = cardInstance.id
@@ -34,6 +35,7 @@ class Charge extends Stripe {
       amount: this.amount,
       currency: this.currency,
       receipt_email: this.email,
+      receipt_number: this.receiptNumber,
       customer: this.customer,
       source: this.source
     })
@@ -49,6 +51,7 @@ class Charge extends Stripe {
       amount: this.amount,
       currency: this.currency,
       receipt_email: this.email,
+      receipt_number: this.receiptNumber,
       customer: this.customer,
       source: this.source
     })
