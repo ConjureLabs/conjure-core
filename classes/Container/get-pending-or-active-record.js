@@ -7,7 +7,7 @@ const log = require('../../modules/log')('container getPendingOrActiveRecord')
   This will not return pending container records
  */
 async function getPendingOrActiveRecord() {
-  const { query } = require('@conjurelabs/db')
+  const { query, DatabaseRow } = require('@conjurelabs/db')
 
   // get watched repo record
   const watchedRepo = await this.payload.getWatchedRepoRecord()
@@ -32,7 +32,7 @@ async function getPendingOrActiveRecord() {
   }
 
   if (containerResult.rows.length) {
-    return containerResult.rows[0]
+    return new DatabaseRow('container', containerResult.rows[0])
   }
   return null
 }
