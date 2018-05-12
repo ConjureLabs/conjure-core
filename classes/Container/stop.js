@@ -68,7 +68,7 @@ async function tlogRecordRan(containerRecord, watchedRepo, endDate) {
   const billingPlan = orgBillingPlanRecords[0]
 
   DatabaseTable.insert('containerTransactionLog', {
-    containerId: containerRecord.id,
+    container: containerRecord.id,
     billingPlan: billingPlan.id,
     action: 'ran',
     actionStart: containerRecord.activeStart,

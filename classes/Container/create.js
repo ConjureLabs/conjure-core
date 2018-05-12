@@ -118,7 +118,7 @@ async function tlogRecordBuild(containerRecord, watchedRepo) {
   const billingPlan = orgBillingPlanRecords[0]
 
   DatabaseTable.insert('containerTransactionLog', {
-    containerId: containerRecord.id,
+    container: containerRecord.id,
     billingPlan: billingPlan.id,
     action: 'build',
     actionStart: containerRecord.activeStart,
