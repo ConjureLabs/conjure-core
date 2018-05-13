@@ -96,6 +96,7 @@ const config = {
   },
 
   postmark: {
+    enabled: process.env.CONJURE_POSTMARK_ENABLED,
     key: process.env.CONJURE_POSTMARK_KEY
   },
 
