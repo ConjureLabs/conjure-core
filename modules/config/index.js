@@ -108,9 +108,16 @@ const config = {
 
   services: {
     github: {
-      id: process.env.CONJURE_GITHUB_CLIENT_ID,
-      secret: process.env.CONJURE_GITHUB_CLIENT_SECRET,
-      inboundWebhookScret: 'super secret secret'
+      id: process.env.CONJURE_GITHUB_APP_ID,
+
+      oauth: {
+        id: process.env.CONJURE_GITHUB_APP_OAUTH_ID,
+        secret: process.env.CONJURE_GITHUB_APP_OAUTH_SECRET
+      },
+
+      webhook: {
+        secret: process.env.CONJURE_GITHUB_APP_WEBHOOK_SECRET
+      }
     }
   },
 
