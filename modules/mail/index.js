@@ -17,6 +17,10 @@ module.exports.send = ({ to, subject, text, html }) => {
 
   const emailContent = typeof html === 'string' ? html : `<body>${text}</body>`
 
+  if (!config.postmark.enabled) {
+    return
+  }
+
   client.sendEmail({
     From: 'info@conjure.sh',
     To: to,
