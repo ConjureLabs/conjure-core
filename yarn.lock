@@ -44,16 +44,6 @@
   dependencies:
     arrify "^1.0.1"
 
-"@conjurelabs/db@1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@conjurelabs/db/-/db-1.0.3.tgz#25f5ab9c92adc5747fbc8a6f8e757cb060635b74"
-  dependencies:
-    "@conjurelabs/err" "0.0.2"
-
-"@conjurelabs/err@0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@conjurelabs/err/-/err-0.0.2.tgz#432f40ccecf74fc5c4cab4eeb0886c0bfdf40c67"
-
 JSV@^4.0.x:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/JSV/-/JSV-4.0.2.tgz#d077f6825571f82132f9dffaed587b4029feff57"
