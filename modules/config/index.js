@@ -108,7 +108,10 @@ const config = {
 
   services: {
     github: {
-      id: process.env.CONJURE_GITHUB_APP_ID,
+      app: {
+        id: process.env.CONJURE_GITHUB_APP_ID,
+        name: process.env.CONJURE_GITHUB_APP_NAME
+      },
 
       oauth: {
         id: process.env.CONJURE_GITHUB_APP_OAUTH_ID,

@@ -13,12 +13,15 @@ class API {
   }
 
   // returns a promise, so you can await
-  request(urlPath, method = 'GET') {
+  request({
+    path,
+    method = 'GET'
+  }) {
     return new Promise((resolve, reject) => {
       request({
-        url: `https://api.github.com/${urlPath.replace(leadingSlash, '')}`,
+        url: `https://api.github.com/${path.replace(leadingSlash, '')}`,
         method,
-        headers,
+        headers: this.headers,
         json: true
       }, (err, res, body) => {
         if (err) {
