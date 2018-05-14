@@ -16,7 +16,7 @@ const pathsRequiringAppAuth = /^\/?installation/
 
 // see https://developer.github.com/v3/apps/permissions/
 class AppTokenAPI extends API {
-  constructor() {
+  constructor(installationId) {
     const nowSeconds = Math.floor(Date.now() / 1000)
     // see https://developer.github.com/apps/building-github-apps/authentication-options-for-github-apps/#authenticating-as-a-github-app
     const token = jwt.sign({
@@ -26,6 +26,8 @@ class AppTokenAPI extends API {
     }, pem, {
       algorithm: 'RS256'
     })
+
+    this.installationId = installationId
 
     super({
       headers: {
@@ -44,7 +46,7 @@ class AppTokenAPI extends API {
 
   async handleTwoStepRequest(opts) {
     const accessBoby = await super.request({
-      path: 'installations/:installation_id/access_tokens',
+      path: `installations/${this.installationId}/access_tokens`,
       method: 'POST'
     })
 
