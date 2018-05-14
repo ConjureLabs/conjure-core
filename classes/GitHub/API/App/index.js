@@ -27,13 +27,13 @@ class AppTokenAPI extends API {
       algorithm: 'RS256'
     })
 
-    this.installationId = installationId
-
     super({
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
+
+    this.installationId = installationId
   }
 
   async request(opts) {
