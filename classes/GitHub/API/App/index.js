@@ -15,7 +15,7 @@ const pem = readFileSync(resolve(__dirname, 'conjure-dev.pem')) // eslint no-syn
 const pathsRequiringAppAuth = /^\/?installation/
 
 // see https://developer.github.com/v3/apps/permissions/
-class AppTokenAPI5 extends API {
+class AppTokenAPI extends API {
   constructor() {
     const nowSeconds = Math.floor(Date.now() / 1000)
     // see https://developer.github.com/apps/building-github-apps/authentication-options-for-github-apps/#authenticating-as-a-github-app
