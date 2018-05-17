@@ -21,10 +21,10 @@ class GitHubIssueComment {
   async save(body) {
     const gitHubClient = await this.issue.payload.getGitHubClient()
     if (!gitHubClient) {
-      throw new NotFoundError('No github account record, with valid token, found')
+      throw new NotFoundError('No github account record found')
     }
 
-    if (this.commentRow && this.commentRow.is_active === true) {
+    if (this.commentRow && this.commentRow.isActive === true) {
       return await this[updateComment](gitHubClient, body)
     }
 
@@ -45,21 +45,28 @@ class GitHubIssueComment {
     // saving payload to s3, for later access
     const s3Data = uploadToS3(payload)
 
-    // actual comment creation
-    const issueCommentResponse = await createGitHubIssueComment(gitHubClient, orgName, repoName, number, body)
+    // see https://developer.github.com/v3/issues/comments/#create-a-comment
+    await gitHubClient.request({
+      path: `/repos/${orgName}/${repoName}/issues/${number}/comments`,
+      method: 'POST',
+      body: {
+        // { "body": "Me too" }
+        body: body
+      }
+    })
 
     // need to get watched repo record, so we can know its id (for next step)
     const watchedRepo = await this.issue.payload.getWatchedRepoRecord()
 
     // creating new comment record on our end
     const { DatabaseTable } = require('@conjurelabs/db')
-    const commentRows = await DatabaseTable.insert('github_issue_comment', {
-      watched_repo: watchedRepo.id,
-      issue_id: number,
-      comment_id: issueCommentResponse.id,
-      url: issueCommentResponse.html_url,
-      is_active: true,
-      s3_key: (await s3Data).Key,
+    const commentRows = await DatabaseTable.insert('githubIssueComment', {
+      watchedRepo: watchedRepo.id,
+      issueId: number,
+      commentId: issueCommentResponse.id,
+      url: issueCommentResponse.htmlUrl,
+      isActive: true,
+      s3Key: (await s3Data).Key,
       added: new Date()
     })
     this.commentRow = commentRows[0]
@@ -72,7 +79,7 @@ class GitHubIssueComment {
 
     // making sure it's still active
     // this should not happen
-    if (this.commentRow.is_active !== true) {
+    if (this.commentRow.isActive !== true) {
       throw new UnexpectedError('Can not update comment that is not longer active')
     }
 
@@ -86,15 +93,22 @@ class GitHubIssueComment {
 
     // saving payload to s3, for later access
     const s3Data = uploadToS3(payload)
-
-    // updating github comment
-    await updateGitHubIssueComment(gitHubClient, orgName, repoName, number, this.commentRow.comment_id, body)
+    
+    // see https://developer.github.com/v3/issues/comments/#edit-a-comment
+    await gitHubClient.request({
+      path: `/repos/${orgName}/${repoName}/issues/${number}/comments/${this.commentRow.commentId}`,
+      method: 'PATCH',
+      body: {
+        // { "body": "Me too" }
+        body: body
+      }
+    })
 
     // tracking updated time on our record
     await this.commentRow
       .set({
         updated: new Date(),
-        s3_key: (await s3Data).Key
+        s3Key: (await s3Data).Key
       })
       .save()
 
@@ -111,7 +125,7 @@ class GitHubIssueComment {
     // first deleting our own record of the comment
     await this.commentRow
       .set({
-        is_active: false,
+        isActive: false,
         updated: new Date()
       })
       .save()
@@ -119,7 +133,7 @@ class GitHubIssueComment {
     // getting github client
     const gitHubClient = await this.issue.payload.getGitHubClient()
     if (!gitHubClient) {
-      throw new NotFoundError('No github account record, with valid token, found')
+      throw new NotFoundError('No github client found')
     }
 
     // now deleting the actual comment on github
@@ -129,62 +143,17 @@ class GitHubIssueComment {
       number
     } = this.issue.payload
 
-    await deleteGitHubIssueComment(gitHubClient, orgName, repoName, number, this.commentRow.comment_id)
+    // see https://developer.github.com/v3/issues/comments/#delete-a-comment
+    await gitHubClient.request({
+      path: `/repos/${orgName}/${repoName}/issues/${number}/comments/${this.commentRow.commentId}`,
+      method: 'DELETE'
+    })
 
     // removing local attributes, since comment is gone
     this.commentRow = null
 
     return null
   }
-}
-
-function createGitHubIssueComment(gitHubClient, orgName, repoName, issueNumber, body) {
-  return new Promise((resolve, reject) => {
-    // will need integration access from github, in order to post as ourselves, not the user
-    gitHubClient
-      .issue(`${orgName}/${repoName}`, issueNumber)
-      .createComment({
-        body
-      }, (err, response) => {
-        if (err) {
-          return reject(err)
-        }
-
-        resolve(response)
-      })
-  })
-}
-
-function updateGitHubIssueComment(gitHubClient, orgName, repoName, issueNumber, commentId, body) {
-  return new Promise((resolve, reject) => {
-    // will need integration access from github, in order to post as ourselves, not the user
-    gitHubClient
-      .issue(`${orgName}/${repoName}`, issueNumber)
-      .updateComment(commentId, {
-        body
-      }, (err, response) => {
-        if (err) {
-          return reject(err)
-        }
-
-        resolve(response)
-      })
-  })
-}
-
-function deleteGitHubIssueComment(gitHubClient, orgName, repoName, issueNumber, commentId) {
-  return new Promise((resolve, reject) => {
-    // will need integration access from github, in order to post as ourselves, not the user
-    gitHubClient
-      .issue(`${orgName}/${repoName}`, issueNumber)
-      .deleteComment(commentId, (err, response) => {
-        if (err) {
-          return reject(err)
-        }
-
-        resolve(response)
-      })
-  })
 }
 
 function uploadToS3(payload) {
