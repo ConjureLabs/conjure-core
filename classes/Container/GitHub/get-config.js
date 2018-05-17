@@ -1,60 +1,40 @@
 const { ContentError, NotFoundError } = require('@conjurelabs/err')
+const AppAPI = require('../../GitHub/API/App')
 
 module.exports = function getConfig() {
   return new Promise(async (resolve, reject) => {
-    // get github client
-    const gitHubClient = await this.payload.getGitHubClient()
+    const { repoName, orgName, branch } = this.payload
+    const api = AppAPI.fromOrg(orgName)
 
-    if (!gitHubClient) {
-      return reject(new NotFoundError('No github account record, with valid token, found'))
-    }
+    // see https://developer.github.com/v3/repos/contents/
+    let result
 
-    const {
-      branch,
-      orgName,
-      repoName
-    } = this.payload
-
-    // get yml config
-    const repoConfig = await getProjectYml(gitHubClient, orgName, repoName, branch)
-
-    if (repoConfig.machine.start == undefined) {
-      return reject(new ContentError('No container start command defined or known'))
-    }
-
-    if (repoConfig.machine.port == undefined) {
-      return reject(new ContentError('No container port defined'))
-    }
-
-    resolve(repoConfig)
-  })
-}
-
-function getProjectYml(gitHubClient, orgName, repoName, branch) {
-  return new Promise((resolve, reject) => {
-    gitHubClient
-      .repo(`${orgName}/${repoName}`)
-      .contents('.conjure/config.yml', branch, (err, file) => {
-        if (
-          (err && err.message === 'Not Found') ||
-          (!file || file.type !== 'file' || typeof file.content !== 'string')
-        ) {
-          return reject(new ContentError('No Conjure YML config present in repo'))
+    try {
+      result = await api.request({
+        path: `/repos/${orgName}/${repoName}/contents/.conjure/config.yml`,
+        qs: {
+          ref: branch
         }
-
-        if (err) {
-          return reject(err)
-        }
-
-        const yml = new Buffer(file.content, 'base64')
-        const Config = require('conjure-core/classes/Repo/Config')
-        const ymlContent = new Config(yml)
-
-        if (ymlContent.valid === false) {
-          return reject(new ContentError('Invalid Conjure YML config'))
-        }
-
-        resolve(ymlContent)
       })
+    } catch(err) {
+      if (err.message === 'Not Found') {
+        return reject(new ContentError('No Conjure YML config present in repo'))
+      }
+      return reject(err)
+    }
+
+    if (!result || result.type !== 'file' || typeof result.content !== 'string') {
+      return reject(new ContentError('No Conjure YML config present in repo'))
+    }
+
+    const yml = new Buffer(result.content, 'base64')
+    const Config = require('conjure-core/classes/Repo/Config')
+    const ymlContent = new Config(yml)
+
+    if (ymlContent.valid === false) {
+      return reject(new ContentError('Invalid Conjure YML config'))
+    }
+
+    resolve(ymlContent)
   })
 }

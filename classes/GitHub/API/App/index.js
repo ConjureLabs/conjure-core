@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const { readFileSync } = require('fs')
 const { resolve } = require('path')
+const { NotFoundError } = require('@conjurelabs/err')
 
 const API = require('../')
 const config = require('../../../../modules/config')
@@ -16,6 +17,19 @@ const pathsRequiringAppAuth = /^\/?installation/
 
 // see https://developer.github.com/v3/apps/permissions/
 class AppTokenAPI extends API {
+  static async fromOrg(orgName) {
+    const { DatabaseTable } = require('@conjurelabs/db')
+    const installations = await DatabaseTable.select('githubAppInstallation', {
+      username: orgName,
+      inactive: null
+    })
+    if (!installations.length) {
+      throw new NotFoundError(`GitHub app installation for org ${orgName} not found`)
+    }
+    const install = installations[0]
+    return new AppTokenAPI(install.installationId)
+  }
+
   constructor(installationId) {
     const nowSeconds = Math.floor(Date.now() / 1000)
     // see https://developer.github.com/apps/building-github-apps/authentication-options-for-github-apps/#authenticating-as-a-github-app
