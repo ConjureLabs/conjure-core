@@ -1,5 +1,4 @@
 const { UnexpectedError } = require('@conjurelabs/err')
-const AppAPI = require('../../../../GitHub/API/App')
 
 const TYPE_BRANCH = Symbol('is related to a branch')
 const TYPE_COMMIT = Symbol('is related to a commit')
@@ -164,7 +163,61 @@ class WebhookPayload {
     or may be another user on the repo (if the author is not on Conjure)
    */
   async getGitHubAccount() {
-    await this.getGitHubClient
+    if (this[cached].gitHubAccount) {
+      return this[cached].gitHubAccount
+    }
+
+    const { DatabaseTable } = require('@conjurelabs/db')
+
+    // pulling repo records first
+    const accountRepoRows = await DatabaseTable.select('accountRepo', {
+      service: 'github',
+      serviceRepoId: this.repoId,
+      accessRights: 'rw' // need rw to write comment
+    })
+
+    // if nothing, callback with nothing
+    if (!Array.isArray(accountRepoRows) || !accountRepoRows.length) {
+      return null
+    }
+
+    // checking rate limit, in order to verify token still is valid
+    for (const accountRepo of accountRepoRows) {
+      let currentGitHubAccount
+
+      try {
+        const gitHubAccountRows = await DatabaseTable.select('accountGithub', {
+          account: accountRepo.account,
+          accessTokenAssumedValid: true
+        })
+        if (!gitHubAccountRows.length) {
+          // should not happen
+          continue
+        }
+        currentGitHubAccount = gitHubAccountRows[0]
+
+        const UserAPI = require('../../../../GitHub/API/User')
+        const api = new UserAPI(currentGitHubAccount.accessToken)
+        // limit api will throw if token if invalid
+        // and limit api does count against usage
+        // using this, as a hack, to test if token is valid
+        await api.request({
+          path: '/rate_limit'
+        })
+
+        this[cached].gitHubAccount = currentGitHubAccount
+        break
+      } catch(err) {
+        if (currentGitHubAccount) {
+          currentGitHubAccount
+            .set({
+              accessTokenAssumedValid: false
+            })
+            .save()
+        }
+      }
+    }
+
     return this[cached].gitHubAccount
   }
 
@@ -173,6 +226,7 @@ class WebhookPayload {
       return this[cached].gitHubClient
     }
 
+    const AppAPI = require('../../../../GitHub/API/App')
     this[cached].githubClient = await AppAPI.fromOrg(orgName)
     return this[cached].githubClient
   }
