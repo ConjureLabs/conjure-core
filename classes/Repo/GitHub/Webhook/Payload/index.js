@@ -1,4 +1,5 @@
-const { UnexpectedError, ContentError } = require('@conjurelabs/err')
+const { UnexpectedError } = require('@conjurelabs/err')
+const AppAPI = require('../../../../GitHub/API/App')
 
 const TYPE_BRANCH = Symbol('is related to a branch')
 const TYPE_COMMIT = Symbol('is related to a commit')
@@ -172,59 +173,8 @@ class WebhookPayload {
       return this[cached].gitHubClient
     }
 
-    const { DatabaseTable } = require('@conjurelabs/db')
-
-    // pulling repo records first, since payload sender may not have logged into Conjure yet
-    const accountRepoRows = await DatabaseTable.select('account_repo', {
-      service: 'github',
-      service_repo_id: this.repoId,
-      access_rights: 'rw' // need rw to write comment
-    })
-
-    // if nothing, callback with nothing
-    if (!Array.isArray(accountRepoRows) || !accountRepoRows.length) {
-      return null
-    }
-
-    // checking rate limit, in order to verify token still is valid
-    let gitHubClient
-    let gitHubAccount
-    for (let accountRepo of accountRepoRows) {
-      let currentGitHubAccount
-
-      try {
-        const gitHubAccountRows = await DatabaseTable.select('account_github', {
-          account: accountRepo.account,
-          access_token_assumed_valid: true
-        })
-        if (!gitHubAccountRows.length) {
-          // should not happen
-          continue
-        }
-        currentGitHubAccount = gitHubAccountRows[0]
-        gitHubClient = await getValidGitHubClient(currentGitHubAccount)
-        gitHubAccount = currentGitHubAccount
-        break
-      } catch(err) {
-        if (currentGitHubAccount) {
-          currentGitHubAccount
-            .set({
-              access_token_assumed_valid: false
-            })
-            .save()
-        }
-      }
-    }
-
-    // if no valid client found, then exit
-    if (!gitHubAccount) {
-      return null
-    }
-
-    this[cached].gitHubAccount = gitHubAccount
-    this[cached].gitHubClient = gitHubClient
-
-    return gitHubClient
+    this[cached].githubClient = await AppAPI.fromOrg(orgName)
+    return this[cached].githubClient
   }
 
   // will likely fail if not a pull request payload
@@ -284,25 +234,6 @@ function isAllZeros(str) {
   }
 
   return false
-}
-
-function getValidGitHubClient(githubAccount) {
-  return new Promise((resolve, reject) => {
-    const github = require('octonode')
-    const githubClient = github.client(githubAccount.accessToken)
-
-    // just for debub purposes
-    // todo: move or remove this
-    githubClient.limit((err/* , left, max, reset */) => {
-      if (err) {
-        return reject(err)
-      }
-
-      // todo: check `left out of max`?
-      // todo: reset?
-      resolve(githubClient)
-    })
-  })
 }
 
 module.exports = WebhookPayload
