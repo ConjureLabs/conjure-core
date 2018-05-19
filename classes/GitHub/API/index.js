@@ -37,7 +37,7 @@ class API {
             { message: 'Not Found',
               documentation_url: 'https://developer.github.com/v3' }
            */
-          let message = body.message || `Github returned code ${res.statusCode}`
+          let message = body.message || `Github returned code ${res.statusCode} (/${pathPrepared})`
           message = message === 'Not Found' ? `Not Found (/${pathPrepared})` : message
           return reject(new ConjureError(message))
         }
