@@ -31,10 +31,6 @@ class AppTokenAPI extends API {
   }
 
   constructor(installationId) {
-    if (!installationId) {
-      throw new ContentError('GitHub App API must be contructed with installation id')
-    }
-
     const nowSeconds = Math.floor(Date.now() / 1000)
     // see https://developer.github.com/apps/building-github-apps/authentication-options-for-github-apps/#authenticating-as-a-github-app
     const token = jwt.sign({
@@ -63,6 +59,10 @@ class AppTokenAPI extends API {
   }
 
   async handleTwoStepRequest(opts) {
+    if (!this.installationId) {
+      throw new ContentError('GitHub App API must be contructed with installation id, if making installation-specific requests')
+    }
+
     const accessBoby = await super.request({
       path: `installations/${this.installationId}/access_tokens`,
       method: 'POST'
