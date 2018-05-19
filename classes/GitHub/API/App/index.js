@@ -60,7 +60,7 @@ class AppTokenAPI extends API {
 
   async handleTwoStepRequest(opts) {
     if (!this.installationId) {
-      throw new ContentError('GitHub App API must be contructed with installation id, if making installation-specific requests')
+      throw new ContentError(`GitHub App API must be contructed with installation id, if making installation-specific requests (${opts.path})`)
     }
 
     const accessBoby = await super.request({
