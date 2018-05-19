@@ -32,7 +32,7 @@ class API {
         }
 
         // ensuring it's a 2xx code
-        const isTwoHundreds = Math.floor(+res.statusCode / 100) === 2
+        const isTwoHundreds = Math.floor(res.statusCode / 100) === 2
         if (!isTwoHundreds) {
           /*
             e.g.
