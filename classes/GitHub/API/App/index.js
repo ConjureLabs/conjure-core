@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const { readFileSync } = require('fs')
 const { resolve } = require('path')
-const { NotFoundError } = require('@conjurelabs/err')
+const { ContentError, NotFoundError } = require('@conjurelabs/err')
 
 const API = require('../')
 const config = require('../../../../modules/config')
@@ -31,6 +31,10 @@ class AppTokenAPI extends API {
   }
 
   constructor(installationId) {
+    if (!installationId) {
+      throw new ContentError('GitHub App API must be contructed with installation id')
+    }
+
     const nowSeconds = Math.floor(Date.now() / 1000)
     // see https://developer.github.com/apps/building-github-apps/authentication-options-for-github-apps/#authenticating-as-a-github-app
     const token = jwt.sign({
