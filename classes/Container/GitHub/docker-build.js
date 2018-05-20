@@ -30,7 +30,6 @@ module.exports = function dockerBuild() {
       preSetupSteps = new Buffer(preSetupSteps).toString('base64')
     }
 
-    const gitHubAccount = await this.payload.getGitHubAccount()
     const watchedRepo = await this.payload.getWatchedRepoRecord()
 
     const {
@@ -39,7 +38,14 @@ module.exports = function dockerBuild() {
       branch
     } = this.payload
 
-    const containerUid = await buildProject(gitHubAccount.accessToken, watchedRepo, orgName, repoName, branch, dockerfileTemplateName, preSetupSteps, repoConfig.machine.setup, repoConfig.machine.start)
+    // need to get installation access token - see https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
+    // will first get installation id for the repo, and then get the access token
+    const appInstallationRecord = await this.payload.getGitHubInstallationRecord()
+    const AppAPI = require('../../GitHub/API/App')
+    const api = new AppAPI(appInstallationRecord.installationId)
+    const accessToken = await api.getAccessToken()
+
+    const containerUid = await buildProject(accessToken, watchedRepo, orgName, repoName, branch, dockerfileTemplateName, preSetupSteps, repoConfig.machine.setup, repoConfig.machine.start)
 
     resolve(containerUid)
   })
@@ -116,7 +122,7 @@ function buildProject(gitHubToken, watchedRepo, orgName, repoName, branch, templ
       'bash',
       './build/project.sh',
       templateName,
-      `https://${gitHubToken}:x-oauth-basic@github.com/${orgName}/${repoName}.git`,
+      `https://x-access-token:${gitHubToken}@github.com/${orgName}/${repoName}.git`,
       branch,
       containerUid,
       `conjure/${config.aws.ecs.fargate.prefix}${watchedRepo.id}`,

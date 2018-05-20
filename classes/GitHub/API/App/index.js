@@ -27,7 +27,8 @@ class AppTokenAPI extends API {
       throw new NotFoundError(`GitHub app installation for org ${orgName} not found`)
     }
     const install = installations[0]
-    return new AppTokenAPI(install.installationId)
+    const instance = new AppTokenAPI(install.installationId)
+    return instance
   }
 
   constructor(installationId, forceTwoStep = false) {
@@ -60,8 +61,17 @@ class AppTokenAPI extends API {
   }
 
   async handleTwoStepRequest(opts) {
+    const accessToken = await this.getAccessToken()
+
+    const UserAPI = require('../User')
+    const api = new UserAPI(accessToken)
+
+    return api.request(opts)
+  }
+
+  async getAccessToken() {
     if (!this.installationId) {
-      throw new ContentError(`GitHub App API must be contructed with installation id, if making installation-specific requests (${opts.path})`)
+      throw new ContentError(`GitHub App API must be contructed with installation id, if requesting access token`)
     }
 
     const accessBoby = await super.request({
@@ -69,10 +79,7 @@ class AppTokenAPI extends API {
       method: 'POST'
     })
 
-    const UserAPI = require('../User')
-    const api = new UserAPI(accessBoby.token)
-
-    return api.request(opts)
+    return accessBody.token
   }
 }
 

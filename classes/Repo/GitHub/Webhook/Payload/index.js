@@ -1,4 +1,4 @@
-const { UnexpectedError } = require('@conjurelabs/err')
+const { UnexpectedError, NotFoundError } = require('@conjurelabs/err')
 
 const TYPE_BRANCH = Symbol('is related to a branch')
 const TYPE_COMMIT = Symbol('is related to a commit')
@@ -262,8 +262,8 @@ class WebhookPayload {
     }
 
     const { DatabaseTable } = require('@conjurelabs/db')
-    const rows = await DatabaseTable.select('watched_repo', {
-      service_repo_id: this.repoId
+    const rows = await DatabaseTable.select('watchedRepo', {
+      serviceRepoId: this.repoId
     })
 
     if (!rows.length) {
@@ -272,6 +272,19 @@ class WebhookPayload {
     }
 
     this[cached].watchedRepo = rows[0]
+    return rows[0]
+  }
+
+  // gets app installation record (for github app)
+  async getGitHubInstallationRecord() {
+    const orgName = this.orgName
+    const { DatabaseTable } = require('@conjurelabs/db')
+    const rows = await DatabaseTable.select('githubAppInstallation', {
+      username: orgName
+    })
+    if (rows.length === 0) {
+      throw new NotFoundError('Not GitHub App installation record found for payload')
+    }
     return rows[0]
   }
 }
