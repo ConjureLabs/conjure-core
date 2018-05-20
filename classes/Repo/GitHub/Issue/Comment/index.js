@@ -136,6 +136,7 @@ class GitHubIssueComment {
     if (!gitHubClient) {
       throw new NotFoundError('No github client found')
     }
+    gitHubClient.forceTwoStep = true
 
     // now deleting the actual comment on github
     const {
@@ -146,7 +147,7 @@ class GitHubIssueComment {
 
     // see https://developer.github.com/v3/issues/comments/#delete-a-comment
     await gitHubClient.request({
-      path: `/repos/${orgName}/${repoName}/issues/${number}/comments/${this.commentRow.commentId}`,
+      path: `/repos/${orgName}/${repoName}/issues/comments/${this.commentRow.commentId}`,
       method: 'DELETE'
     })
 
