@@ -97,7 +97,7 @@ class GitHubIssueComment {
     
     // see https://developer.github.com/v3/issues/comments/#edit-a-comment
     await gitHubClient.request({
-      path: `/repos/${orgName}/${repoName}/issues/${number}/comments/${this.commentRow.commentId}`,
+      path: `/repos/${orgName}/${repoName}/issues/comments/${this.commentRow.commentId}`,
       method: 'PATCH',
       body: {
         // { "body": "Me too" }
