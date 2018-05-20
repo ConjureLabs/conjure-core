@@ -21,7 +21,7 @@ class AppTokenAPI extends API {
     const { DatabaseTable } = require('@conjurelabs/db')
     const installations = await DatabaseTable.select('githubAppInstallation', {
       username: orgName,
-      inactive: null
+      inactive: false
     })
     if (!installations.length) {
       throw new NotFoundError(`GitHub app installation for org ${orgName} not found`)
