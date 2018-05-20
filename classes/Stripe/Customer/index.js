@@ -1,5 +1,5 @@
 const Stripe = require('../')
-const { UnexpectedError, ContentError } = require('@conjurelabs/err')
+const { UnexpectedError, NotFoundError } = require('@conjurelabs/err')
 
 const createCustomer = Symbol('create customer')
 const updateCustomer = Symbol('update existing customer')
@@ -86,7 +86,7 @@ class Customer extends Stripe {
 
     // if no account stripe_id, then error, since we expect it
     if (typeof account.stripe_id !== 'string' || !account.stripe_id) {
-      throw new ContentError('Account is not associated to any Stripe records')
+      throw new NotFoundError('Account is not associated to any Stripe records')
     }
 
     return await this.retrieve(req.user.id, account.stripe_id)
