@@ -40,7 +40,7 @@ class API {
               documentation_url: 'https://developer.github.com/v3' }
            */
           const message = body.message || `Github returned code ${res.statusCode}`
-          return reject(new ConjureError(`${message} (/${pathPrepared})`))
+          return reject(new ConjureError(`${message} (${method.toUpperCase()} /${pathPrepared})`))
         }
 
         // see https://developer.github.com/v3/#pagination
