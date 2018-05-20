@@ -227,7 +227,7 @@ class WebhookPayload {
     }
 
     const AppAPI = require('../../../../GitHub/API/App')
-    this[cached].githubClient = await AppAPI.fromOrg(orgName)
+    this[cached].githubClient = await AppAPI.fromOrg(this.orgName)
     return this[cached].githubClient
   }
 
