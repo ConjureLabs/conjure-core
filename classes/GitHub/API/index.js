@@ -62,6 +62,9 @@ class API {
             pagination[ match[2] ] = match[1]
           }
         }
+
+        body = body || {}
+
         Object.defineProperty(body, 'pagination', {
           value: pagination,
           enumerable: false,
