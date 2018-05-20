@@ -4,7 +4,8 @@ const AppAPI = require('../../GitHub/API/App')
 module.exports = function getConfig() {
   return new Promise(async (resolve, reject) => {
     const { repoName, orgName, branch } = this.payload
-    const api = AppAPI.fromOrg(orgName)
+    const api = await AppAPI.fromOrg(orgName)
+    api.forceTwoStep = true
 
     // see https://developer.github.com/v3/repos/contents/
     let result
