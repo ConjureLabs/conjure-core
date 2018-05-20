@@ -30,7 +30,7 @@ class AppTokenAPI extends API {
     return new AppTokenAPI(install.installationId)
   }
 
-  constructor(installationId) {
+  constructor(installationId, forceTwoStep = false) {
     const nowSeconds = Math.floor(Date.now() / 1000)
     // see https://developer.github.com/apps/building-github-apps/authentication-options-for-github-apps/#authenticating-as-a-github-app
     const token = jwt.sign({
@@ -48,10 +48,11 @@ class AppTokenAPI extends API {
     })
 
     this.installationId = installationId
+    this.forceTwoStep = forceTwoStep
   }
 
   async request(opts) {
-    if (pathsRequiringAppAuth.test(opts.path)) {
+    if (this.forceTwoStep || pathsRequiringAppAuth.test(opts.path)) {
       return await this.handleTwoStepRequest(opts)
     }
 
