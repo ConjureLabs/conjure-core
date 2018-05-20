@@ -39,9 +39,8 @@ class API {
             { message: 'Not Found',
               documentation_url: 'https://developer.github.com/v3' }
            */
-          let message = body.message || `Github returned code ${res.statusCode} (/${pathPrepared})`
-          message = message === 'Not Found' || message === 'Bad credentials' ? `${message} (/${pathPrepared})` : message
-          return reject(new ConjureError(message))
+          const message = body.message || `Github returned code ${res.statusCode}`
+          return reject(new ConjureError(`${message} (/${pathPrepared})`))
         }
 
         // see https://developer.github.com/v3/#pagination
