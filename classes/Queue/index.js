@@ -53,7 +53,7 @@ class Queue {
           doneArgs = args
         })
       } catch(err) {
-        return done
+        return done(err)
       }
 
       if (isSuccess) {
