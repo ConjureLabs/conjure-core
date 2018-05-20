@@ -18,19 +18,19 @@ class GitHubContainer extends Container {
     await issueComment.upsert(`:octocat: [You can view this branch on Conjure](${containerUrl})`)
   }
 
-  async destroy() {
-    await super.destroy()
-
-    const issueComment = new IssueComment(this.payload)
-    await issueComment.delete()
-  }
-
   async stop() {
     await super.stop()
 
     const issueComment = new IssueComment(this.payload)
     const containerRequestUrl = `${config.app.web.url}/start/${orgName}/${repoName}/${number}`
     await issueComment.upsert(`:ghost: [You can spin up this branch on Conjure](${containerRequestUrl})`)
+  }
+
+  async prune() {
+    const issueComment = new IssueComment(this.payload)
+    await issueComment.delete()
+
+    await super.prune()
   }
 }
 
