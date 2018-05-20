@@ -96,7 +96,7 @@ const config = {
   },
 
   postmark: {
-    enabled: process.env.CONJURE_POSTMARK_ENABLED,
+    enabled: parseInt(process.env.CONJURE_POSTMARK_ENABLED, 10) === 1,
     key: process.env.CONJURE_POSTMARK_KEY
   },
 
