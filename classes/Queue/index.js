@@ -1,4 +1,5 @@
 const BeeQueue = require('bee-queue')
+const { UnexpectedError } = require('@conjurelabs/err')
 const config = require('../../modules/config')
 const log = require('../../modules/log')('Queue')
 
@@ -44,7 +45,22 @@ class Queue {
 
   subscribe(handler, parallelCount = 1) {
     this.queue.process(parallelCount, (job, done) => {
-      handler(job.data, done)
+      let isDone = false
+      let doneArgs
+      try {
+        handler(job.data, function(...args) {
+          isDone = true
+          doneArgs = args
+        })
+      } catch(err) {
+        return done
+      }
+
+      if (isSuccess) {
+        done(...doneArgs)
+      } else {
+        done(new UnexpectedError('Queue job did not call done()'))
+      }
     })
   }
 }
