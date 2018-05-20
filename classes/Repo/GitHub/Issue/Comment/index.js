@@ -23,6 +23,7 @@ class GitHubIssueComment {
     if (!gitHubClient) {
       throw new NotFoundError('No github account record found')
     }
+    gitHubClient.forceTwoStep = true // these are integration endpoints
 
     if (this.commentRow && this.commentRow.isActive === true) {
       return await this[updateComment](gitHubClient, body)
@@ -46,7 +47,7 @@ class GitHubIssueComment {
     const s3Data = uploadToS3(payload)
 
     // see https://developer.github.com/v3/issues/comments/#create-a-comment
-    await gitHubClient.request({
+    const issueCommentResponse = await gitHubClient.request({
       path: `/repos/${orgName}/${repoName}/issues/${number}/comments`,
       method: 'POST',
       body: {
@@ -64,7 +65,7 @@ class GitHubIssueComment {
       watchedRepo: watchedRepo.id,
       issueId: number,
       commentId: issueCommentResponse.id,
-      url: issueCommentResponse.htmlUrl,
+      url: issueCommentResponse.html_url,
       isActive: true,
       s3Key: (await s3Data).Key,
       added: new Date()
