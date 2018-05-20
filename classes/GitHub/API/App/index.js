@@ -74,7 +74,7 @@ class AppTokenAPI extends API {
       throw new ContentError(`GitHub App API must be contructed with installation id, if requesting access token`)
     }
 
-    const accessBoby = await super.request({
+    const accessBody = await super.request({
       path: `installations/${this.installationId}/access_tokens`,
       method: 'POST'
     })
