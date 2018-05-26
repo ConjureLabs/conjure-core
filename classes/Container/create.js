@@ -12,6 +12,8 @@ const log = require('../../modules/log')('container create')
 async function containerCreate() {
   log.info('starting create')
 
+  notifySlack(this.payload)
+
   const { branch } = this.payload
   
   // get watched repo record
@@ -96,6 +98,39 @@ async function containerCreate() {
   clearInterval(heartbeat)
 
   return containerUid
+}
+
+function notifySlack(payload) {
+  if (process.env.NODE_ENV !== 'production') {
+    return
+  }
+
+  const request = require('request')
+  const { repoName, orgName, branch } = payload
+  request({
+    url: 'https://hooks.slack.com/services/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',
+    method: 'POST',
+    json: true,
+    body: {
+      channel: '#conjure-container-run',
+      username: 'Conjure Worker',
+      text: 'Container being created',
+      icon_emoji: ':conjure:',
+      attachments: [{
+        fields: [{
+          title: `${orgName}/${repoName}`,
+          value: branch,
+          short: false
+        }]
+      }]
+    }
+  }, (err, res, body) => {
+    if (err) {
+      log.error(err)
+    } else if (res.statusCode !== 200) {
+      log.error(new ConjureError(body))
+    }
+  })
 }
 
 /*
