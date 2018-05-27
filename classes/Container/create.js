@@ -12,7 +12,9 @@ const log = require('../../modules/log')('container create')
 async function containerCreate() {
   log.info('starting create')
 
-  notifySlack(this.payload)
+  try {
+    notifySlack(this.payload)
+  } catch(err) {}
 
   const { branch } = this.payload
   
