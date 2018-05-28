@@ -7,6 +7,8 @@ ARG CACHEBUST=<CACHEBUST>
 RUN git init
 RUN git pull <REPO> <BRANCH>
 
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
+
 # adding in entrypoint file, needed to boot the process
 ADD entrypoint.sh /var/conjure/support/entrypoint.sh
 
