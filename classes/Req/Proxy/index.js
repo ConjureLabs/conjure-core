@@ -23,8 +23,8 @@ class ReqProxy {
       url: fullUrl,
       method: 'HEAD'
     }, err => {
-      if (err && err.message && err.message.includes('ECONNREFUSED')) {
-        return next()
+      if (err) {
+        return next(err)
       }
 
       request(fullUrl).pipe(res)
