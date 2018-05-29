@@ -4,7 +4,7 @@ const log = require('../log')('child process execution')
 
 module.exports = (command, options = {}) => {
   return new Promise((resolve, reject) => {
-    const exec = require('child_process').exec
+    const exec = require('exec-sh')
 
     log.dev.info(command)
 
