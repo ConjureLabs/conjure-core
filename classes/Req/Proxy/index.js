@@ -1,3 +1,5 @@
+const log = require('../../../modules/log')('req proxy')
+
 class ReqProxy {
   constructor(options) {
     options = options || {}
@@ -24,6 +26,7 @@ class ReqProxy {
       method: 'HEAD'
     }, err => {
       if (err) {
+        log.error(err)
         return next(err)
       }
 
