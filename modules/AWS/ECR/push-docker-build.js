@@ -13,7 +13,7 @@ module.exports = function pushDockerBuild(watchedRepoRecord /*, workingDir */) {
 }
 
 function dockerLogin(workingDir) {
-  const command = `eval $(XYZ=$(aws ecr get-login --region us-east-1) && printf '%s\\n' "$\{XYZ// -e none/}")`
+  const command = `eval $(XYZ=$(aws ecr get-login --no-include-email --region us-east-1 | sed 's|https://||') && printf '%s\\n' "$\{XYZ// -e none/}")`
   return exec(command, workingDir, (err, resolve, reject) => {
     if (!err.message || !err.message.includes('WARNING! Using --password via the CLI is insecure.')) {
       return reject(err)
