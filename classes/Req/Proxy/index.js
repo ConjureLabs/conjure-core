@@ -14,9 +14,21 @@ class ReqProxy {
     this.forward = this.forward.bind(this)
   }
 
-  forward(req, res) {
+  forward(req, res, next) {
+    const fullUrl = `${this.protocol}://${this.domain}${this.port ? `:${this.port}` : ''}${this.path}`
     const request = require('request')
-    request(`${this.protocol}://${this.domain}${this.port ? `:${this.port}` : ''}${this.path}`).pipe(res)
+
+    // first pinging to make sure it won't crash
+    request({
+      url: fullUrl,
+      method: 'HEAD'
+    }, err => {
+      if (err && err.message && err.message.includes('ECONNREFUSED')) {
+        return next()
+      }
+
+      request(fullUrl).pipe(res)
+    })
   }
 }
 
