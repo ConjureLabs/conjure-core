@@ -14,7 +14,7 @@ class GitHubContainer extends Container {
 
     // create vm
     const containerUid = await super.create()
-    const containerUrl = `${config.app.web.protocol}://${containerUid}.view.${config.app.web.host}`
+    const containerUrl = `${config.app.web.protocol}://${containerUid}-view.${config.app.web.host}`
     await issueComment.upsert(`:octocat: [You can view this branch on Conjure](${containerUrl})`)
   }
 
