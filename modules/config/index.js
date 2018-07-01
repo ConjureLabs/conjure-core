@@ -111,7 +111,7 @@ const config = {
       app: {
         id: process.env.CONJURE_GITHUB_APP_ID,
         name: process.env.CONJURE_GITHUB_APP_NAME,
-        pemName: process.env.CONJURE_GITHUB_APP_PEM_NAME
+        pemPath: process.env.CONJURE_GITHUB_APP_PEM_PATH
       },
 
       oauth: {

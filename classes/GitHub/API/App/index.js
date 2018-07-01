@@ -7,7 +7,7 @@ const API = require('../')
 const config = require('../../../../modules/config')
 
 // reading sync once
-const pem = readFileSync(resolve(__dirname, config.services.github.app.pemName)) // eslint no-sync: 0
+const pem = readFileSync(config.services.github.app.pemPath) // eslint no-sync: 0
 
 // see https://developer.github.com/apps/building-github-apps/authentication-options-for-github-apps/#authenticating-as-an-installation
 // see https://developer.github.com/v3/apps/installations/
