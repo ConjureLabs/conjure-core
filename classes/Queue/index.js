@@ -56,7 +56,7 @@ class Queue {
         return done(err)
       }
 
-      if (isSuccess) {
+      if (isDone) {
         done(...doneArgs)
       } else {
         done(new UnexpectedError('Queue job did not call done()'))

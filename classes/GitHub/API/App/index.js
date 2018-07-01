@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken')
 const { readFileSync } = require('fs')
-const { resolve } = require('path')
 const { ContentError, NotFoundError } = require('@conjurelabs/err')
 
 const API = require('../')

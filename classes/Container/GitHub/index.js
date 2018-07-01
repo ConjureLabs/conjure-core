@@ -22,6 +22,7 @@ class GitHubContainer extends Container {
     await super.stop()
 
     const issueComment = new IssueComment(this.payload)
+    const { orgName, repoName, number } = this.payload
     const containerRequestUrl = `${config.app.web.url}/start/${orgName}/${repoName}/${number}`
     await issueComment.upsert(`:ghost: [You can spin up this branch on Conjure](${containerRequestUrl})`)
   }

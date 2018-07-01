@@ -1,4 +1,4 @@
-const { ContentError, UnexpectedError } = require('@conjurelabs/err')
+const { ConjureError, ContentError, UnexpectedError } = require('@conjurelabs/err')
 const path = require('path')
 const log = require('../../modules/log')('container create')
 

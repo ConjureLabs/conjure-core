@@ -1,3 +1,4 @@
+const { UnexpectedError } = require('@conjurelabs/err')
 const log = require('../../modules/log')('container stop')
 
 /*
@@ -39,8 +40,6 @@ async function containerStop() {
   }, {
     id: containerRecord.id
   })
-
-  const { branch } = this.payload
   
   // get watched repo record
   const watchedRepo = await this.payload.getWatchedRepoRecord()

@@ -47,7 +47,7 @@ class API {
         const pagination = {}
         if (res.headers.Link) {
           const expr = /^\s*<https:\/\/api\.github\.com\/([^>]+)>;\s+rel="([^"]+)"\s*$/
-          for (i = 0; i < 20; i++) { // 20 just to be safe
+          for (let i = 0; i < 20; i++) { // 20 just to be safe
             const match = expr.exec(res.headers.Link)
 
             if (!match) {

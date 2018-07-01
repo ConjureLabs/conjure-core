@@ -88,8 +88,7 @@ class GitHubIssueComment {
 
     const {
       orgName,
-      repoName,
-      number
+      repoName
     } = payload
 
     // saving payload to s3, for later access
@@ -141,8 +140,7 @@ class GitHubIssueComment {
     // now deleting the actual comment on github
     const {
       orgName,
-      repoName,
-      number
+      repoName
     } = this.issue.payload
 
     // see https://developer.github.com/v3/issues/comments/#delete-a-comment
