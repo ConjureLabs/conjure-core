@@ -3,16 +3,8 @@ const { test } = require('ava')
 const exec = require('../../../modules/childProcess/exec')
 
 test('should echo', async t => {
-  const echo = await exec('echo "This is Via a Test"')
+  const echo = await exec('echo "This is Via a Test" && exit 0')
   t.is(echo, 'This is Via a Test')
-})
-
-test('should honor cwd', async t => {
-  const path = require('path')
-  const content = await exec('cat ./contents.txt', {
-    cwd: path.resolve(__dirname, 'path', 'test')
-  })
-  t.is(content, 'Dark Forest')
 })
 
 test('should return stderr if needed', async t => {

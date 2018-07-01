@@ -2,7 +2,7 @@ const { ConjureError } = require('@conjurelabs/err')
 
 const log = require('../log')('child process execution')
 
-module.exports = (command, options = {}) => {
+module.exports = (command, options = { stdio: null }) => {
   return new Promise((resolve, reject) => {
     const exec = require('exec-sh')
 
