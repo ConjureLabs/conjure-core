@@ -131,6 +131,7 @@ const config = {
   },
 
   stripe: {
+    enabled: process.env.CONJURE_STRIPE_ENABLED === 'false' ? false : true,
     secret: process.env.CONJURE_STRIPE_API_SECRET
   }
 }
